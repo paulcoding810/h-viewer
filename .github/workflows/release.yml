@@ -1,0 +1,62 @@
+name: Build & Release
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_VERSION: '21'
+      ANDROID_API_LEVEL: 34
+      ANDROID_BUILD_TOOLS_VERSION: 34.0.0
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build app
+        run: ./gradlew assembleRelease
+
+      - name: Sign APK
+        id: sign_app
+        uses: ilharp/sign-android-release@nightly
+        with:
+          releaseDir: app/build/outputs/apk/release
+          signingKey: ${{ secrets.SIGNING_KEY }}
+          keyAlias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          buildToolsVersion: ${{ env.ANDROID_BUILD_TOOLS_VERSION }}
+
+      - name: Rename signed APK
+        run: |
+          mv "${{ steps.sign_app.outputs.signedFile }}" "app-release.apk"
+
+      - name: Create changelog
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ${{ steps.changelog.outputs.changes }}
+          files: "app-release.apk"
+          fail_on_unmatched_files: true
+          make_latest: true
