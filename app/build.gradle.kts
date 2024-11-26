@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId = "com.paulcoding.hviewer"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -66,6 +66,11 @@ dependencies {
     implementation(libs.coil.video)
     implementation(libs.ksoup.lite)
     implementation(libs.accompanist.permissions)
+    implementation(libs.rhino)
+    implementation(libs.androidx.javascriptengine)
+    implementation(libs.androidx.concurrent.futures.ktx)
+    implementation(libs.jsoup)
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

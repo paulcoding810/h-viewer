@@ -1,6 +1,0 @@
-package com.paulcoding.hviewer
-
-import androidx.lifecycle.ViewModel
-
-class MainViewModel : ViewModel() {
-}

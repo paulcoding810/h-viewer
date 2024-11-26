@@ -2,6 +2,10 @@
 accompanistPermissions = "0.36.0"
 agp = "8.7.2"
 coilNetworkOkhttp = "3.0.0"
+concurrentFuturesKtx = "1.2.0"
+gson = "2.11.0"
+javascriptengine = "1.0.0-beta01"
+jsoup = "1.18.1"
 kotlin = "2.0.0"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -15,15 +19,20 @@ activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 mmkv = "2.0.0"
 navigationCompose = "2.8.4"
+rhino = "1.7.15"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+androidx-concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrentFuturesKtx" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-javascriptengine = { module = "androidx.javascriptengine:javascriptengine", version.ref = "javascriptengine" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilNetworkOkhttp" }
 coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coilNetworkOkhttp" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coilNetworkOkhttp" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -41,6 +50,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 ksoup-lite = { module = "com.fleeksoft.ksoup:ksoup-lite", version.ref = "ksoupLite" }
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
+rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
