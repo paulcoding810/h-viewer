@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document
 import org.mozilla.javascript.BaseFunction
 import org.mozilla.javascript.Context
 import org.mozilla.javascript.Scriptable
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 val fetchFunction = object : BaseFunction() {
     override fun call(
@@ -48,5 +50,20 @@ val importFunction = object : BaseFunction() {
 
         val script = appContext.readFile(filePath)
         cx?.evaluateString(scope, script, filePath, 1, null)
+    }
+}
+
+@OptIn(ExperimentalEncodingApi::class)
+val atobFunction = object : BaseFunction() {
+    override fun call(
+        cx: Context?,
+        scope: Scriptable?,
+        thisObj: Scriptable?,
+        args: Array<out Any>
+    ): Any {
+        val encoded = args.getOrNull(0) as? String
+            ?: throw IllegalArgumentException("Encoded string is required")
+        val decoded = Base64.Default.decode(encoded)
+        return decoded.decodeToString()
     }
 }

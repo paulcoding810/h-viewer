@@ -48,6 +48,7 @@ class JS(envFilePath: String) {
 
         ScriptableObject.putProperty(scope, "import", importFunction)
         ScriptableObject.putProperty(scope, "fetch", fetchFunction)
+        ScriptableObject.putProperty(scope, "atob", atobFunction)
         ScriptableObject.putProperty(scope, "console", NativeObject().apply {
             put("log", this, logFunction)
         })
