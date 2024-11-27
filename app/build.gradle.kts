@@ -71,6 +71,10 @@ dependencies {
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.jsoup)
     implementation(libs.gson)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.mmkv)
+    implementation(libs.commons.compress)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
