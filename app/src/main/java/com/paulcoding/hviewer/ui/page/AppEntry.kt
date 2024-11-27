@@ -71,14 +71,14 @@ fun AppEntry() {
                 topic = topic,
                 navToImages = { postUrl: String ->
                     navController.navigate(
-                        "${Route.POST}/${site}/${
+                        "${Route.POST}/${site}/${topic}/${
                             URLEncoder.encode(postUrl, StandardCharsets.UTF_8.toString())
                         }"
                     )
                 },
                 goBack = { navController.popBackStack() })
         }
-        animatedComposable("${Route.POST}/{site}/{postUrl}") { backStackEntry ->
+        animatedComposable("${Route.POST}/{site}/{topic}/{postUrl}") { backStackEntry ->
             val postUrl = backStackEntry.arguments?.getString("postUrl") ?: ""
             val site = backStackEntry.arguments?.getString("site") ?: ""
             val decodedUrl = URLDecoder.decode(postUrl, StandardCharsets.UTF_8.toString())
