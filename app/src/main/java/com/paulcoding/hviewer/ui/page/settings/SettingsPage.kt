@@ -49,10 +49,11 @@ import com.paulcoding.hviewer.ui.icon.EditIcon
 @Composable
 fun SettingsPage(goBack: () -> Boolean) {
     val githubState by Github.stateFlow.collectAsState()
+    val prevSiteConfigs = remember { githubState.siteConfigs }
     var modalVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(githubState.siteConfigs) {
-        if (githubState.siteConfigs != null) {
+        if (prevSiteConfigs == null && githubState.siteConfigs != null) {
             goBack()
         }
     }
@@ -80,7 +81,7 @@ fun SettingsPage(goBack: () -> Boolean) {
                     }
                 }
                 Text(
-                    githubState.remoteUrl.ifEmpty { "Empty" },
+                    githubState.remoteUrl.ifEmpty { "https://github.com/{OWNER}/{REPO}/" },
                     textDecoration = TextDecoration.Underline
                 )
             }
@@ -89,7 +90,9 @@ fun SettingsPage(goBack: () -> Boolean) {
         if (modalVisible)
             InputRemoteModal(setVisible = {
                 modalVisible = it
-            }) { Github.updateRemoteUrl(it) }
+            }) {
+                Github.updateRemoteUrl(it)
+            }
     }
 }
 
@@ -109,7 +112,6 @@ fun InputRemoteModal(setVisible: (Boolean) -> Unit, onSubmit: (url: String) -> U
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
-
     }
 
     Dialog(

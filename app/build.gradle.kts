@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.mmkv)
     implementation(libs.commons.compress)
+    implementation(libs.lottie.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

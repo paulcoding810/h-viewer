@@ -19,6 +19,7 @@ ksoupLite = "0.2.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
+lottieCompose = "6.6.0"
 mmkv = "2.0.0"
 navigationCompose = "2.8.4"
 retrofit = "2.11.0"
@@ -54,6 +55,7 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 ksoup-lite = { module = "com.fleeksoft.ksoup:ksoup-lite", version.ref = "ksoupLite" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
