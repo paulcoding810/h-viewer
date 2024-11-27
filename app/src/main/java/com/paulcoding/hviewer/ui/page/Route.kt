@@ -6,5 +6,5 @@ object Route {
     const val TOPICS = "topics"
     const val POSTS = "posts"
     const val POST = "post"
-    const val SETTINGS = "Settings"
+    const val SETTINGS = "settings"
 }

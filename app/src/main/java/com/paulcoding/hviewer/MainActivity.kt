@@ -53,12 +53,9 @@ fun Content() {
     }
 
     HViewerTheme {
-        if (repoUrl.isEmpty())
-            SettingsPage()
         if (githubState.isLoading)
             UpdateDialog()
-        else if (githubState.siteConfigs != null)
-            AppEntry()
+        AppEntry()
     }
 }
 

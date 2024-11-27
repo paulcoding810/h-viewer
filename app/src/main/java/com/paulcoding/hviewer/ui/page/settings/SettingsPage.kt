@@ -51,6 +51,12 @@ fun SettingsPage(goBack: () -> Boolean) {
     val githubState by Github.stateFlow.collectAsState()
     var modalVisible by remember { mutableStateOf(false) }
 
+    LaunchedEffect(githubState.siteConfigs) {
+        if (githubState.siteConfigs != null) {
+            goBack()
+        }
+    }
+
     Scaffold(topBar = {
         TopAppBar(title = { Text("Settings") }, navigationIcon = {
             HBackIcon { goBack() }
