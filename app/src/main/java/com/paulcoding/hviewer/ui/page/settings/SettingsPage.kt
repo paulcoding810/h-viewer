@@ -42,16 +42,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.paulcoding.hviewer.network.Github
-import com.paulcoding.hviewer.ui.icon.Edit
+import com.paulcoding.hviewer.ui.component.HBackIcon
+import com.paulcoding.hviewer.ui.icon.EditIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsPage() {
+fun SettingsPage(goBack: () -> Boolean) {
     val githubState by Github.stateFlow.collectAsState()
     var modalVisible by remember { mutableStateOf(false) }
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Settings") })
+        TopAppBar(title = { Text("Settings") }, navigationIcon = {
+            HBackIcon { goBack() }
+        })
     }) { paddings ->
         Box(modifier = Modifier.padding(paddings)) {
             Column(
@@ -67,7 +70,7 @@ fun SettingsPage() {
                 ) {
                     Text("Remote Url", modifier = Modifier.weight(1f))
                     IconButton(onClick = { modalVisible = true }) {
-                        Icon(Edit, "Edit")
+                        Icon(EditIcon, "Edit")
                     }
                 }
                 Text(
