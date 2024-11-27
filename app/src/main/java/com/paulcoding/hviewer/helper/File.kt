@@ -5,10 +5,14 @@ import com.google.gson.Gson
 import java.io.File
 import java.io.FileOutputStream
 
- const val SCRIPTS_DIR = "scripts"
+const val SCRIPTS_DIR = "scripts"
+const val CONFIG_FILE = "config.json"
 
-private val Context.scriptsDir
+val Context.scriptsDir
     get() = File(filesDir, SCRIPTS_DIR)
+
+val Context.configFile
+    get() = File(scriptsDir, CONFIG_FILE)
 
 fun Context.setupPaths() {
     scriptsDir.mkdir()
@@ -33,6 +37,13 @@ fun Context.readFile(fileName: String): String {
 inline fun <reified T> Context.readJsonFile(fileName: String): Result<T> {
     return runCatching {
         val content = readFile(fileName)
+        return@runCatching Gson().fromJson(content, T::class.java)
+    }
+}
+
+inline fun <reified T> Context.readConfigFile(): Result<T> {
+    return runCatching {
+        val content = readFile(CONFIG_FILE)
         return@runCatching Gson().fromJson(content, T::class.java)
     }
 }

@@ -20,9 +20,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.paulcoding.hviewer.ui.model.SiteConfigs
 import com.paulcoding.hviewer.helper.alsoLog
-import com.paulcoding.hviewer.helper.readJsonFile
+import com.paulcoding.hviewer.helper.readConfigFile
+import com.paulcoding.hviewer.ui.model.SiteConfigs
 import com.paulcoding.hviewer.ui.page.post.PostPage
 import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.sites.SitesPage
@@ -39,7 +39,7 @@ fun AppEntry() {
     var siteConfigs by remember { mutableStateOf(SiteConfigs()) }
 
     LaunchedEffect(Unit) {
-        context.readJsonFile<SiteConfigs>("config.json").alsoLog("siteConfigs")
+        context.readConfigFile<SiteConfigs>().alsoLog("siteConfigs")
             .onSuccess {
                 siteConfigs = it
             }

@@ -3,6 +3,8 @@ package com.paulcoding.hviewer.js
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
+import com.paulcoding.hviewer.MainApp.Companion.appContext
+import com.paulcoding.hviewer.helper.scriptsDir
 import com.tencent.mmkv.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -12,6 +14,7 @@ import org.mozilla.javascript.NativeArray
 import org.mozilla.javascript.NativeObject
 import org.mozilla.javascript.Scriptable
 import org.mozilla.javascript.ScriptableObject
+import java.io.File
 import java.io.FileReader
 
 fun toJsonElement(jsObject: Any?, gson: Gson = Gson()): JsonElement {
@@ -30,7 +33,7 @@ fun toJsonElement(jsObject: Any?, gson: Gson = Gson()): JsonElement {
     }
 }
 
-class JS(envFilePath: String) {
+class JS(fileName: String) {
     var scope: ScriptableObject
     val gson = Gson()
 
@@ -53,10 +56,14 @@ class JS(envFilePath: String) {
             put("log", this, logFunction)
         })
 
-        val reader = FileReader(envFilePath)
-        context.evaluateReader(scope, reader, envFilePath, 1, null)
-        Context.exit()
-        reader.close()
+        try {
+            val reader = FileReader(File(appContext.scriptsDir, fileName))
+            context.evaluateReader(scope, reader, fileName, 1, null)
+            Context.exit()
+            reader.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     // <reified> is required (https://github.com/google/gson/blob/main/Troubleshooting.md#-illegalargumentexception-typetoken-type-argument-must-not-contain-a-type-variable)
