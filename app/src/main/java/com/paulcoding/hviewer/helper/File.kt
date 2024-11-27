@@ -2,42 +2,37 @@ package com.paulcoding.hviewer.helper
 
 import android.content.Context
 import com.google.gson.Gson
-import java.io.BufferedReader
 import java.io.File
-import java.io.InputStreamReader
+import java.io.FileOutputStream
+
+ const val SCRIPTS_DIR = "scripts"
+
+private val Context.scriptsDir
+    get() = File(filesDir, SCRIPTS_DIR)
+
+fun Context.setupPaths() {
+    scriptsDir.mkdir()
+}
 
 fun Context.writeFile(data: String, fileName: String): File {
-    openFileOutput(fileName, Context.MODE_PRIVATE).use { outputStream ->
-        outputStream.use { stream ->
-            stream.write(data.toByteArray())
-        }
+    val file = File(scriptsDir, fileName)
+    FileOutputStream(file).use { fos ->
+        fos.write(data.toByteArray())
     }
-
-    return File(filesDir, fileName)
+    return file
 }
 
-fun Context.readFile(path: String): String {
-    val stringBuilder = StringBuilder()
+fun Context.readFile(fileName: String): String {
+    val file = File(scriptsDir, fileName)
 
-    try {
-        openFileInput(path).use { inputStream ->
-            BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                var line: String?
-                while (reader.readLine().also { line = it } != null) {
-                    stringBuilder.append(line).append("\n")
-                }
-            }
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
+    file.bufferedReader().use { reader ->
+        return reader.readText()
     }
-
-    return stringBuilder.toString()
 }
 
-inline fun <reified T> Context.readJsonFile(path: String): Result<T> {
+inline fun <reified T> Context.readJsonFile(fileName: String): Result<T> {
     return runCatching {
-        val content = readFile(path)
+        val content = readFile(fileName)
         return@runCatching Gson().fromJson(content, T::class.java)
     }
 }
