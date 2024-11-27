@@ -73,7 +73,6 @@ data class PostItem(
     val name: String = "",
     val url: String = "",
     val thumbnail: String = "",
-    val views: String = ""
 )
 
 data class Posts(
