@@ -69,6 +69,8 @@ fun extractTarGzFromResponseBody(responseBody: ResponseBody, destinationDir: Fil
             entry = tarInputStream.nextEntry
         }
 
+//        remove files in scripts directory before overwrite
+        File(destinationDir, SCRIPTS_DIR).listFiles()?.forEach { it.delete() }
         File(destinationDir, directoryName).apply {
             if (exists()) {
                 renameTo(File(destinationDir, SCRIPTS_DIR))

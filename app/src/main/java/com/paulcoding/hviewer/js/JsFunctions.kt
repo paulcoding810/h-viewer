@@ -1,9 +1,9 @@
 package com.paulcoding.hviewer.js
 
 import com.paulcoding.hviewer.MainApp.Companion.appContext
+import com.paulcoding.hviewer.helper.log
 import com.paulcoding.hviewer.helper.readFile
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mozilla.javascript.BaseFunction
 import org.mozilla.javascript.Context
 import org.mozilla.javascript.Scriptable
@@ -16,10 +16,18 @@ val fetchFunction = object : BaseFunction() {
         scope: Scriptable?,
         thisObj: Scriptable?,
         args: Array<out Any?>
-    ): Any {
+    ): Any? {
         val url = args.getOrNull(0) as? String ?: throw IllegalArgumentException("URL is required")
-        val doc: Document = Jsoup.connect(url).get()
-        return doc
+
+        return runCatching {
+            Jsoup.connect(url).followRedirects(true).get()
+        }.onSuccess {
+            return it
+        }.onFailure {
+            log(url, "Failed to fetch")
+            it.printStackTrace()
+            return null
+        }
     }
 }
 

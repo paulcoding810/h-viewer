@@ -22,7 +22,7 @@ object Github {
         val remoteUrl: String = Preferences.getRemote(),
         val isLoading: Boolean = false,
         val error: Throwable? = null,
-        val siteConfigs: SiteConfigs? = null
+        val siteConfigs: SiteConfigs? = appContext.readConfigFile<SiteConfigs>().getOrNull()
     )
 
     private fun setError(throwable: Throwable) {
@@ -74,7 +74,7 @@ object Github {
         val (owner, repo) = parseRepo(repoUrl)
 
         val configUrl =
-            "https://raw.githubusercontent.com/$owner/$repo/refs/heads/main/config.json"
+            "https://raw.githubusercontent.com/$owner/$repo/refs/heads/main/config.json?v=1"
         val result = RetrofitInstance.getInstance().getSiteConfigs(configUrl)
         return result
     }
