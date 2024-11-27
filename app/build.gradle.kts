@@ -77,6 +77,7 @@ dependencies {
     implementation(libs.mmkv)
     implementation(libs.commons.compress)
     implementation(libs.lottie.compose)
+    implementation(libs.zoomable)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

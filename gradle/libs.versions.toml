@@ -24,6 +24,7 @@ mmkv = "2.0.0"
 navigationCompose = "2.8.4"
 retrofit = "2.11.0"
 rhino = "1.7.15"
+zoomable = "0.14.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -59,6 +60,7 @@ lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
+zoomable = { module = "me.saket.telephoto:zoomable", version.ref = "zoomable" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
