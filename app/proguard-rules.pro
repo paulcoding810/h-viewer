@@ -23,3 +23,6 @@
 -obfuscationdictionary dict.txt
 -classobfuscationdictionary dict.txt
 -packageobfuscationdictionary dict.txt
+
+-keepattributes Signature
+-dontwarn org.mozilla.javascript.**
