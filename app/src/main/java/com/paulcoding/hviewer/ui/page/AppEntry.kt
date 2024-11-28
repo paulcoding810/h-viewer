@@ -39,7 +39,12 @@ fun AppEntry() {
             SitesPage(siteConfigs = siteConfigs,
                 refresh = { Github.refreshLocalConfigs() },
                 navToTopics = { site ->
-                    navController.navigate("${Route.TOPICS}/$site")
+                    val firstTopic = siteConfigs.sites[site]?.tags?.keys?.first()
+                    if (firstTopic != null) {
+                        navController.navigate("${Route.POSTS}/$site/$firstTopic")
+                    } else {
+                        navController.navigate("${Route.TOPICS}/$site")
+                    }
                 }, navToSettings = {
                     navController.navigate(Route.SETTINGS)
                 },
@@ -69,7 +74,7 @@ fun AppEntry() {
 
             PostsPage(
                 siteConfig = siteConfig,
-                topic = topic,
+                initialTopic = topic,
                 navToImages = { postUrl: String ->
                     navController.navigate(
                         "${Route.POST}/${site}/${topic}/${
