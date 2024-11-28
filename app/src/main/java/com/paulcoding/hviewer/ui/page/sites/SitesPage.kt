@@ -15,8 +15,15 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.pullToRefreshIndicator
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
@@ -26,8 +33,10 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.paulcoding.hviewer.R
-import com.paulcoding.hviewer.ui.icon.SettingsIcon
 import com.paulcoding.hviewer.model.SiteConfigs
+import com.paulcoding.hviewer.ui.icon.SettingsIcon
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,8 +44,16 @@ fun SitesPage(
     navToTopics: (site: String) -> Unit,
     goBack: () -> Unit,
     siteConfigs: SiteConfigs,
-    navToSettings: () -> Unit
+    navToSettings: () -> Unit,
+    refresh: () -> Unit,
 ) {
+    val state = rememberPullToRefreshState()
+
+//  TODO: check refreshing status
+//   https://stackoverflow.com/questions/75293735/pullrefreshindicator-does-not-disappear-after-refreshing
+    var refreshing by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
 
     Scaffold(topBar = {
         TopAppBar(title = { Text("Sites") }, actions = {
@@ -45,11 +62,27 @@ fun SitesPage(
             }
         })
     }) {
-        Box(
+        PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(it)
+                .padding(it),
+            state = state,
+            isRefreshing = refreshing,
+            onRefresh = {
+                scope.launch {
+                    refreshing = true
+                    refresh()
+                    delay(100)
+                    refreshing = false
+                }
+            }
         ) {
+            Box(
+                modifier = Modifier.pullToRefreshIndicator(
+                    isRefreshing = false,
+                    state = rememberPullToRefreshState(),
+                )
+            ) {}
             Column(
                 modifier = Modifier
                     .padding(16.dp)

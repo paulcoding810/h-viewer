@@ -72,6 +72,14 @@ object Github {
         }
     }
 
+    fun refreshLocalConfigs() {
+        appContext.readConfigFile<SiteConfigs>()
+            .onSuccess { configs ->
+                _stateFlow.update { it.copy(siteConfigs = configs) }
+            }
+            .onFailure { setError(it) }
+    }
+
     private suspend fun getSiteConfigs(): SiteConfigs {
         val repoUrl = Preferences.getRemote()
 

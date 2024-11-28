@@ -37,6 +37,7 @@ fun AppEntry() {
     NavHost(navController, Route.SITES) {
         animatedComposable(Route.SITES) {
             SitesPage(siteConfigs = siteConfigs,
+                refresh = { Github.refreshLocalConfigs() },
                 navToTopics = { site ->
                     navController.navigate("${Route.TOPICS}/$site")
                 }, navToSettings = {
