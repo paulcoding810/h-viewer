@@ -53,6 +53,7 @@ jobs:
           token: ${{ github.token }}
           tag: ${{ github.ref_name }}
           includeInvalidCommits: true
+          excludeTypes: build,chore
           writeToFile: false
 
       - name: Create release
