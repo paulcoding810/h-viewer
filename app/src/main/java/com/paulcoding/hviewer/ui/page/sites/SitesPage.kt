@@ -1,8 +1,10 @@
 package com.paulcoding.hviewer.ui.page.sites
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -33,6 +35,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.ui.icon.SettingsIcon
 import kotlinx.coroutines.delay
@@ -85,7 +88,6 @@ fun SitesPage(
             ) {}
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
@@ -96,12 +98,28 @@ fun SitesPage(
                         Box(modifier = Modifier.clickable {
                             navToTopics(site)
                         }) {
-                            Text(site)
+                            siteConfigs.sites[site]?.let { siteConfig ->
+                                Site(
+                                    key = site,
+                                    site = siteConfig
+                                )
+                            }
                         }
                     }
-
             }
         }
+    }
+}
+
+@Composable
+fun Site(site: SiteConfig, key: String) {
+    Row(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        site.SiteIcon()
+        Text(key)
     }
 }
 
