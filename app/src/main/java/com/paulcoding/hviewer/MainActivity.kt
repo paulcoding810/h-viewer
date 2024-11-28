@@ -20,8 +20,8 @@ import androidx.compose.ui.window.Dialog
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.ui.component.HLoading
+import com.paulcoding.hviewer.ui.component.ToastExit
 import com.paulcoding.hviewer.ui.page.AppEntry
-import com.paulcoding.hviewer.ui.page.settings.SettingsPage
 import com.paulcoding.hviewer.ui.theme.HViewerTheme
 
 class MainActivity : ComponentActivity() {
@@ -40,6 +40,8 @@ class MainActivity : ComponentActivity() {
 fun Content() {
     val githubState by Github.stateFlow.collectAsState()
     val repoUrl = githubState.remoteUrl
+
+    ToastExit()
 
     LaunchedEffect(repoUrl) {
         if (repoUrl.isNotEmpty())
@@ -74,5 +76,6 @@ fun UpdateDialog() {
         }
     }
 }
+
 
 
