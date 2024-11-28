@@ -1,13 +1,17 @@
 package com.paulcoding.hviewer.network
 
+import com.google.gson.Gson
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.helper.alsoLog
 import com.paulcoding.hviewer.helper.configFile
 import com.paulcoding.hviewer.helper.extractTarGzFromResponseBody
 import com.paulcoding.hviewer.helper.log
 import com.paulcoding.hviewer.helper.readConfigFile
-import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.model.SiteConfigs
+import com.paulcoding.hviewer.preference.Preferences
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.statement.readRawBytes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -75,8 +79,9 @@ object Github {
 
         val configUrl =
             "https://raw.githubusercontent.com/$owner/$repo/refs/heads/main/config.json?v=1"
-        val result = RetrofitInstance.getInstance().getSiteConfigs(configUrl)
-        return result
+        val resultText: String = ktorClient.get(configUrl).body()
+
+        return Gson().fromJson(resultText, SiteConfigs::class.java)
     }
 
     private suspend fun downloadAndGetConfig() {
@@ -94,9 +99,9 @@ object Github {
         val tarUrl =
             "https://api.github.com/repos/$owner/$repo/tarball".alsoLog("tarUrl")
 
-        val responseBody = RetrofitInstance.getInstance().downloadTar(tarUrl)
+        val inputStream = ktorClient.get(tarUrl).readRawBytes().inputStream()
 
-        extractTarGzFromResponseBody(responseBody, appContext.filesDir)
+        extractTarGzFromResponseBody(inputStream, appContext.filesDir)
     }
 
     private fun parseRepo(url: String): Pair<String, String> {

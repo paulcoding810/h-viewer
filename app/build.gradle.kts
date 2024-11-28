@@ -72,12 +72,16 @@ dependencies {
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.jsoup)
     implementation(libs.gson)
-    implementation(libs.retrofit)
-    implementation(libs.converter.gson)
     implementation(libs.mmkv)
     implementation(libs.commons.compress)
     implementation(libs.lottie.compose)
     implementation(libs.zoomable)
+
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.android)
+    implementation(libs.ktor.serialization.gson)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -4,7 +4,6 @@ agp = "8.7.2"
 coilNetworkOkhttp = "3.0.0"
 commonsCompress = "1.27.1"
 concurrentFuturesKtx = "1.2.0"
-converterGson = "2.11.0"
 gson = "2.11.0"
 javascriptengine = "1.0.0-beta01"
 jsoup = "1.18.1"
@@ -16,13 +15,17 @@ espressoCore = "3.6.1"
 kotlinxCoroutinesCore = "1.9.0"
 kotlinxSerializationJson = "1.7.3"
 ksoupLite = "0.2.0"
+ktorClientAndroid = "3.0.0"
+ktorClientContentNegotiation = "3.0.0"
+ktorClientCore = "3.0.0"
+ktorClientLogging = "3.0.0"
+ktorSerializationGson = "3.0.0"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.04.01"
 lottieCompose = "6.6.0"
 mmkv = "2.0.0"
 navigationCompose = "2.8.4"
-retrofit = "2.11.0"
 rhino = "1.7.15"
 zoomable = "0.14.0"
 
@@ -37,7 +40,6 @@ coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coilNetworkOkh
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilNetworkOkhttp" }
 coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coilNetworkOkhttp" }
 commons-compress = { module = "org.apache.commons:commons-compress", version.ref = "commonsCompress" }
-converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "converterGson" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -56,9 +58,13 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 ksoup-lite = { module = "com.fleeksoft.ksoup:ksoup-lite", version.ref = "ksoupLite" }
+ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
+ktor-serialization-gson = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktorSerializationGson" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
-retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
 zoomable = { module = "me.saket.telephoto:zoomable", version.ref = "zoomable" }
 

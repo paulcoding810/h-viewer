@@ -1,6 +1,5 @@
 package com.paulcoding.hviewer.helper
 
-import okhttp3.ResponseBody
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
@@ -8,6 +7,7 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.InputStream
 
 fun extractTarGz(tarGzFile: File, destinationDir: File) {
     if (!destinationDir.exists()) {
@@ -43,13 +43,13 @@ fun extractTarGz(tarGzFile: File, destinationDir: File) {
 }
 
 
-fun extractTarGzFromResponseBody(responseBody: ResponseBody, destinationDir: File) {
+fun extractTarGzFromResponseBody(inputStream: InputStream, destinationDir: File) {
     if (!destinationDir.exists()) {
         destinationDir.mkdirs()
     }
 
-    val inputStream = responseBody.byteStream()
     val gzipInputStream = GzipCompressorInputStream(inputStream)
+
     val tarInputStream = TarArchiveInputStream(gzipInputStream)
 
     var directoryName = ""

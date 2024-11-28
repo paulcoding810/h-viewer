@@ -44,7 +44,7 @@ inline fun <reified T> Context.readJsonFile(fileName: String): Result<T> {
 
 inline fun <reified T> Context.readConfigFile(): Result<T> {
     return runCatching {
-        val content = readFile(CONFIG_FILE).alsoLog("config file content")
+        val content = readFile(CONFIG_FILE)
         val type = object : TypeToken<T>() {}.type
         Gson().fromJson(content, type) as T
     }

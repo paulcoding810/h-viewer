@@ -31,11 +31,13 @@
 -keep class org.jsoup.** { *; }
 -dontwarn org.jspecify.annotations.NullMarked
 
-### Retrofit and OkHttp
--keep class retrofit2.** { *; }
+### Ktor and OkHttp
 -keep class okhttp3.** { *; }
 -keep class com.squareup.okhttp3.** { *; }
--keep class com.squareup.retrofit2.** { *; }
+
+-keep class io.ktor.** { *; }
+-dontwarn java.lang.management.ManagementFactory
+-dontwarn java.lang.management.RuntimeMXBean
 
 ### Gson
 -keep class com.google.gson.** { *; }
