@@ -17,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.network.Github
+import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.ToastExit
 import com.paulcoding.hviewer.ui.page.AppEntry
@@ -28,6 +30,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        window.setSecureScreen(Preferences.secureScreen)
 
         enableEdgeToEdge()
         setContent {

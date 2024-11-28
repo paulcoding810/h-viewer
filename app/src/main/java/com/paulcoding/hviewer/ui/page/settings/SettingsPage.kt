@@ -15,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -35,13 +36,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.paulcoding.hviewer.MainActivity
+import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.network.Github
+import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.icon.EditIcon
 
@@ -51,6 +56,8 @@ fun SettingsPage(goBack: () -> Boolean) {
     val githubState by Github.stateFlow.collectAsState()
     val prevSiteConfigs = remember { githubState.siteConfigs }
     var modalVisible by remember { mutableStateOf(false) }
+    var secureScreen by remember { mutableStateOf(Preferences.secureScreen) }
+    val window = (LocalContext.current as MainActivity).window
 
     LaunchedEffect(githubState.siteConfigs) {
         if (prevSiteConfigs == null && githubState.siteConfigs != null) {
@@ -69,7 +76,8 @@ fun SettingsPage(goBack: () -> Boolean) {
                     .padding(horizontal = 16.dp)
                     .verticalScroll(
                         rememberScrollState()
-                    )
+                    ),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -84,6 +92,18 @@ fun SettingsPage(goBack: () -> Boolean) {
                     githubState.remoteUrl.ifEmpty { "https://github.com/{OWNER}/{REPO}/" },
                     textDecoration = TextDecoration.Underline
                 )
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("Enable secure screen", modifier = Modifier.weight(1f))
+                    Checkbox(checked = secureScreen, onCheckedChange = {
+                        secureScreen = it
+                        Preferences.secureScreen = it
+                        window.setSecureScreen(it)
+                    })
+                }
             }
         }
 
