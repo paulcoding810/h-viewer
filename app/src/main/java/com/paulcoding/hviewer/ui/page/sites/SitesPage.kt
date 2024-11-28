@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -95,14 +96,12 @@ fun SitesPage(
                     Empty(navToSettings)
                 } else
                     siteConfigs.sites.keys.map { site ->
-                        Box(modifier = Modifier.clickable {
-                            navToTopics(site)
-                        }) {
-                            siteConfigs.sites[site]?.let { siteConfig ->
-                                Site(
-                                    key = site,
-                                    site = siteConfig
-                                )
+                        siteConfigs.sites[site]?.let { siteConfig ->
+                            Site(
+                                key = site,
+                                site = siteConfig
+                            ) {
+                                navToTopics(site)
                             }
                         }
                     }
@@ -112,14 +111,20 @@ fun SitesPage(
 }
 
 @Composable
-fun Site(site: SiteConfig, key: String) {
-    Row(
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        site.SiteIcon()
-        Text(key)
+fun Site(site: SiteConfig, key: String, onClick: () -> Unit) {
+    Box(modifier = Modifier.clickable {
+        onClick()
+    }) {
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            site.SiteIcon()
+            Text(key)
+        }
     }
 }
 

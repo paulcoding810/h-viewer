@@ -43,17 +43,24 @@ fun TopicsPage(
         ) {
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
-                horizontalArrangement = Arrangement.spacedBy(16.dp), verticalItemSpacing = 16.dp
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(tags) { tag ->
-                    Box(modifier = Modifier
-                        .align(Alignment.Center)
-                        .clickable {
-                            navToTopic(tag)
-                        })
-                    Text(tag)
+                    Topic(tag) {
+                        navToTopic(tag)
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun Topic(tag: String, onClick: () -> Unit) {
+    Box(modifier = Modifier
+        .clickable { onClick() }
+        .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Text(tag)
     }
 }
