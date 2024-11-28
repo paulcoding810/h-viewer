@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.js.JS
-import com.paulcoding.hviewer.ui.model.SiteConfig
+import com.paulcoding.hviewer.model.PostData
+import com.paulcoding.hviewer.model.SiteConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -79,8 +80,3 @@ class PostViewModelFactory(private val postUrl: String, private val siteConfig: 
         throw IllegalArgumentException("Unknown ViewModel class")
     }
 }
-
-data class PostData(
-    val images: List<String>,
-    val total: Int,
-)

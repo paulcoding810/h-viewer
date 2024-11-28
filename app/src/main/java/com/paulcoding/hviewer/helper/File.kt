@@ -2,6 +2,7 @@ package com.paulcoding.hviewer.helper
 
 import android.content.Context
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileOutputStream
 
@@ -43,7 +44,8 @@ inline fun <reified T> Context.readJsonFile(fileName: String): Result<T> {
 
 inline fun <reified T> Context.readConfigFile(): Result<T> {
     return runCatching {
-        val content = readFile(CONFIG_FILE)
-        return@runCatching Gson().fromJson(content, T::class.java)
+        val content = readFile(CONFIG_FILE).alsoLog("config file content")
+        val type = object : TypeToken<T>() {}.type
+        Gson().fromJson(content, type) as T
     }
 }

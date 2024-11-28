@@ -27,7 +27,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.ui.icon.SettingsIcon
-import com.paulcoding.hviewer.ui.model.SiteConfigs
+import com.paulcoding.hviewer.model.SiteConfigs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

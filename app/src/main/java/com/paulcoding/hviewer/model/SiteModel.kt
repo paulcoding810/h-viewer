@@ -1,4 +1,4 @@
-package com.paulcoding.hviewer.ui.model
+package com.paulcoding.hviewer.model
 
 data class SiteConfig(
     val baseUrl: String = "",

@@ -7,7 +7,7 @@ import com.paulcoding.hviewer.helper.extractTarGzFromResponseBody
 import com.paulcoding.hviewer.helper.log
 import com.paulcoding.hviewer.helper.readConfigFile
 import com.paulcoding.hviewer.preference.Preferences
-import com.paulcoding.hviewer.ui.model.SiteConfigs
+import com.paulcoding.hviewer.model.SiteConfigs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

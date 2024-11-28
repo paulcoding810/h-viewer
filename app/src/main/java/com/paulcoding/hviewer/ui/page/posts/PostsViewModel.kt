@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.js.JS
-import com.paulcoding.hviewer.ui.model.SiteConfig
+import com.paulcoding.hviewer.model.PostItem
+import com.paulcoding.hviewer.model.Posts
+import com.paulcoding.hviewer.model.SiteConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -68,17 +70,6 @@ class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
         return _stateFlow.value.postsPage < _stateFlow.value.postsTotalPage
     }
 }
-
-data class PostItem(
-    val name: String = "",
-    val url: String = "",
-    val thumbnail: String = "",
-)
-
-data class Posts(
-    val posts: List<PostItem> = listOf(),
-    val total: Int = 1,
-)
 
 @Suppress("UNCHECKED_CAST")
 class PostsViewModelFactory(private val siteConfig: SiteConfig, private val topic: String) :

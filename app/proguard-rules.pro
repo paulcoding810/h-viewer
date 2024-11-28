@@ -24,5 +24,21 @@
 -classobfuscationdictionary dict.txt
 -packageobfuscationdictionary dict.txt
 
+### Rhino
 -keepattributes Signature
 -dontwarn org.mozilla.javascript.**
+-keep class org.mozilla.javascript.** { *; }
+-keep class org.jsoup.** { *; }
+-dontwarn org.jspecify.annotations.NullMarked
+
+### Retrofit and OkHttp
+-keep class retrofit2.** { *; }
+-keep class okhttp3.** { *; }
+-keep class com.squareup.okhttp3.** { *; }
+-keep class com.squareup.retrofit2.** { *; }
+
+### Gson
+-keep class com.google.gson.** { *; }
+-keep class com.paulcoding.hviewer.model.** { *; }
+-keep class com.paulcoding.hviewer.js.** { *; }
+

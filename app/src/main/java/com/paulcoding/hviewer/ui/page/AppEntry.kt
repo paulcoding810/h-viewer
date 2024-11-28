@@ -16,8 +16,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.network.Github
-import com.paulcoding.hviewer.ui.model.SiteConfigs
 import com.paulcoding.hviewer.ui.page.post.PostPage
 import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.settings.SettingsPage
