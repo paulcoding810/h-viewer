@@ -79,9 +79,11 @@ object Github {
 
         val configUrl =
             "https://raw.githubusercontent.com/$owner/$repo/refs/heads/main/config.json?v=1"
-        val resultText: String = ktorClient.get(configUrl).body()
 
-        return Gson().fromJson(resultText, SiteConfigs::class.java)
+        ktorClient.use { client ->
+            val resultText: String = client.get(configUrl).body()
+            return Gson().fromJson(resultText, SiteConfigs::class.java)
+        }
     }
 
     private suspend fun downloadAndGetConfig() {
@@ -99,9 +101,10 @@ object Github {
         val tarUrl =
             "https://api.github.com/repos/$owner/$repo/tarball".alsoLog("tarUrl")
 
-        val inputStream = ktorClient.get(tarUrl).readRawBytes().inputStream()
-
-        extractTarGzFromResponseBody(inputStream, appContext.filesDir)
+        ktorClient.use { client ->
+            val inputStream = client.get(tarUrl).readRawBytes().inputStream()
+            extractTarGzFromResponseBody(inputStream, appContext.filesDir)
+        }
     }
 
     private fun parseRepo(url: String): Pair<String, String> {
