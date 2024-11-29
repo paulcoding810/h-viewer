@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page.post
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,6 +29,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.compose.AsyncImage
+import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.SiteConfig
@@ -49,6 +51,10 @@ fun PostPage(siteConfig: SiteConfig, postUrl: String, goBack: () -> Unit) {
     val uiState by viewModel.stateFlow.collectAsState()
     var selectedImage by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
+
+    uiState.error?.let {
+        Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
+    }
 
     LaunchedEffect(Unit) {
         viewModel.getImages()
