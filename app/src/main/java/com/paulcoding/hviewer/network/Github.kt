@@ -12,6 +12,7 @@ import com.paulcoding.hviewer.preference.Preferences
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.statement.readRawBytes
+import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -89,7 +90,10 @@ object Github {
             "https://raw.githubusercontent.com/$owner/$repo/refs/heads/main/config.json?v=1"
 
         ktorClient.use { client ->
-            val resultText: String = client.get(configUrl).body()
+            val response = client.get(configUrl)
+            if (response.status != HttpStatusCode.OK)
+                throw Exception("Invalid repo")
+            val resultText: String = response.body()
             return Gson().fromJson(resultText, SiteConfigs::class.java)
         }
     }
