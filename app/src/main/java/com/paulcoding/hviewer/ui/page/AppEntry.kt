@@ -23,6 +23,7 @@ import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.settings.SettingsPage
 import com.paulcoding.hviewer.ui.page.sites.SitesPage
 import com.paulcoding.hviewer.ui.page.topics.TopicsPage
+import com.paulcoding.hviewer.ui.page.webeditor.WebEditorPage
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -47,6 +48,9 @@ fun AppEntry() {
                     }
                 }, navToSettings = {
                     navController.navigate(Route.SETTINGS)
+                },
+                navToEditor = { site ->
+                    navController.navigate("${Route.EDITOR}/$site")
                 },
                 goBack = { navController.popBackStack() })
         }
@@ -92,6 +96,14 @@ fun AppEntry() {
                 siteConfig = siteConfigs.sites[site]!!, postUrl = decodedUrl, goBack = {
                     navController.popBackStack()
                 })
+        }
+        animatedComposable("${Route.EDITOR}/{site}") { backStackEntry ->
+            val site = backStackEntry.arguments?.getString("site") ?: ""
+
+            WebEditorPage(
+                goBack = { navController.popBackStack() },
+                siteConfig = siteConfigs.sites[site]!!
+            )
         }
     }
 }

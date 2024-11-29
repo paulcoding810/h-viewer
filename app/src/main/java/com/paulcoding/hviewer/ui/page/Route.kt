@@ -7,4 +7,5 @@ object Route {
     const val POSTS = "posts"
     const val POST = "post"
     const val SETTINGS = "settings"
+    const val EDITOR = "editor"
 }

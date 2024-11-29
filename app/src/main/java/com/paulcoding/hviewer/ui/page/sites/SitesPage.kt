@@ -38,6 +38,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
+import com.paulcoding.hviewer.ui.icon.EditIcon
 import com.paulcoding.hviewer.ui.icon.SettingsIcon
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -49,6 +50,7 @@ fun SitesPage(
     goBack: () -> Unit,
     siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
+    navToEditor: (site: String) -> Unit,
     refresh: () -> Unit,
 ) {
     val state = rememberPullToRefreshState()
@@ -99,7 +101,8 @@ fun SitesPage(
                         siteConfigs.sites[site]?.let { siteConfig ->
                             Site(
                                 key = site,
-                                site = siteConfig
+                                site = siteConfig,
+                                onEdit = { navToEditor(site) }
                             ) {
                                 navToTopics(site)
                             }
@@ -111,7 +114,7 @@ fun SitesPage(
 }
 
 @Composable
-fun Site(site: SiteConfig, key: String, onClick: () -> Unit) {
+fun Site(site: SiteConfig, key: String, onEdit: () -> Unit, onClick: () -> Unit) {
     Box(modifier = Modifier.clickable {
         onClick()
     }) {
@@ -123,7 +126,10 @@ fun Site(site: SiteConfig, key: String, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             site.SiteIcon()
-            Text(key)
+            Text(key, modifier = Modifier.weight(1f))
+            IconButton(onClick = onEdit) {
+                Icon(EditIcon, "Edit")
+            }
         }
     }
 }

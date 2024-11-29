@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Editor with Prettier</title>
+    <link rel="stylesheet" href="codemirror.min.css" />
+    <style>
+        body {
+          font-family: Arial, sans-serif;
+          margin: 20px;
+          background-color: #f4f4f9;
+        }
+        .editor-container {
+          margin-bottom: 20px;
+        }
+        #code-editor {
+          height: 300px;
+          border: 1px solid #ccc;
+        }
+        .input-container,
+        .button-container {
+          margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="editor-container">
+      <textarea id="code-editor">
+// Write your JavaScript code here...</textarea
+      >
+</div>
+
+<div class="button-container">
+    <button id="fill-button">Fill Default Data</button>
+</div>
+
+<div class="button-container">
+    <button id="submit-button">Submit</button>
+</div>
+
+<script src="hello.js"></script>
+<script src="codemirror.min.js"></script>
+<script src="javascript.min.js"></script>
+<script src="prettier-standalone.js"></script>
+<script src="prettier-parser-babel.js"></script>
+<script>
+    function fillData(data) {
+      editor.setValue(data);
+    }
+</script>
+<script>
+    // Initialize CodeMirror editor
+    const editor = CodeMirror.fromTextArea(
+      document.getElementById("code-editor"),
+      {
+        mode: "javascript",
+        lineNumbers: true,
+        theme: "default",
+      }
+    );
+
+    // Fill textarea with default data
+    document.getElementById("fill-button").addEventListener("click", () => {
+      const defaultData = `
+function greet(name) {
+console.log("Hello, " + name + "!");
+}
+
+greet("World");
+    `;
+      fillData(defaultData);
+    });
+
+    // Handle the submit button click
+    document.getElementById("submit-button").addEventListener("click", () => {
+      const code = editor.getValue(); // Get the code from CodeMirror
+
+      // Format the code using Prettier
+      try {
+        const formattedCode = prettier.format(code, {
+          parser: "babel",
+          plugins: prettierPlugins,
+        });
+
+        // Display the formatted code and user input
+        console.log("Formatted JavaScript Code:");
+        console.log(formattedCode);
+
+        sendData(formattedCode);
+      } catch (error) {
+        console.error("Error formatting code:", error);
+        alert(
+          "There was an error formatting the code. Check the console for details."
+        );
+      }
+    });
+</script>
+</body>
+</html>
