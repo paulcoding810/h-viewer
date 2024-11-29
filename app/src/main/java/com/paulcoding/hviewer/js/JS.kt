@@ -5,6 +5,7 @@ import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.helper.scriptsDir
+import com.paulcoding.hviewer.model.SiteConfig
 import com.tencent.mmkv.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,7 +34,9 @@ fun toJsonElement(jsObject: Any?, gson: Gson = Gson()): JsonElement {
     }
 }
 
-class JS(fileName: String) {
+class JS(siteConfig: SiteConfig) {
+    private val fileName = siteConfig.scriptFile
+
     var scope: ScriptableObject
     val gson = Gson()
 
@@ -48,7 +51,7 @@ class JS(fileName: String) {
     init {
         val context = prepareContext()
         scope = context.initStandardObjects()
-
+        ScriptableObject.putProperty(scope, "baseUrl", Context.javaToJS(siteConfig.baseUrl, scope))
         ScriptableObject.putProperty(scope, "import", importFunction)
         ScriptableObject.putProperty(scope, "fetch", fetchFunction)
         ScriptableObject.putProperty(scope, "atob", atobFunction)

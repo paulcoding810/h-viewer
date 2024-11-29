@@ -15,7 +15,7 @@ class PostViewModel(private val postUrl: String, siteConfig: SiteConfig) : ViewM
     private var _stateFlow = MutableStateFlow(UiState())
     val stateFlow = _stateFlow.asStateFlow()
 
-    private val js = JS(siteConfig.scriptFile)
+    private val js = JS(siteConfig)
 
     data class UiState(
         val images: List<String> = listOf(),
