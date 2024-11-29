@@ -3,6 +3,7 @@ package com.paulcoding.hviewer.model
 data class PostData(
     val images: List<String>,
     val total: Int,
+    val next: String? = null
 )
 
 

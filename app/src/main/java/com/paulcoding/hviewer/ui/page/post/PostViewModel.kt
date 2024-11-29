@@ -21,6 +21,7 @@ class PostViewModel(private val postUrl: String, siteConfig: SiteConfig) : ViewM
         val images: List<String> = listOf(),
         val postPage: Int = 1,
         val postTotalPage: Int = 1,
+        val nextPage: String? = null,
         val isLoading: Boolean = false,
         val error: Throwable? = null,
         val currentPostUrl: String = "",
@@ -41,14 +42,20 @@ class PostViewModel(private val postUrl: String, siteConfig: SiteConfig) : ViewM
     }
 
     fun getImages(page: Int = 1) {
+        val url = if (page == 1) postUrl else _stateFlow.value.nextPage
+        if (url.isNullOrEmpty())
+            return setError(
+                Exception("Next page is NULL")
+            )
         launchAndLoad {
-            js.callFunction<PostData>("getImages", arrayOf(postUrl, page))
+            js.callFunction<PostData>("getImages", arrayOf(url, page))
                 .onSuccess { postData ->
                     _stateFlow.update {
                         it.copy(
                             isLoading = false,
                             images = it.images + postData.images,
-                            postTotalPage = postData.total
+                            postTotalPage = postData.total,
+                            nextPage = postData.next
                         )
                     }
                 }
