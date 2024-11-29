@@ -15,4 +15,5 @@ data class PostItem(
 data class Posts(
     val posts: List<PostItem> = listOf(),
     val total: Int = 1,
+    val next: String? = null
 )

@@ -24,6 +24,7 @@ class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
         val postItems: List<PostItem> = listOf(),
         val postsPage: Int = 1,
         val postsTotalPage: Int = 1,
+        val nextPage: String? = null,
         val images: List<String> = listOf(),
         val isLoading: Boolean = false,
         val error: Throwable? = null,
@@ -44,13 +45,17 @@ class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
     }
 
     fun getPosts(page: Int) {
+        val url = if (page == 1) topicUrl else _stateFlow.value.nextPage ?: return setError(
+            Exception("Next page null")
+        )
         launchAndLoad {
-            js.callFunction<Posts>("getPosts", arrayOf(topicUrl, page))
+            js.callFunction<Posts>("getPosts", arrayOf(url, page))
                 .onSuccess { postsData ->
                     _stateFlow.update {
                         it.copy(
                             postItems = it.postItems + postsData.posts,
-                            postsTotalPage = postsData.total
+                            postsTotalPage = postsData.total,
+                            nextPage = postsData.next
                         )
                     }
                 }
