@@ -34,9 +34,7 @@ fun toJsonElement(jsObject: Any?, gson: Gson = Gson()): JsonElement {
     }
 }
 
-class JS(siteConfig: SiteConfig) {
-    private val fileName = siteConfig.scriptFile
-
+class JS(siteConfig: SiteConfig? = null) {
     var scope: ScriptableObject
     val gson = Gson()
 
@@ -51,19 +49,28 @@ class JS(siteConfig: SiteConfig) {
     init {
         val context = prepareContext()
         scope = context.initStandardObjects()
-        ScriptableObject.putProperty(scope, "baseUrl", Context.javaToJS(siteConfig.baseUrl, scope))
         ScriptableObject.putProperty(scope, "import", importFunction)
         ScriptableObject.putProperty(scope, "fetch", fetchFunction)
+        ScriptableObject.putProperty(scope, "xhr", xhrFunction)
         ScriptableObject.putProperty(scope, "atob", atobFunction)
         ScriptableObject.putProperty(scope, "console", NativeObject().apply {
             put("log", this, logFunction)
         })
 
         try {
-            val reader = FileReader(File(appContext.scriptsDir, fileName))
-            context.evaluateReader(scope, reader, fileName, 1, null)
-            Context.exit()
-            reader.close()
+            siteConfig?.let {
+                val fileName = it.scriptFile
+
+                ScriptableObject.putProperty(
+                    scope,
+                    "baseUrl",
+                    Context.javaToJS(it.baseUrl, scope)
+                )
+                val reader = FileReader(File(appContext.scriptsDir, fileName))
+                context.evaluateReader(scope, reader, fileName, 1, null)
+                Context.exit()
+                reader.close()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
