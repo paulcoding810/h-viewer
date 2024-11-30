@@ -39,6 +39,11 @@ object Github {
         withContext(Dispatchers.IO) {
             try {
                 _stateFlow.update { it.copy(isLoading = true) }
+                if (_stateFlow.value.remoteUrl != Preferences.getRemote()) {
+                    Preferences.setRemote(_stateFlow.value.remoteUrl)
+                    downloadAndGetConfig()
+                    return@withContext
+                }
                 if (!appContext.configFile.exists()) {
                     log("Config file not exist, downloading from remote...", "check update")
                     downloadAndGetConfig()
@@ -134,7 +139,6 @@ object Github {
         kotlin.runCatching {
             val (owner, repo) = parseRepo(url)
             val remoteUrl = "https://github.com/$owner/$repo/"
-            Preferences.setRemote(remoteUrl)
             _stateFlow.update { it.copy(remoteUrl = remoteUrl) }
         }.onFailure {
             setError(it)
