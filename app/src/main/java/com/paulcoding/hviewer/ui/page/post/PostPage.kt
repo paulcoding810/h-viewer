@@ -1,6 +1,7 @@
 package com.paulcoding.hviewer.ui.page.post
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,7 @@ import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
+import com.paulcoding.hviewer.ui.component.HideSystemBars
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
@@ -66,13 +69,38 @@ fun PostPage(siteConfig: SiteConfig, postUrl: String, goBack: () -> Unit) {
         }
     }
 
+    var isScrollingUp by remember { mutableStateOf(false) }
+
+    // Detect scroll direction
+    LaunchedEffect(listState) {
+        var previousIndex = listState.firstVisibleItemIndex
+        var previousOffset = listState.firstVisibleItemScrollOffset
+
+        snapshotFlow { listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset }
+            .collect { (index, offset) ->
+                isScrollingUp = if (index != previousIndex) {
+                    index < previousIndex
+                } else {
+                    offset < previousOffset
+                }
+                previousIndex = index
+                previousOffset = offset
+            }
+    }
+
+    HideSystemBars()
+
     Scaffold(topBar = {
-        TopAppBar(
-            navigationIcon = {
-                HBackIcon { goBack() }
-            },
-            title = {},
-        )
+        AnimatedVisibility(
+            visible = isScrollingUp
+        ) {
+            TopAppBar(
+                navigationIcon = {
+                    HBackIcon { goBack() }
+                },
+                title = {},
+            )
+        }
     }) {
 
         LazyColumn(
