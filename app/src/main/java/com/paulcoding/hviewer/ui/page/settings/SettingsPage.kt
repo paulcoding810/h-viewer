@@ -60,7 +60,7 @@ fun SettingsPage(goBack: () -> Boolean) {
     val window = (LocalContext.current as MainActivity).window
 
     LaunchedEffect(githubState.siteConfigs) {
-        if (prevSiteConfigs == null && githubState.siteConfigs != null) {
+        if (prevSiteConfigs != githubState.siteConfigs) {
             goBack()
         }
     }
@@ -108,17 +108,23 @@ fun SettingsPage(goBack: () -> Boolean) {
         }
 
         if (modalVisible)
-            InputRemoteModal(setVisible = {
-                modalVisible = it
-            }) {
+            InputRemoteModal(
+                initialText = githubState.remoteUrl,
+                setVisible = {
+                    modalVisible = it
+                }) {
                 Github.updateRemoteUrl(it)
             }
     }
 }
 
 @Composable
-fun InputRemoteModal(setVisible: (Boolean) -> Unit, onSubmit: (url: String) -> Unit) {
-    var text by remember { mutableStateOf("") }
+fun InputRemoteModal(
+    initialText: String = "",
+    setVisible: (Boolean) -> Unit,
+    onSubmit: (url: String) -> Unit
+) {
+    var text by remember { mutableStateOf(initialText) }
     val focusRequester = remember { FocusRequester() }
 
     fun submit() {
@@ -162,6 +168,7 @@ fun InputRemoteModal(setVisible: (Boolean) -> Unit, onSubmit: (url: String) -> U
                     keyboardActions = KeyboardActions(
                         onSend = { submit() }
                     ),
+                    placeholder = { Text("https://github.com/paulcoding810/h-viewer-scripts") }
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
