@@ -74,7 +74,6 @@ fun AppEntry() {
 
             PostsPage(
                 siteConfig = siteConfig,
-                initialTopic = topic,
                 navToImages = { postUrl: String ->
                     navController.navigate(
                         "${Route.POST}/${site}/${topic}/${

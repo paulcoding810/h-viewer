@@ -2,31 +2,29 @@ package com.paulcoding.hviewer.ui.page.posts
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
@@ -36,6 +34,7 @@ import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,11 +42,55 @@ import com.paulcoding.hviewer.ui.component.HLoading
 fun PostsPage(
     navToImages: (postUrl: String) -> Unit,
     siteConfig: SiteConfig,
-    initialTopic: String = "home",
     goBack: () -> Unit
 ) {
     val listTopic = siteConfig.tags.keys.toList()
-    var topic by remember { mutableStateOf(initialTopic) }
+    val pagerState = rememberPagerState { listTopic.size }
+    val selectedTabIndex = pagerState.currentPage
+    val currentPage = listTopic[selectedTabIndex]
+    val scope = rememberCoroutineScope()
+    Scaffold(topBar = {
+        TopAppBar(title = { Text(currentPage.toCapital()) }, navigationIcon = {
+            HBackIcon { goBack() }
+        })
+    }) { paddings ->
+        Column(modifier = Modifier.padding(paddings)) {
+            ScrollableTabRow(
+                selectedTabIndex = selectedTabIndex,
+                modifier = Modifier.fillMaxWidth(),
+                edgePadding = 0.dp,
+            ) {
+                listTopic.forEachIndexed { index, tab ->
+                    Tab(
+                        selected = selectedTabIndex == index,
+                        selectedContentColor = MaterialTheme.colorScheme.primary,
+                        unselectedContentColor = MaterialTheme.colorScheme.outline,
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(index)
+                            }
+                        },
+                        text = { Text(text = tab) },
+                    )
+                }
+            }
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+            ) { pageIndex ->
+                val page = listTopic[pageIndex]
+                PageContent(siteConfig, page) { postUrl ->
+                    navToImages(postUrl)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PageContent(siteConfig: SiteConfig, topic: String, onClick: (String) -> Unit) {
+
 
     val viewModel: PostsViewModel = viewModel(
         factory = PostsViewModelFactory(siteConfig, topic),
@@ -56,10 +99,8 @@ fun PostsPage(
     val listState = rememberLazyListState()
     val uiState by viewModel.stateFlow.collectAsState()
 
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let {
-            Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
-        }
+    uiState.error?.let {
+        Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
     }
 
     LaunchedEffect(uiState.postItems) {
@@ -74,40 +115,18 @@ fun PostsPage(
         }
     }
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text(topic.toCapital()) }, navigationIcon = {
-            HBackIcon { goBack() }
-        })
-    }) { paddings ->
-        Column(modifier = Modifier.padding(paddings)) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                listTopic.map {
-                    Text(it, fontSize = 10.sp, modifier = Modifier
-                        .clickable { topic = it }
-                        .padding(horizontal = 4.dp),
-                        fontWeight = if (topic == it) FontWeight.Bold else FontWeight.Normal
-                    )
-                }
-            }
-            LazyColumn(
-                state = listState
-            ) {
-                items(uiState.postItems) { post ->
-                    PostItemView(post) { postUrl ->
-                        navToImages(postUrl)
-                    }
-                }
-                if (uiState.isLoading)
-                    item {
-                        HLoading()
-                    }
+    LazyColumn(
+        state = listState
+    ) {
+        items(uiState.postItems) { post ->
+            PostItemView(post) { postUrl ->
+                onClick(postUrl)
             }
         }
+        if (uiState.isLoading)
+            item {
+                HLoading()
+            }
     }
 }
 
