@@ -1,4 +1,4 @@
-package com.paulcoding.hviewer.ui.page.posts
+package com.paulcoding.hviewer.ui.page.search
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -12,9 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
-    private val topicUrl = siteConfig.tags[topic] ?: ""
-
+class SearchViewModel(siteConfig: SiteConfig) : ViewModel() {
     private var _stateFlow = MutableStateFlow(UiState())
     val stateFlow = _stateFlow.asStateFlow()
 
@@ -22,9 +20,10 @@ class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
 
     data class UiState(
         val postItems: List<PostItem> = listOf(),
+        val query: String = "",
         val postsPage: Int = 1,
         val postsTotalPage: Int = 1,
-        val nextPage: String? = null,
+        val queryUrl: String? = null,
         val isLoading: Boolean = false,
         val error: Throwable? = null,
     )
@@ -42,18 +41,27 @@ class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
         }
     }
 
-    fun getPosts(page: Int) {
-        val url = if (page == 1) topicUrl else _stateFlow.value.nextPage ?: return setError(
-            Exception("Next page null")
-        )
+    fun setQueryAndSearch(query: String) {
+        viewModelScope.launch {
+            js.callFunction<String>("getSearchUrl", arrayOf(query))
+                .onSuccess { queryUrl ->
+                    _stateFlow.update { UiState(query = query, queryUrl = queryUrl) }
+                    getPosts(1)
+                }
+                .onFailure { setError(it) }
+        }
+    }
+
+    private fun getPosts(page: Int) {
+        val url = _stateFlow.value.queryUrl ?: return setError(Exception("Next page null"))
         launchAndLoad {
-            js.callFunction<Posts>("getPosts", arrayOf(url, page))
+            js.callFunction<Posts>("search", arrayOf(url, page))
                 .onSuccess { postsData ->
                     _stateFlow.update {
                         it.copy(
                             postItems = it.postItems + postsData.posts,
                             postsTotalPage = postsData.total,
-                            nextPage = postsData.next
+                            queryUrl = postsData.next
                         )
                     }
                 }
@@ -64,9 +72,11 @@ class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
     }
 
     fun getNextPosts() {
-        val newPage = _stateFlow.value.postsPage + 1
-        _stateFlow.update { it.copy(postsPage = newPage) }
-        getPosts(newPage)
+        launchAndLoad {
+            val newPage = _stateFlow.value.postsPage + 1
+            _stateFlow.update { it.copy(postsPage = newPage) }
+            getPosts(newPage)
+        }
     }
 
     fun canLoadMorePostsData(): Boolean {
@@ -75,11 +85,11 @@ class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
 }
 
 @Suppress("UNCHECKED_CAST")
-class PostsViewModelFactory(private val siteConfig: SiteConfig, private val topic: String) :
+class SearchViewModelFactory(private val siteConfig: SiteConfig) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PostsViewModel::class.java)) {
-            return PostsViewModel(siteConfig, topic) as T
+        if (modelClass.isAssignableFrom(SearchViewModel::class.java)) {
+            return SearchViewModel(siteConfig) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

@@ -33,8 +33,10 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
+import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
+import com.paulcoding.hviewer.ui.icon.Search
 import kotlinx.coroutines.launch
 
 
@@ -42,6 +44,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun PostsPage(
     navToImages: (postUrl: String) -> Unit,
+    navToSearch: () -> Unit,
     siteConfig: SiteConfig,
     goBack: () -> Unit
 ) {
@@ -53,6 +56,8 @@ fun PostsPage(
     Scaffold(topBar = {
         TopAppBar(title = { Text(currentPage.toCapital()) }, navigationIcon = {
             HBackIcon { goBack() }
+        }, actions = {
+            HIcon(imageVector = Search) { navToSearch() }
         })
     }) { paddings ->
         Column(modifier = Modifier.padding(paddings)) {
@@ -91,8 +96,6 @@ fun PostsPage(
 
 @Composable
 fun PageContent(siteConfig: SiteConfig, topic: String, onClick: (String) -> Unit) {
-
-
     val viewModel: PostsViewModel = viewModel(
         factory = PostsViewModelFactory(siteConfig, topic),
         key = topic

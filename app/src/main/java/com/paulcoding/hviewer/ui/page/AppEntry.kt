@@ -20,6 +20,7 @@ import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.ui.page.post.PostPage
 import com.paulcoding.hviewer.ui.page.posts.PostsPage
+import com.paulcoding.hviewer.ui.page.search.SearchPage
 import com.paulcoding.hviewer.ui.page.settings.SettingsPage
 import com.paulcoding.hviewer.ui.page.sites.SitesPage
 import com.paulcoding.hviewer.ui.page.topics.TopicsPage
@@ -81,7 +82,9 @@ fun AppEntry() {
                         }"
                     )
                 },
-                goBack = { navController.popBackStack() })
+                navToSearch = { navController.navigate("${Route.SEARCH}/$site") },
+                goBack = { navController.popBackStack() },
+            )
         }
         animatedComposable("${Route.POST}/{site}/{topic}/{postUrl}") { backStackEntry ->
             val postUrl = backStackEntry.arguments?.getString("postUrl") ?: ""
@@ -91,6 +94,22 @@ fun AppEntry() {
                 siteConfig = siteConfigs.sites[site]!!, postUrl = decodedUrl, goBack = {
                     navController.popBackStack()
                 })
+        }
+        animatedComposable("${Route.SEARCH}/{site}") { backStackEntry ->
+            val site = backStackEntry.arguments?.getString("site") ?: ""
+            val siteConfig = siteConfigs.sites[site]!!
+
+            SearchPage(
+                siteConfig = siteConfig,
+                navToImages = { postUrl: String ->
+                    navController.navigate(
+                        "${Route.POST}/${site}/search/${
+                            URLEncoder.encode(postUrl, StandardCharsets.UTF_8.toString())
+                        }"
+                    )
+                },
+                goBack = { navController.popBackStack() },
+            )
         }
     }
 }

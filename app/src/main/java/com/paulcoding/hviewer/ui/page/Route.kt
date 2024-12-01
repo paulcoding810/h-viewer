@@ -6,5 +6,6 @@ object Route {
     const val TOPICS = "topics"
     const val POSTS = "posts"
     const val POST = "post"
+    const val SEARCH = "search"
     const val SETTINGS = "settings"
 }
