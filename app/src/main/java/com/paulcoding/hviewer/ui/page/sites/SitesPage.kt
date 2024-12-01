@@ -5,10 +5,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,7 +17,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.pullToRefreshIndicator
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,15 +26,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import com.airbnb.lottie.compose.rememberLottieComposition
-import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
+import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.icon.SettingsIcon
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -81,19 +73,13 @@ fun SitesPage(
                 }
             }
         ) {
-            Box(
-                modifier = Modifier.pullToRefreshIndicator(
-                    isRefreshing = false,
-                    state = rememberPullToRefreshState(),
-                )
-            ) {}
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
                 if (siteConfigs.sites.keys.isEmpty()) {
-                    Empty(navToSettings)
+                    HEmpty(title = "No sites found", message = "Add repo?") { navToSettings() }
                 } else
                     siteConfigs.sites.keys.map { site ->
                         siteConfigs.sites[site]?.let { siteConfig ->
@@ -128,27 +114,3 @@ fun Site(site: SiteConfig, key: String, onClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun Empty(navToSettings: () -> Unit) {
-    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.empty))
-    val progress by animateLottieCompositionAsState(composition)
-
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        LottieAnimation(
-            composition = composition,
-            progress = { progress },
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Text("No sites found")
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                "Add repo?",
-                modifier = Modifier.clickable { navToSettings() },
-                textDecoration = TextDecoration.Underline
-            )
-        }
-    }
-}

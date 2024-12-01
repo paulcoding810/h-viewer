@@ -32,6 +32,7 @@ import com.paulcoding.hviewer.extensions.toCapital
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
+import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
 import kotlinx.coroutines.launch
@@ -126,6 +127,15 @@ fun PageContent(siteConfig: SiteConfig, topic: String, onClick: (String) -> Unit
         if (uiState.isLoading)
             item {
                 HLoading()
+            }
+        else if (uiState.postItems.isEmpty())
+            item {
+                HEmpty(
+                    title = "No posts found",
+                    message = "Refresh?"
+                ) {
+                    viewModel.getPosts(1)
+                }
             }
     }
 }
