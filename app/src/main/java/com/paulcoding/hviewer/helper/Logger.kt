@@ -5,7 +5,7 @@ import com.paulcoding.hviewer.BuildConfig
 
 fun log(
     message: Any?,
-    tag: String? = "DevLauncher",
+    tag: String? = "HViewer",
 ) {
     if (BuildConfig.DEBUG) {
         val border = "*".repeat(150)
@@ -20,7 +20,7 @@ fun log(
     }
 }
 
-fun <T> T.alsoLog(tag: String? = "DevLauncher"): T {
+fun <T> T.alsoLog(tag: String? = "HViewer"): T {
     log(this, tag)
     return this
 }
