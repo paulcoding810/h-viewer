@@ -13,7 +13,6 @@ import org.mozilla.javascript.Context
 import org.mozilla.javascript.Function
 import org.mozilla.javascript.NativeArray
 import org.mozilla.javascript.NativeObject
-import org.mozilla.javascript.Scriptable
 import org.mozilla.javascript.ScriptableObject
 import java.io.File
 import java.io.FileReader
@@ -93,10 +92,13 @@ class JS(siteConfig: SiteConfig? = null) {
     ): Result<T> {
         return withContext(Dispatchers.IO) {
             return@withContext runCatching {
-                val fn = scope.get(functionName, scope) as Function
-                if (fn == Scriptable.NOT_FOUND)
-                    throw Exception("$functionName not found.")
-                val result = fn.call(prepareContext(), scope, scope, args)
+                val context = prepareContext()
+                val fn = try {
+                    scope.get(functionName, scope) as Function
+                } catch (e: Exception) {
+                    throw Exception("fn $functionName not found.")
+                }
+                val result = fn.call(context, scope, scope, args)
                 transformResult<T>(result)
             }.closeContext()
         }
