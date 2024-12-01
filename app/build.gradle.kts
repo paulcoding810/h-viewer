@@ -8,12 +8,16 @@ android {
     namespace = "com.paulcoding.hviewer"
     compileSdk = 35
 
+    val latestTag = providers.exec {
+        commandLine = "git describe --tags --abbrev=0".split(' ')
+    }.standardOutput.asText.get().trim().replaceFirst("v", "")
+
     defaultConfig {
         applicationId = "com.paulcoding.hviewer"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "1.1.0"
+        versionName = latestTag
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
