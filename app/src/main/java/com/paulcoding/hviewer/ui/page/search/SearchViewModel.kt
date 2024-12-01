@@ -41,7 +41,7 @@ class SearchViewModel(siteConfig: SiteConfig) : ViewModel() {
         }
     }
 
-    fun setQuery(query: String) {
+    fun setQueryAndSearch(query: String) {
         viewModelScope.launch {
             js.callFunction<String>("getSearchUrl", arrayOf(query))
                 .onSuccess { queryUrl ->

@@ -36,6 +36,7 @@ import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
+import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.icon.EditIcon
 import com.paulcoding.hviewer.ui.page.posts.PostItemView
@@ -56,7 +57,7 @@ fun SearchPage(
     val focusManager = LocalFocusManager.current
 
     fun submit() {
-        viewModel.setQuery(query)
+        viewModel.setQueryAndSearch(query)
         focusManager.clearFocus()
     }
 
@@ -130,6 +131,12 @@ fun PageContent(
         if (uiState.isLoading)
             item {
                 HLoading()
+            }
+        else if (uiState.postItems.isEmpty() && uiState.query.isNotEmpty())
+            item {
+                HEmpty(
+                    title = "No posts found",
+                )
             }
     }
 }

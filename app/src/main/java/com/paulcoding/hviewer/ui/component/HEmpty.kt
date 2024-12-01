@@ -19,7 +19,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.paulcoding.hviewer.R
 
 @Composable
-fun HEmpty(title: String? = null, message: String? = null, block: () -> Unit) {
+fun HEmpty(title: String? = null, message: String? = null, block: (() -> Unit)? = null) {
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.empty))
     val progress by animateLottieCompositionAsState(composition)
 
@@ -39,7 +39,7 @@ fun HEmpty(title: String? = null, message: String? = null, block: () -> Unit) {
             if (message != null)
                 Text(
                     message,
-                    modifier = Modifier.clickable { block() },
+                    modifier = Modifier.clickable { block?.invoke() },
                     textDecoration = TextDecoration.Underline
                 )
         }
