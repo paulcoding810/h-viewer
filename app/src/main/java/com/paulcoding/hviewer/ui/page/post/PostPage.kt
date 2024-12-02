@@ -1,21 +1,16 @@
 package com.paulcoding.hviewer.ui.page.post
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -23,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -34,11 +28,9 @@ import coil3.compose.AsyncImage
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.helper.makeToast
-import com.paulcoding.hviewer.model.SiteConfig
-import com.paulcoding.hviewer.ui.component.HBackIcon
+import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
-import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.component.HideSystemBars
 import com.paulcoding.hviewer.ui.page.AppViewModel
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
@@ -46,7 +38,6 @@ import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
     val appState by appViewModel.stateFlow.collectAsState()
@@ -75,47 +66,11 @@ fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
         }
     }
 
-    var isScrollingUp by remember { mutableStateOf(false) }
-
-    // Detect scroll direction
-    LaunchedEffect(listState) {
-        var previousIndex = listState.firstVisibleItemIndex
-        var previousOffset = listState.firstVisibleItemScrollOffset
-
-        snapshotFlow { listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset }
-            .collect { (index, offset) ->
-                isScrollingUp = if (index != previousIndex) {
-                    index < previousIndex
-                } else {
-                    offset < previousOffset
-                }
-                previousIndex = index
-                previousOffset = offset
-            }
-    }
-
     HideSystemBars()
 
-    Scaffold(topBar = {
-        AnimatedVisibility(
-            visible = isScrollingUp
-        ) {
-            TopAppBar(
-                navigationIcon = {
-                    HBackIcon { goBack() }
-                },
-                title = {},
-                actions = {
-                    if (uiState.images.isNotEmpty())
-                        HPageProgress(uiState.postPage, uiState.postTotalPage)
-                }
-            )
-        }
-    }) {
-
+    Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.padding(it),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(uiState.images) { image ->
@@ -128,7 +83,10 @@ fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
                 item {
                     HLoading()
                 }
+
         }
+
+        HGoTop(listState)
 
         if (selectedImage != null) {
             ImageModal(url = selectedImage!!) {
