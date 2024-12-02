@@ -1,21 +1,17 @@
 package com.paulcoding.hviewer.ui.page.post
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,11 +30,8 @@ import coil3.compose.AsyncImage
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.helper.makeToast
-import com.paulcoding.hviewer.model.SiteConfig
-import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
-import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.component.HideSystemBars
 import com.paulcoding.hviewer.ui.page.AppViewModel
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
@@ -96,44 +89,25 @@ fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
 
     HideSystemBars()
 
-    Scaffold(topBar = {
-        AnimatedVisibility(
-            visible = isScrollingUp
-        ) {
-            TopAppBar(
-                navigationIcon = {
-                    HBackIcon { goBack() }
-                },
-                title = {},
-                actions = {
-                    if (uiState.images.isNotEmpty())
-                        HPageProgress(uiState.postPage, uiState.postTotalPage)
-                }
+    LazyColumn(
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(uiState.images) { image ->
+            HImage(
+                modifier = Modifier.clickable { selectedImage = image },
+                url = image
             )
         }
-    }) {
-
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.padding(it),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(uiState.images) { image ->
-                HImage(
-                    modifier = Modifier.clickable { selectedImage = image },
-                    url = image
-                )
+        if (uiState.isLoading)
+            item {
+                HLoading()
             }
-            if (uiState.isLoading)
-                item {
-                    HLoading()
-                }
-        }
+    }
 
-        if (selectedImage != null) {
-            ImageModal(url = selectedImage!!) {
-                selectedImage = null
-            }
+    if (selectedImage != null) {
+        ImageModal(url = selectedImage!!) {
+            selectedImage = null
         }
     }
 }
