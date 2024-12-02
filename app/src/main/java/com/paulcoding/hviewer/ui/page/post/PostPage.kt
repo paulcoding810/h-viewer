@@ -38,6 +38,7 @@ import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
+import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.component.HideSystemBars
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
@@ -99,6 +100,9 @@ fun PostPage(siteConfig: SiteConfig, postUrl: String, goBack: () -> Unit) {
                     HBackIcon { goBack() }
                 },
                 title = {},
+                actions = {
+                    HPageProgress(uiState.postPage, uiState.postTotalPage)
+                }
             )
         }
     }) {
