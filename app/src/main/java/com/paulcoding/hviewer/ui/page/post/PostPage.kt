@@ -101,7 +101,8 @@ fun PostPage(siteConfig: SiteConfig, postUrl: String, goBack: () -> Unit) {
                 },
                 title = {},
                 actions = {
-                    HPageProgress(uiState.postPage, uiState.postTotalPage)
+                    if (uiState.images.isNotEmpty())
+                        HPageProgress(uiState.postPage, uiState.postTotalPage)
                 }
             )
         }

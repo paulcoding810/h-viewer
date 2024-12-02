@@ -38,6 +38,7 @@ import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HLoading
+import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.icon.EditIcon
 import com.paulcoding.hviewer.ui.page.posts.PostItemView
 
@@ -52,6 +53,7 @@ fun SearchPage(
     val viewModel: SearchViewModel = viewModel(
         factory = SearchViewModelFactory(siteConfig),
     )
+    val uiState by viewModel.stateFlow.collectAsState()
     var query by remember { mutableStateOf(viewModel.stateFlow.value.query) }
     val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -69,7 +71,11 @@ fun SearchPage(
     Scaffold(topBar = {
         TopAppBar(title = { Text("Search") }, navigationIcon = {
             HBackIcon { goBack() }
-        })
+        },
+            actions = {
+                if (uiState.postItems.isNotEmpty())
+                    HPageProgress(uiState.postsPage, uiState.postsTotalPage)
+            })
     }) { paddings ->
         Column(modifier = Modifier.padding(paddings)) {
             Row(

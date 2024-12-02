@@ -63,8 +63,8 @@ fun PostsPage(
         TopAppBar(title = { Text(currentPage.toCapital()) }, navigationIcon = {
             HBackIcon { goBack() }
         }, actions = {
-            HIcon(imageVector = Search) { navToSearch() }
             HPageProgress(pageProgress.first, pageProgress.second)
+            HIcon(imageVector = Search) { navToSearch() }
         })
     }) { paddings ->
         Column(modifier = Modifier.padding(paddings)) {
