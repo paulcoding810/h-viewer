@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -28,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
@@ -148,7 +151,7 @@ fun PageContent(
         state = listState
     ) {
         items(uiState.postItems) { post ->
-            PostItemView(post) {
+            PostCard(post) {
                 onClick(post)
             }
         }
@@ -169,16 +172,22 @@ fun PageContent(
 }
 
 @Composable
-fun PostItemView(postItem: PostItem, viewPost: () -> Unit) {
-    return Column(modifier = Modifier
-        .padding(horizontal = 16.dp, vertical = 12.dp)
-        .clickable {
-            viewPost()
-        }) {
-        Text(postItem.name)
-        HImage(
-            url = postItem.thumbnail
-        )
+fun PostCard(postItem: PostItem, viewPost: () -> Unit) {
+    Card(
+        elevation = CardDefaults.cardElevation(8.dp),
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        shape = MaterialTheme.shapes.medium,
+    ) {
+        Column(modifier = Modifier
+            .padding(8.dp)
+            .clickable {
+                viewPost()
+            }) {
+            HImage(
+                url = postItem.thumbnail
+            )
+            Text(postItem.name, fontSize = 12.sp)
+        }
     }
 }
-
