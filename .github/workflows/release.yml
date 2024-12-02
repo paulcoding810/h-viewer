@@ -32,6 +32,9 @@ jobs:
         uses: android-actions/setup-android@v3
 
       - name: TEST
+        run: git tag -l
+
+      - name: TEST
         run: git describe --tags --abbrev=0
 
       - name: Build app
