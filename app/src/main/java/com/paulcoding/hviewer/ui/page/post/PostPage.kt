@@ -40,6 +40,7 @@ import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.component.HideSystemBars
+import com.paulcoding.hviewer.ui.page.AppViewModel
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
@@ -47,9 +48,13 @@ import me.saket.telephoto.zoomable.zoomable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PostPage(siteConfig: SiteConfig, postUrl: String, goBack: () -> Unit) {
+fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
+    val appState by appViewModel.stateFlow.collectAsState()
+    val post = appState.post
+    val siteConfig = appState.siteConfig
+
     val viewModel: PostViewModel = viewModel(
-        factory = PostViewModelFactory(postUrl, siteConfig = siteConfig)
+        factory = PostViewModelFactory(post.url, siteConfig = siteConfig)
     )
 
     val uiState by viewModel.stateFlow.collectAsState()

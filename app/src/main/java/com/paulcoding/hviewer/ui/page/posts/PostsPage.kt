@@ -41,17 +41,21 @@ import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.icon.Search
+import com.paulcoding.hviewer.ui.page.AppViewModel
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostsPage(
-    navToImages: (postUrl: String) -> Unit,
+    appViewModel: AppViewModel,
+    navToImages: (PostItem) -> Unit,
     navToSearch: () -> Unit,
-    siteConfig: SiteConfig,
     goBack: () -> Unit
 ) {
+    val appState by appViewModel.stateFlow.collectAsState()
+    val siteConfig = appState.siteConfig
+
     val listTopic = siteConfig.tags.keys.toList()
     val pagerState = rememberPagerState { listTopic.size }
     val selectedTabIndex = pagerState.currentPage
@@ -98,8 +102,8 @@ fun PostsPage(
                     page,
                     onPageChange = { currentPage, total ->
                         pageProgress = currentPage to total
-                    }) { postUrl ->
-                    navToImages(postUrl)
+                    }) { post ->
+                    navToImages(post)
                 }
             }
         }
@@ -111,7 +115,7 @@ fun PageContent(
     siteConfig: SiteConfig,
     topic: String,
     onPageChange: (Int, Int) -> Unit,
-    onClick: (String) -> Unit
+    onClick: (PostItem) -> Unit
 ) {
     val viewModel: PostsViewModel = viewModel(
         factory = PostsViewModelFactory(siteConfig, topic),
@@ -144,8 +148,8 @@ fun PageContent(
         state = listState
     ) {
         items(uiState.postItems) { post ->
-            PostItemView(post) { postUrl ->
-                onClick(postUrl)
+            PostItemView(post) {
+                onClick(post)
             }
         }
         if (uiState.isLoading)
@@ -165,11 +169,11 @@ fun PageContent(
 }
 
 @Composable
-fun PostItemView(postItem: PostItem, viewPost: (postUrl: String) -> Unit) {
+fun PostItemView(postItem: PostItem, viewPost: () -> Unit) {
     return Column(modifier = Modifier
         .padding(horizontal = 16.dp, vertical = 12.dp)
         .clickable {
-            viewPost(postItem.url)
+            viewPost()
         }) {
         Text(postItem.name)
         HImage(

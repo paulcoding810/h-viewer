@@ -34,22 +34,26 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
-import com.paulcoding.hviewer.model.SiteConfig
+import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.icon.EditIcon
+import com.paulcoding.hviewer.ui.page.AppViewModel
 import com.paulcoding.hviewer.ui.page.posts.PostItemView
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchPage(
-    navToImages: (postUrl: String) -> Unit,
-    siteConfig: SiteConfig,
-    goBack: () -> Unit
+    appViewModel: AppViewModel,
+    navToImages: (post: PostItem) -> Unit,
+    goBack: () -> Unit,
 ) {
+    val appState by appViewModel.stateFlow.collectAsState()
+    val siteConfig = appState.siteConfig
+
     val viewModel: SearchViewModel = viewModel(
         factory = SearchViewModelFactory(siteConfig),
     )
@@ -100,8 +104,8 @@ fun SearchPage(
                     Icon(EditIcon, contentDescription = "Search")
                 }
             }
-            PageContent(viewModel = viewModel) { postUrl ->
-                navToImages(postUrl)
+            PageContent(viewModel = viewModel) { post ->
+                navToImages(post)
             }
         }
     }
@@ -111,7 +115,7 @@ fun SearchPage(
 @Composable
 fun PageContent(
     viewModel: SearchViewModel,
-    onClick: (String) -> Unit
+    onClick: (PostItem) -> Unit
 ) {
     val listState = rememberLazyListState()
     val uiState by viewModel.stateFlow.collectAsState()
@@ -130,8 +134,8 @@ fun PageContent(
         state = listState
     ) {
         items(uiState.postItems) { post ->
-            PostItemView(post) { postUrl ->
-                onClick(postUrl)
+            PostItemView(post) {
+                onClick(post)
             }
         }
         if (uiState.isLoading)
