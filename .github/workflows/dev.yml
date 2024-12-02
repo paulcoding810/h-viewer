@@ -6,7 +6,7 @@ on:
       - main
   pull_request:
     branches:
-      - mainn
+      - main
 
 jobs:
   build:
@@ -39,6 +39,12 @@ jobs:
           key: gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             gradle-
+
+      - name: TEST
+        run: git tag -l
+
+      - name: TEST
+        run: git describe --tags --abbrev=0
 
       - name: Build app
         run: ./gradlew assembleDebug

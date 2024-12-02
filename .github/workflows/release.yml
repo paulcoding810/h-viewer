@@ -2,12 +2,9 @@ name: Build & Release
 
 on:
   workflow_dispatch:
-#  push:
-#    tags:
-#      - 'v*.*'
-  pull_request:
-    branches:
-      - main
+  push:
+    tags:
+      - 'v*.*'
 
 jobs:
   build:
@@ -31,12 +28,6 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: TEST
-        run: git tag -l
-
-      - name: TEST
-        run: git describe --tags --abbrev=0
-
       - name: Build app
         run: ./gradlew assembleRelease
 
@@ -55,20 +46,20 @@ jobs:
         run: |
           mv "${{ steps.sign_app.outputs.signedFile }}" "app-release.apk"
 
-      - name: Create changelog
-        id: changelog
-        uses: requarks/changelog-action@v1
-        with:
-          token: ${{ github.token }}
-          tag: ${{ github.ref_name }}
-          includeInvalidCommits: true
-          excludeTypes: build,chore
-          writeToFile: false
-
-#      - name: Create release
-#        uses: softprops/action-gh-release@v2
+#      - name: Create changelog
+#        id: changelog
+#        uses: requarks/changelog-action@v1
 #        with:
-#          body: ${{ steps.changelog.outputs.changes }}
-#          files: "app-release.apk"
-#          fail_on_unmatched_files: true
-#          make_latest: true
+#          token: ${{ github.token }}
+#          tag: ${{ github.ref_name }}
+#          includeInvalidCommits: true
+#          excludeTypes: build,chore
+#          writeToFile: false
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          body: ChangeLog
+          files: "app-release.apk"
+          fail_on_unmatched_files: true
+          make_latest: true
