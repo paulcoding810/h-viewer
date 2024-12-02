@@ -2,9 +2,12 @@ name: Build & Release
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - 'v*.*'
+#  push:
+#    tags:
+#      - 'v*.*'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -27,6 +30,9 @@ jobs:
 
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+
+      - name: TEST
+        run: git describe --tags --abbrev=0
 
       - name: Build app
         run: ./gradlew assembleRelease
@@ -56,10 +62,10 @@ jobs:
           excludeTypes: build,chore
           writeToFile: false
 
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          body: ${{ steps.changelog.outputs.changes }}
-          files: "app-release.apk"
-          fail_on_unmatched_files: true
-          make_latest: true
+#      - name: Create release
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          body: ${{ steps.changelog.outputs.changes }}
+#          files: "app-release.apk"
+#          fail_on_unmatched_files: true
+#          make_latest: true
