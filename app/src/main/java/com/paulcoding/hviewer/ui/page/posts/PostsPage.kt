@@ -2,6 +2,7 @@ package com.paulcoding.hviewer.ui.page.posts
 
 import android.widget.Toast
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,6 +37,7 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
+import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
@@ -144,27 +146,30 @@ fun PageContent(
         onPageChange(uiState.postsPage, uiState.postsTotalPage)
     }
 
-    LazyColumn(
-        state = listState
-    ) {
-        items(uiState.postItems) { post ->
-            PostItemView(post) {
-                onClick(post)
-            }
-        }
-        if (uiState.isLoading)
-            item {
-                HLoading()
-            }
-        else if (uiState.postItems.isEmpty())
-            item {
-                HEmpty(
-                    title = "No posts found",
-                    message = "Refresh?"
-                ) {
-                    viewModel.getPosts(1)
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState
+        ) {
+            items(uiState.postItems) { post ->
+                PostItemView(post) {
+                    onClick(post)
                 }
             }
+            if (uiState.isLoading)
+                item {
+                    HLoading()
+                }
+            else if (uiState.postItems.isEmpty())
+                item {
+                    HEmpty(
+                        title = "No posts found",
+                        message = "Refresh?"
+                    ) {
+                        viewModel.getPosts(1)
+                    }
+                }
+        }
+        HGoTop(listState)
     }
 }
 

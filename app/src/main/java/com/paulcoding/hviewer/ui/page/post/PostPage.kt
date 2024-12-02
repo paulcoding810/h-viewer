@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -19,7 +18,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -30,6 +28,7 @@ import coil3.compose.AsyncImage
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.helper.makeToast
+import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HideSystemBars
@@ -39,7 +38,6 @@ import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
     val appState by appViewModel.stateFlow.collectAsState()
@@ -68,46 +66,32 @@ fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
         }
     }
 
-    var isScrollingUp by remember { mutableStateOf(false) }
-
-    // Detect scroll direction
-    LaunchedEffect(listState) {
-        var previousIndex = listState.firstVisibleItemIndex
-        var previousOffset = listState.firstVisibleItemScrollOffset
-
-        snapshotFlow { listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset }
-            .collect { (index, offset) ->
-                isScrollingUp = if (index != previousIndex) {
-                    index < previousIndex
-                } else {
-                    offset < previousOffset
-                }
-                previousIndex = index
-                previousOffset = offset
-            }
-    }
-
     HideSystemBars()
 
-    LazyColumn(
-        state = listState,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(uiState.images) { image ->
-            HImage(
-                modifier = Modifier.clickable { selectedImage = image },
-                url = image
-            )
-        }
-        if (uiState.isLoading)
-            item {
-                HLoading()
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(uiState.images) { image ->
+                HImage(
+                    modifier = Modifier.clickable { selectedImage = image },
+                    url = image
+                )
             }
-    }
+            if (uiState.isLoading)
+                item {
+                    HLoading()
+                }
 
-    if (selectedImage != null) {
-        ImageModal(url = selectedImage!!) {
-            selectedImage = null
+        }
+
+        HGoTop(listState)
+
+        if (selectedImage != null) {
+            ImageModal(url = selectedImage!!) {
+                selectedImage = null
+            }
         }
     }
 }
