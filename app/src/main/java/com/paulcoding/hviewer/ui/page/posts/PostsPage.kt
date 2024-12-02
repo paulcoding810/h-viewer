@@ -22,7 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -36,6 +39,7 @@ import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
+import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.icon.Search
 import kotlinx.coroutines.launch
 
@@ -53,11 +57,14 @@ fun PostsPage(
     val selectedTabIndex = pagerState.currentPage
     val currentPage = listTopic[selectedTabIndex]
     val scope = rememberCoroutineScope()
+    var pageProgress by remember { mutableStateOf(1 to 1) }
+
     Scaffold(topBar = {
         TopAppBar(title = { Text(currentPage.toCapital()) }, navigationIcon = {
             HBackIcon { goBack() }
         }, actions = {
             HIcon(imageVector = Search) { navToSearch() }
+            HPageProgress(pageProgress.first, pageProgress.second)
         })
     }) { paddings ->
         Column(modifier = Modifier.padding(paddings)) {
@@ -86,7 +93,12 @@ fun PostsPage(
                 modifier = Modifier.fillMaxSize(),
             ) { pageIndex ->
                 val page = listTopic[pageIndex]
-                PageContent(siteConfig, page) { postUrl ->
+                PageContent(
+                    siteConfig,
+                    page,
+                    onPageChange = { currentPage, total ->
+                        pageProgress = currentPage to total
+                    }) { postUrl ->
                     navToImages(postUrl)
                 }
             }
@@ -95,7 +107,12 @@ fun PostsPage(
 }
 
 @Composable
-fun PageContent(siteConfig: SiteConfig, topic: String, onClick: (String) -> Unit) {
+fun PageContent(
+    siteConfig: SiteConfig,
+    topic: String,
+    onPageChange: (Int, Int) -> Unit,
+    onClick: (String) -> Unit
+) {
     val viewModel: PostsViewModel = viewModel(
         factory = PostsViewModelFactory(siteConfig, topic),
         key = topic
@@ -117,6 +134,10 @@ fun PageContent(siteConfig: SiteConfig, topic: String, onClick: (String) -> Unit
         if (viewModel.canLoadMorePostsData() && !uiState.isLoading && listState.isScrolledToEnd()) {
             viewModel.getNextPosts()
         }
+    }
+
+    LaunchedEffect(uiState.postsPage, uiState.postsTotalPage) {
+        onPageChange(uiState.postsPage, uiState.postsTotalPage)
     }
 
     LazyColumn(
