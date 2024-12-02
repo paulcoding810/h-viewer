@@ -44,7 +44,7 @@ import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.icon.EditIcon
 import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.posts.PostItemView
+import com.paulcoding.hviewer.ui.page.posts.PostCard
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -138,7 +138,7 @@ fun PageContent(
             state = listState
         ) {
             items(uiState.postItems) { post ->
-                PostItemView(post) {
+                PostCard(post) {
                     onClick(post)
                 }
             }
