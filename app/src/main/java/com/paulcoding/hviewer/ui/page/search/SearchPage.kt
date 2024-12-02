@@ -2,8 +2,10 @@ package com.paulcoding.hviewer.ui.page.search
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,6 +39,7 @@ import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
+import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.icon.EditIcon
@@ -130,23 +133,27 @@ fun PageContent(
         }
     }
 
-    LazyColumn(
-        state = listState
-    ) {
-        items(uiState.postItems) { post ->
-            PostCard(post) {
-                onClick(post)
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            state = listState
+        ) {
+            items(uiState.postItems) { post ->
+                PostCard(post) {
+                    onClick(post)
+                }
             }
+            if (uiState.isLoading)
+                item {
+                    HLoading()
+                }
+            else if (uiState.postItems.isEmpty() && uiState.query.isNotEmpty())
+                item {
+                    HEmpty(
+                        title = "No posts found",
+                    )
+                }
         }
-        if (uiState.isLoading)
-            item {
-                HLoading()
-            }
-        else if (uiState.postItems.isEmpty() && uiState.query.isNotEmpty())
-            item {
-                HEmpty(
-                    title = "No posts found",
-                )
-            }
+        HGoTop(listState)
     }
 }
+
