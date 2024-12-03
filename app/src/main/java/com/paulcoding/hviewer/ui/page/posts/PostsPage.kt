@@ -1,6 +1,8 @@
 package com.paulcoding.hviewer.ui.page.posts
 
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -200,7 +202,10 @@ fun PostCard(
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .animateContentSize(
+                animationSpec = tween(durationMillis = 300)
+            ),
         shape = MaterialTheme.shapes.medium,
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
