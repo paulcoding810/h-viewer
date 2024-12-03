@@ -1,5 +1,8 @@
 package com.paulcoding.hviewer.model
 
+ import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 data class PostData(
     val images: List<String>,
     val total: Int,
@@ -7,9 +10,11 @@ data class PostData(
 )
 
 
+@Entity(tableName = "favorite_posts")
 data class PostItem(
-    val name: String = "",
+    @PrimaryKey
     val url: String = "",
+    val name: String = "",
     val thumbnail: String = "",
 )
 

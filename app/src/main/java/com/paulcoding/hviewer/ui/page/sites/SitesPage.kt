@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.ui.component.HEmpty
+import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.icon.SettingsIcon
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,6 +43,7 @@ fun SitesPage(
     siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
     refresh: () -> Unit,
+    navToFavorite: () -> Unit,
 ) {
     val state = rememberPullToRefreshState()
 
@@ -53,6 +55,9 @@ fun SitesPage(
 
     Scaffold(topBar = {
         TopAppBar(title = { Text("Sites") }, actions = {
+            HFavoriteIcon(isFavorite = false) {
+                navToFavorite()
+            }
             IconButton(onClick = navToSettings) {
                 Icon(SettingsIcon, "Settings")
             }

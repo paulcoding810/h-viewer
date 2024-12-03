@@ -20,6 +20,7 @@ import androidx.navigation.compose.rememberNavController
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.network.Github
+import com.paulcoding.hviewer.ui.favorite.FavoritePage
 import com.paulcoding.hviewer.ui.page.post.PostPage
 import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.search.SearchPage
@@ -48,6 +49,9 @@ fun AppEntry() {
                     navController.navigate(Route.POSTS)
                 }, navToSettings = {
                     navController.navigate(Route.SETTINGS)
+                },
+                navToFavorite = {
+                    navController.navigate(Route.FAVORITE)
                 },
                 goBack = { navController.popBackStack() })
         }
@@ -78,6 +82,15 @@ fun AppEntry() {
                     navToImages(post)
                 },
                 goBack = { navController.popBackStack() },
+            )
+        }
+        animatedComposable(Route.FAVORITE) {
+            FavoritePage(
+                appViewModel = appViewModel,
+                navToImages = { post: PostItem ->
+                    navToImages(post)
+                },
+                goBack = { navController.popBackStack() }
             )
         }
     }
