@@ -21,18 +21,17 @@ class AppViewModel : ViewModel() {
     }
 
     fun setSiteConfig(site: String, siteConfig: SiteConfig) {
-        _stateFlow.update { it.copy(site = site, siteConfig = siteConfig) }
+        _stateFlow.update { it.copy(site = site to siteConfig) }
     }
 
     data class UiState(
         val post: PostItem = PostItem(),
-        val site: String = "",
-        val siteConfig: SiteConfig = SiteConfig(),
+        val site: Pair<String, SiteConfig> = "" to SiteConfig(),
     )
 
     fun addFavorite(postItem: PostItem) {
         viewModelScope.launch {
-            val postWithPage = postItem.copy(site = _stateFlow.value.site)
+            val postWithPage = postItem.copy(site = _stateFlow.value.site.first)
             DatabaseProvider.getInstance().favoritePostDao().insert(postWithPage)
         }
     }

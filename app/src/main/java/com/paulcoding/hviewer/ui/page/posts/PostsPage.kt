@@ -61,7 +61,7 @@ fun PostsPage(
     goBack: () -> Unit
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
-    val siteConfig = appState.siteConfig
+    val siteConfig = appState.site.second
 
     val listTopic = siteConfig.tags.keys.toList()
     val pagerState = rememberPagerState { listTopic.size }
