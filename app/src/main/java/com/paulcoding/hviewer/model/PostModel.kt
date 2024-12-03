@@ -16,6 +16,7 @@ data class PostItem(
     val url: String = "",
     val name: String = "",
     val thumbnail: String = "",
+    val site: String = "",
 )
 
 data class Posts(

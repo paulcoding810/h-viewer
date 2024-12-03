@@ -45,7 +45,7 @@ fun AppEntry() {
             SitesPage(siteConfigs = siteConfigs,
                 refresh = { Github.refreshLocalConfigs() },
                 navToTopics = { site ->
-                    appViewModel.setSiteConfig(siteConfigs.sites[site]!!)
+                    appViewModel.setSiteConfig(site, siteConfigs.sites[site]!!)
                     navController.navigate(Route.POSTS)
                 }, navToSettings = {
                     navController.navigate(Route.SETTINGS)
@@ -88,6 +88,7 @@ fun AppEntry() {
             FavoritePage(
                 appViewModel = appViewModel,
                 navToImages = { post: PostItem ->
+                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
                     navToImages(post)
                 },
                 goBack = { navController.popBackStack() }

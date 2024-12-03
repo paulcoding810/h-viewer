@@ -11,7 +11,9 @@ object DatabaseProvider {
             db = Room.databaseBuilder(
                 appContext,
                 AppDatabase::class.java, "hviewer_db"
-            ).build()
+            )
+                .addMigrations(MIGRATION_1_2)
+                .build()
         }
         return db!!
     }
