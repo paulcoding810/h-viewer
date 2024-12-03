@@ -1,6 +1,8 @@
 package com.paulcoding.hviewer.ui.page.posts
 
 import android.widget.Toast
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +43,7 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
+import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
@@ -59,7 +63,7 @@ fun PostsPage(
     goBack: () -> Unit
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
-    val siteConfig = appState.siteConfig
+    val siteConfig = appState.site.second
 
     val listTopic = siteConfig.tags.keys.toList()
     val pagerState = rememberPagerState { listTopic.size }
@@ -103,6 +107,7 @@ fun PostsPage(
             ) { pageIndex ->
                 val page = listTopic[pageIndex]
                 PageContent(
+                    appViewModel,
                     siteConfig,
                     page,
                     onPageChange = { currentPage, total ->
@@ -117,11 +122,13 @@ fun PostsPage(
 
 @Composable
 fun PageContent(
+    appViewModel: AppViewModel,
     siteConfig: SiteConfig,
     topic: String,
     onPageChange: (Int, Int) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
+    val listFavorite by appViewModel.favoritePosts.collectAsState(initial = emptyList())
     val viewModel: PostsViewModel = viewModel(
         factory = PostsViewModelFactory(siteConfig, topic),
         key = topic
@@ -154,7 +161,16 @@ fun PageContent(
             state = listState
         ) {
             items(uiState.postItems) { post ->
-                PostCard(post) {
+                PostCard(
+                    post,
+                    isFavorite = listFavorite.find { it.url == post.url } != null,
+                    setFavorite = { isFavorite ->
+                        if (isFavorite)
+                            appViewModel.addFavorite(post)
+                        else
+                            appViewModel.deleteFavorite(post)
+                    }
+                ) {
                     onClick(post)
                 }
             }
@@ -177,22 +193,38 @@ fun PageContent(
 }
 
 @Composable
-fun PostCard(postItem: PostItem, viewPost: () -> Unit) {
+fun PostCard(
+    postItem: PostItem,
+    isFavorite: Boolean = false,
+    setFavorite: (Boolean) -> Unit = {},
+    viewPost: () -> Unit
+) {
     Card(
         elevation = CardDefaults.cardElevation(8.dp),
         modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .animateContentSize(
+                animationSpec = tween(durationMillis = 300)
+            ),
         shape = MaterialTheme.shapes.medium,
     ) {
-        Column(modifier = Modifier
-            .padding(8.dp)
-            .clickable {
-                viewPost()
-            }) {
-            HImage(
-                url = postItem.thumbnail
-            )
-            Text(postItem.name, fontSize = 12.sp)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier
+                .padding(8.dp)
+                .clickable {
+                    viewPost()
+                }) {
+                HImage(
+                    url = postItem.thumbnail
+                )
+                Text(postItem.name, fontSize = 12.sp)
+            }
+            HFavoriteIcon(
+                modifier = Modifier.align(Alignment.TopEnd),
+                isFavorite = isFavorite
+            ) {
+                setFavorite(!isFavorite)
+            }
         }
     }
 }

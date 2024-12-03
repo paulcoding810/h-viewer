@@ -42,7 +42,7 @@ import me.saket.telephoto.zoomable.zoomable
 fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
     val appState by appViewModel.stateFlow.collectAsState()
     val post = appState.post
-    val siteConfig = appState.siteConfig
+    val siteConfig = appState.site.second
 
     val viewModel: PostViewModel = viewModel(
         factory = PostViewModelFactory(post.url, siteConfig = siteConfig)

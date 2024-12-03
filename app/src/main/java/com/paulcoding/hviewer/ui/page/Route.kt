@@ -8,4 +8,5 @@ object Route {
     const val POST = "post"
     const val SEARCH = "search"
     const val SETTINGS = "settings"
+    const val FAVORITE = "favorite"
 }
