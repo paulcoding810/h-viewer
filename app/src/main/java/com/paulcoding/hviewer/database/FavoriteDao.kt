@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoritePostDao {
-    @Query("SELECT * FROM favorite_posts")
+    @Query("SELECT * FROM favorite_posts ORDER BY createdAt DESC")
     fun getAll(): Flow<List<PostItem>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

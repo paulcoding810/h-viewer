@@ -12,7 +12,7 @@ object DatabaseProvider {
                 appContext,
                 AppDatabase::class.java, "hviewer_db"
             )
-                .addMigrations(MIGRATION_1_2)
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .build()
         }
         return db!!

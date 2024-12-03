@@ -17,6 +17,7 @@ data class PostItem(
     val name: String = "",
     val thumbnail: String = "",
     val site: String = "",
+    val createdAt: Long = 0,
 )
 
 data class Posts(
