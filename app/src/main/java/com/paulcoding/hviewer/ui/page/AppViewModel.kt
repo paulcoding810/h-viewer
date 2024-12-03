@@ -29,10 +29,13 @@ class AppViewModel : ViewModel() {
         val site: Pair<String, SiteConfig> = "" to SiteConfig(),
     )
 
-    fun addFavorite(postItem: PostItem) {
+    fun addFavorite(postItem: PostItem, reAdded: Boolean = false) {
         viewModelScope.launch {
-            val postWithPage = postItem.copy(site = _stateFlow.value.site.first)
-            DatabaseProvider.getInstance().favoritePostDao().insert(postWithPage)
+            val item = if (reAdded) postItem else postItem.copy(
+                site = _stateFlow.value.site.first,
+                createdAt = System.currentTimeMillis()
+            )
+            DatabaseProvider.getInstance().favoritePostDao().insert(item)
         }
     }
 
