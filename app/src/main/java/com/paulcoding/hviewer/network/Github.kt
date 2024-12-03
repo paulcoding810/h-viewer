@@ -67,7 +67,7 @@ object Github {
                         downloadAndGetConfig()
                     } else {
                         log("Already latest version", "check update")
-                        _stateFlow.update { it.copy(siteConfigs = siteConfigs) }
+                        _stateFlow.update { it.copy(siteConfigs = currentConfigs) }
                     }
                 }
             } catch (e: Exception) {

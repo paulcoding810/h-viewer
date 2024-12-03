@@ -9,4 +9,6 @@ object Route {
     const val SEARCH = "search"
     const val SETTINGS = "settings"
     const val FAVORITE = "favorite"
+    const val EDITOR = "editor"
+    const val LIST_SCRIPT = "list_script"
 }

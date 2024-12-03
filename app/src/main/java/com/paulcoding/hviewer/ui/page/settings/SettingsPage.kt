@@ -47,12 +47,14 @@ import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
+import com.paulcoding.hviewer.ui.component.H7Tap
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.icon.EditIcon
+import com.paulcoding.hviewer.ui.page.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsPage(goBack: () -> Boolean) {
+fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean) {
     val githubState by Github.stateFlow.collectAsState()
     val prevSiteConfigs = remember { githubState.siteConfigs }
     var modalVisible by remember { mutableStateOf(false) }
@@ -73,6 +75,7 @@ fun SettingsPage(goBack: () -> Boolean) {
         Box(modifier = Modifier.padding(paddings)) {
             Column(
                 modifier = Modifier
+                    .fillMaxSize()
                     .padding(horizontal = 16.dp)
                     .verticalScroll(
                         rememberScrollState()
@@ -103,6 +106,14 @@ fun SettingsPage(goBack: () -> Boolean) {
                         Preferences.secureScreen = it
                         window.setSecureScreen(it)
                     })
+                }
+                Box(modifier = Modifier
+                    .weight(1f)
+                    .fillMaxSize()
+                ) {
+                    H7Tap(modifier = Modifier.align(Alignment.BottomCenter)) {
+                        appViewModel.setDevMode(it)
+                    }
                 }
             }
         }

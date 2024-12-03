@@ -31,6 +31,8 @@ import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
+import com.paulcoding.hviewer.ui.component.HIcon
+import com.paulcoding.hviewer.ui.icon.EditIcon
 import com.paulcoding.hviewer.ui.icon.SettingsIcon
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -38,10 +40,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SitesPage(
+    isDevMode: Boolean,
     navToTopics: (site: String) -> Unit,
     goBack: () -> Unit,
     siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
+    navToListScript: () -> Unit,
     refresh: () -> Unit,
     navToFavorite: () -> Unit,
 ) {
@@ -55,6 +59,10 @@ fun SitesPage(
 
     Scaffold(topBar = {
         TopAppBar(title = { Text("Sites") }, actions = {
+            if (isDevMode)
+                HIcon(EditIcon) {
+                    navToListScript()
+                }
             HFavoriteIcon(isFavorite = false) {
                 navToFavorite()
             }
