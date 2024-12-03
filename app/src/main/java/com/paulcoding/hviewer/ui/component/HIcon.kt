@@ -29,8 +29,8 @@ fun HFavoriteIcon(modifier: Modifier = Modifier, isFavorite: Boolean, onClick: (
 
 @Composable
 fun HIcon(
-    modifier: Modifier = Modifier,
     imageVector: ImageVector = SettingsIcon,
+    modifier: Modifier = Modifier,
     description: String = "",
     tint: Color = LocalContentColor.current,
     onClick: () -> Unit

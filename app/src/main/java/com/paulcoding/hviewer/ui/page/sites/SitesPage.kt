@@ -31,6 +31,8 @@ import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
+import com.paulcoding.hviewer.ui.component.HIcon
+import com.paulcoding.hviewer.ui.icon.EditIcon
 import com.paulcoding.hviewer.ui.icon.SettingsIcon
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -42,6 +44,7 @@ fun SitesPage(
     goBack: () -> Unit,
     siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
+    navToListScript: () -> Unit,
     refresh: () -> Unit,
     navToFavorite: () -> Unit,
 ) {
@@ -55,6 +58,9 @@ fun SitesPage(
 
     Scaffold(topBar = {
         TopAppBar(title = { Text("Sites") }, actions = {
+            HIcon(EditIcon) {
+                navToListScript()
+            }
             HFavoriteIcon(isFavorite = false) {
                 navToFavorite()
             }

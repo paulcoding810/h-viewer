@@ -21,6 +21,8 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
+import com.paulcoding.hviewer.ui.page.editor.EditorPage
+import com.paulcoding.hviewer.ui.page.editor.ListScriptPage
 import com.paulcoding.hviewer.ui.page.post.PostPage
 import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.search.SearchPage
@@ -52,6 +54,9 @@ fun AppEntry() {
                 },
                 navToFavorite = {
                     navController.navigate(Route.FAVORITE)
+                },
+                navToListScript = {
+                    navController.navigate(Route.LIST_SCRIPT)
                 },
                 goBack = { navController.popBackStack() })
         }
@@ -93,6 +98,21 @@ fun AppEntry() {
                 },
                 goBack = { navController.popBackStack() }
             )
+        }
+        animatedComposable(Route.LIST_SCRIPT) {
+            ListScriptPage(
+                appViewModel = appViewModel,
+                goBack = { navController.popBackStack() },
+                navToEditor = {
+                    navController.navigate(Route.EDITOR + "/$it")
+                })
+        }
+        animatedComposable(Route.EDITOR + "/{scriptFile}") { backStackEntry ->
+            val scriptFile = backStackEntry.arguments?.getString("scriptFile")!!
+            EditorPage(
+                appViewModel = appViewModel,
+                scriptFile = scriptFile,
+                goBack = { navController.popBackStack() })
         }
     }
 }
