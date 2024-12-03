@@ -34,7 +34,12 @@ class AppViewModel : ViewModel() {
     data class UiState(
         val post: PostItem = PostItem(),
         val site: Pair<String, SiteConfig> = "" to SiteConfig(),
+        val isDevMode: Boolean = false,
     )
+
+    fun setDevMode(isDevMode: Boolean) {
+        _stateFlow.update { it.copy(isDevMode = isDevMode) }
+    }
 
     fun addFavorite(postItem: PostItem, reAdded: Boolean = false) {
         viewModelScope.launch {

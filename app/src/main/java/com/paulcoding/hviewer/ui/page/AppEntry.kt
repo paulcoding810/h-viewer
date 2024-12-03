@@ -36,6 +36,7 @@ fun AppEntry() {
     val githubState by Github.stateFlow.collectAsState()
     val siteConfigs = githubState.siteConfigs ?: SiteConfigs()
     val appViewModel: AppViewModel = viewModel()
+    val appState by appViewModel.stateFlow.collectAsState()
 
     fun navToImages(post: PostItem) {
         appViewModel.setCurrentPost(post)
@@ -44,7 +45,9 @@ fun AppEntry() {
 
     NavHost(navController, Route.SITES) {
         animatedComposable(Route.SITES) {
-            SitesPage(siteConfigs = siteConfigs,
+            SitesPage(
+                isDevMode = appState.isDevMode,
+                siteConfigs = siteConfigs,
                 refresh = { Github.refreshLocalConfigs() },
                 navToTopics = { site ->
                     appViewModel.setSiteConfig(site, siteConfigs.sites[site]!!)
@@ -61,7 +64,7 @@ fun AppEntry() {
                 goBack = { navController.popBackStack() })
         }
         animatedComposable(Route.SETTINGS) {
-            SettingsPage(goBack = { navController.popBackStack() })
+            SettingsPage(appViewModel = appViewModel, goBack = { navController.popBackStack() })
         }
         animatedComposable(Route.POSTS) {
             PostsPage(

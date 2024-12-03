@@ -40,6 +40,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SitesPage(
+    isDevMode: Boolean,
     navToTopics: (site: String) -> Unit,
     goBack: () -> Unit,
     siteConfigs: SiteConfigs,
@@ -58,9 +59,10 @@ fun SitesPage(
 
     Scaffold(topBar = {
         TopAppBar(title = { Text("Sites") }, actions = {
-            HIcon(EditIcon) {
-                navToListScript()
-            }
+            if (isDevMode)
+                HIcon(EditIcon) {
+                    navToListScript()
+                }
             HFavoriteIcon(isFavorite = false) {
                 navToFavorite()
             }
