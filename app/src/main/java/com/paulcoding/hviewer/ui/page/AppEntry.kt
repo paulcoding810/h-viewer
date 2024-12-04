@@ -133,7 +133,7 @@ fun AppEntry() {
             LockPage(onUnlocked = {
                 navController.navigate(Route.SITES)
                 {
-                    popUpTo(navController.graph.startDestinationId) {
+                    popUpTo(Route.LOCK) {
                         inclusive = true
                     }
                 }
