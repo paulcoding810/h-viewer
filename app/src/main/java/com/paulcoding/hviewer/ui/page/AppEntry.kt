@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -20,9 +21,11 @@ import androidx.navigation.compose.rememberNavController
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.network.Github
+import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
 import com.paulcoding.hviewer.ui.page.editor.EditorPage
 import com.paulcoding.hviewer.ui.page.editor.ListScriptPage
+import com.paulcoding.hviewer.ui.page.lock.LockPage
 import com.paulcoding.hviewer.ui.page.post.PostPage
 import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.search.SearchPage
@@ -43,7 +46,10 @@ fun AppEntry() {
         navController.navigate(Route.POST)
     }
 
-    NavHost(navController, Route.SITES) {
+    val startDestination =
+        remember { if (Preferences.pin.isNotEmpty()) Route.LOCK else Route.SITES }
+
+    NavHost(navController, startDestination = startDestination) {
         animatedComposable(Route.SITES) {
             SitesPage(
                 isDevMode = appState.isDevMode,
@@ -64,7 +70,13 @@ fun AppEntry() {
                 goBack = { navController.popBackStack() })
         }
         animatedComposable(Route.SETTINGS) {
-            SettingsPage(appViewModel = appViewModel, goBack = { navController.popBackStack() })
+            SettingsPage(appViewModel = appViewModel, onLockEnabled = {
+                navController.navigate(Route.LOCK) {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    launchSingleTop = true
+                    restoreState = false
+                }
+            }, goBack = { navController.popBackStack() })
         }
         animatedComposable(Route.POSTS) {
             PostsPage(
@@ -116,6 +128,16 @@ fun AppEntry() {
                 appViewModel = appViewModel,
                 scriptFile = scriptFile,
                 goBack = { navController.popBackStack() })
+        }
+        animatedComposable(Route.LOCK) {
+            LockPage(onUnlocked = {
+                navController.navigate(Route.SITES)
+                {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = true
+                    }
+                }
+            })
         }
     }
 }
