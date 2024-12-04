@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,11 +39,11 @@ fun LockModal(onDismiss: () -> Unit, onPinConfirmed: (String) -> Unit = {}) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(modifier = Modifier.align(Alignment.End)) {
                     TextButton(onClick = { dismiss() }) {
-                        Text("Cancel")
+                        Text("Cancel", color = MaterialTheme.colorScheme.error)
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     TextButton(onClick = { onPinConfirmed(pin) }) {
-                        Text("OK")
+                        Text("OK", color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
