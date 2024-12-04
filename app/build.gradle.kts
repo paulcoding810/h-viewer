@@ -6,6 +6,14 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            keyAlias = "androiddebugkey"
+            storePassword = "android"
+            keyPassword = "android"
+        }
+    }
     namespace = "com.paulcoding.hviewer"
     compileSdk = 35
 
@@ -23,6 +31,7 @@ android {
         debug {
             applicationIdSuffix = ".dev"
             resValue("string", "app_name", "H Viewer (Dev)")
+            signingConfig = signingConfigs.getByName("debug")
         }
         release {
             isMinifyEnabled = true
