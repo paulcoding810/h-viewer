@@ -22,6 +22,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -54,17 +55,30 @@ import com.paulcoding.hviewer.ui.page.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean) {
+fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean, onLockEnabled: () -> Unit) {
     val githubState by Github.stateFlow.collectAsState()
     val prevSiteConfigs = remember { githubState.siteConfigs }
     var modalVisible by remember { mutableStateOf(false) }
     var secureScreen by remember { mutableStateOf(Preferences.secureScreen) }
     val window = (LocalContext.current as MainActivity).window
+    var lockModalVisible by remember { mutableStateOf(false) }
+    var appLockEnabled by remember { mutableStateOf(Preferences.pin.isNotEmpty()) }
 
     LaunchedEffect(githubState.siteConfigs) {
         if (prevSiteConfigs != githubState.siteConfigs) {
             goBack()
         }
+    }
+
+    fun onAppLockEnabled(pin: String) {
+        Preferences.pin = pin
+        appLockEnabled = true
+        onLockEnabled()
+    }
+
+    fun onAppLockDisabled() {
+        Preferences.pin = ""
+        appLockEnabled = false
     }
 
     Scaffold(topBar = {
@@ -107,9 +121,25 @@ fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean) {
                         window.setSecureScreen(it)
                     })
                 }
-                Box(modifier = Modifier
-                    .weight(1f)
-                    .fillMaxSize()
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text("Lock Screen", modifier = Modifier.weight(1f))
+                    Switch(checked = appLockEnabled, onCheckedChange = { locked ->
+                        if (locked) {
+                            lockModalVisible = true
+                        } else {
+                            onAppLockDisabled()
+                        }
+                    })
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize()
                 ) {
                     H7Tap(modifier = Modifier.align(Alignment.BottomCenter)) {
                         appViewModel.setDevMode(it)
@@ -125,6 +155,11 @@ fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean) {
                     modalVisible = it
                 }) {
                 Github.updateRemoteUrl(it)
+            }
+
+        if (lockModalVisible)
+            LockModal(onDismiss = { lockModalVisible = false }) {
+                onAppLockEnabled(it)
             }
     }
 }
