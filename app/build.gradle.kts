@@ -108,8 +108,8 @@ dependencies {
 
     implementation(platform(libs.bom))
     implementation(libs.editor)
-    implementation("io.github.Rosemoe.sora-editor:language-textmate")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.3")
+    implementation(libs.language.textmate)
+    coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
