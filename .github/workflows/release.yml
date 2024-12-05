@@ -5,6 +5,9 @@ on:
   push:
     tags:
       - 'v*.*'
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -42,9 +45,14 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}
           buildToolsVersion: ${{ env.ANDROID_BUILD_TOOLS_VERSION }}
 
-      - name: Rename signed APK
+#      - name: Rename signed APK
+#        run: |
+#          mv "${{ steps.sign_app.outputs.signedFile }}" "app-release.apk"
+
+      - name: Rename apks
         run: |
-          mv "${{ steps.sign_app.outputs.signedFile }}" "app-release.apk"
+          echo ${{ steps.sign_app.outputs.signedFiles }}
+
 
 #      - name: Create changelog
 #        id: changelog
@@ -56,10 +64,10 @@ jobs:
 #          excludeTypes: build,chore
 #          writeToFile: false
 
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          body: ChangeLog
-          files: "app-release.apk"
-          fail_on_unmatched_files: true
-          make_latest: true
+#      - name: Create release
+#        uses: softprops/action-gh-release@v2
+#        with:
+#          body: ChangeLog
+#          files: "app-release.apk"
+#          fail_on_unmatched_files: true
+#          make_latest: true
