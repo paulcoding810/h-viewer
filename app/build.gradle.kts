@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.commons.compress)
     implementation(libs.lottie.compose)
     implementation(libs.zoomable)
+    implementation(libs.androidx.material.icons.extended)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.android)

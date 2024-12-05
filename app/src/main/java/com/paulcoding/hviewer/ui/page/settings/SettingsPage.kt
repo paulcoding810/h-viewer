@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -33,7 +33,7 @@ import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.H7Tap
 import com.paulcoding.hviewer.ui.component.HBackIcon
-import com.paulcoding.hviewer.ui.icon.EditIcon
+import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.page.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,8 +84,8 @@ fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean, onLockEnable
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text("Remote Url", modifier = Modifier.weight(1f))
-                    IconButton(onClick = { modalVisible = true }) {
-                        Icon(EditIcon, "Edit")
+                    HIcon(Icons.Outlined.Edit) {
+                        modalVisible = true
                     }
                 }
                 Text(
