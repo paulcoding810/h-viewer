@@ -12,7 +12,7 @@ import coil3.request.crossfade
 import com.paulcoding.hviewer.R
 
 @Composable
-fun HImage(modifier: Modifier = Modifier, url: String) {
+fun HImage(url: String, modifier: Modifier = Modifier) {
     AsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
             .data(url)
@@ -22,7 +22,7 @@ fun HImage(modifier: Modifier = Modifier, url: String) {
         placeholder = painterResource(R.drawable.ic_launcher_foreground),
         error = painterResource(R.drawable.ic_launcher_foreground),
         modifier = modifier.fillMaxWidth(),
-        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.FillWidth,
     )
 }
 
