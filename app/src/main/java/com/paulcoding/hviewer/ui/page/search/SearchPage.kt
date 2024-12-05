@@ -107,7 +107,7 @@ fun SearchPage(
                     Icon(EditIcon, contentDescription = "Search")
                 }
             }
-            PageContent(viewModel = viewModel) { post ->
+            PageContent(appViewModel = appViewModel, viewModel = viewModel) { post ->
                 navToImages(post)
             }
         }
@@ -117,11 +117,13 @@ fun SearchPage(
 
 @Composable
 fun PageContent(
+    appViewModel: AppViewModel,
     viewModel: SearchViewModel,
     onClick: (PostItem) -> Unit
 ) {
     val listState = rememberLazyListState()
     val uiState by viewModel.stateFlow.collectAsState()
+    val listFavorite by appViewModel.favoritePosts.collectAsState(initial = emptyList())
 
     uiState.error?.let {
         Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
@@ -138,7 +140,15 @@ fun PageContent(
             state = listState
         ) {
             items(uiState.postItems) { post ->
-                PostCard(post) {
+                PostCard(post,
+                    isFavorite = listFavorite.find { it.url == post.url } != null,
+                    setFavorite = { isFavorite ->
+                        if (isFavorite)
+                            appViewModel.addFavorite(post)
+                        else
+                            appViewModel.deleteFavorite(post)
+                    }
+                ) {
                     onClick(post)
                 }
             }
