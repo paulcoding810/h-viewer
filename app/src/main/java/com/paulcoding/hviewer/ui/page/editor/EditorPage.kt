@@ -2,6 +2,8 @@ package com.paulcoding.hviewer.ui.page.editor
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,7 +20,6 @@ import com.paulcoding.hviewer.helper.writeFile
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.icon.Save
 import com.paulcoding.hviewer.ui.page.AppViewModel
 import io.github.rosemoe.sora.text.Content
 
@@ -49,7 +50,7 @@ fun EditorPage(
                     goBack()
                 }
             }, actions = {
-                HIcon(imageVector = Save) {
+                HIcon(imageVector = Icons.Outlined.Save) {
                     context.writeFile(state.content.toString(), scriptFile)
                     Github.refreshLocalConfigs()
                     localSoftwareKeyboardController?.hide()

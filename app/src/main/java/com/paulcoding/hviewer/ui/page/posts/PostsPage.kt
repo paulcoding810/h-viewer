@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,7 +50,6 @@ import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
-import com.paulcoding.hviewer.ui.icon.Search
 import com.paulcoding.hviewer.ui.page.AppViewModel
 import kotlinx.coroutines.launch
 
@@ -76,7 +77,7 @@ fun PostsPage(
             HBackIcon { goBack() }
         }, actions = {
             HPageProgress(pageProgress.first, pageProgress.second)
-            HIcon(imageVector = Search) { navToSearch() }
+            HIcon(imageVector = Icons.Outlined.Search) { navToSearch() }
         })
     }) { paddings ->
         Column(modifier = Modifier.padding(paddings)) {

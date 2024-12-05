@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.Javascript
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -19,8 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.ui.component.HBackIcon
-import com.paulcoding.hviewer.ui.icon.BugReport
-import com.paulcoding.hviewer.ui.icon.Javascript
 import com.paulcoding.hviewer.ui.page.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,8 +46,8 @@ fun ListScriptPage(
     }
 
     val fileIcon = when (type) {
-        "script" -> Javascript
-        "crash_log" -> BugReport
+        "script" -> Icons.Outlined.Javascript
+        "crash_log" -> Icons.Outlined.BugReport
         else -> return makeToast("Unknown type $type")
     }
 
