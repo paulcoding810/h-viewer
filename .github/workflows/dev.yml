@@ -44,10 +44,10 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Rename apk
-        run: mv app/build/outputs/apk/debug/app-universal-debug.apk hviewer-${{ github.ref_name }}-debug.apk
+        run: mv app/build/outputs/apk/debug/app-universal-debug.apk hviewer-debug.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app
-          path: hviewer-${{ github.ref_name }}-debug.apk
+          path: hviewer-debug.apk
