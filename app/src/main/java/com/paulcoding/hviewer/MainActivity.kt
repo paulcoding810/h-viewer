@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.helper.makeToast
+import com.paulcoding.hviewer.helper.setupTextmate
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HLoading
@@ -30,6 +31,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setupTextmate()
 
         window.setSecureScreen(Preferences.secureScreen)
 
