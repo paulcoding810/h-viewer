@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.database.DatabaseProvider
+import com.paulcoding.hviewer.helper.crashLogDir
 import com.paulcoding.hviewer.helper.scriptsDir
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
@@ -14,9 +15,11 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 class AppViewModel : ViewModel() {
-    private val scriptsDir = appContext.scriptsDir
     val listScriptFiles: List<File>
-        get() = scriptsDir.listFiles()?.toList() ?: listOf()
+        get() = appContext.scriptsDir.listFiles()?.toList() ?: listOf()
+
+    val listCrashLogFiles: List<File>
+        get() = appContext.crashLogDir.listFiles()?.toList() ?: listOf()
 
     private var _stateFlow = MutableStateFlow(UiState())
     val stateFlow = _stateFlow.asStateFlow()
