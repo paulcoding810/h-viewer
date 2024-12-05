@@ -38,8 +38,12 @@ fun EditorPage(
         else -> return makeToast("Unknown type $type")
     }
     val editable = type == "script"
+    val language = if (type == "script") "js" else null
     val script = context.readFile(scriptFile, dir)
-    val state = rememberCodeEditorState(initialContent = Content(script), editable = editable)
+    val state = rememberCodeEditorState(
+        initialContent = Content(script), editable = editable,
+        language = language
+    )
     val localSoftwareKeyboardController = LocalSoftwareKeyboardController.current
 
     Scaffold(
