@@ -135,7 +135,7 @@ fun PageContent(
         LazyColumn(
             state = listState
         ) {
-            items(uiState.postItems) { post ->
+            items(uiState.postItems, key = { it.url }) { post ->
                 PostCard(post,
                     isFavorite = listFavorite.find { it.url == post.url } != null,
                     setFavorite = { isFavorite ->

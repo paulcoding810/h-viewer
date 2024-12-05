@@ -73,7 +73,7 @@ fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(uiState.images) { image ->
+            items(uiState.images, key = { it }) { image ->
                 HImage(
                     modifier = Modifier.clickable { selectedImage = image },
                     url = image
