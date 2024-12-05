@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Javascript
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.page.AppViewModel
 
@@ -26,14 +28,33 @@ import com.paulcoding.hviewer.ui.page.AppViewModel
 @Composable
 fun ListScriptPage(
     appViewModel: AppViewModel,
+    type: String,
     goBack: () -> Unit,
-    navToEditor: (String) -> Unit
+    navToEditor: (String) -> Unit,
 ) {
+
+    val listFiles = when (type) {
+        "script" -> appViewModel.listScriptFiles
+        "crash_log" -> appViewModel.listCrashLogFiles
+        else -> emptyList()
+    }
+
+    val title = when (type) {
+        "script" -> "List Script"
+        "crash_log" -> "List Crash Log"
+        else -> ""
+    }
+
+    val fileIcon = when (type) {
+        "script" -> Icons.Outlined.Javascript
+        "crash_log" -> Icons.Outlined.BugReport
+        else -> return makeToast("Unknown type $type")
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(text = "List Script") },
+            TopAppBar(title = { Text(text = title) },
                 navigationIcon = {
                     HBackIcon {
                         goBack()
@@ -46,7 +67,7 @@ fun ListScriptPage(
                 .padding(paddings)
                 .fillMaxSize()
         ) {
-            items(appViewModel.listScriptFiles, key = { it.name }) {
+            items(listFiles, key = { it.name }) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -57,7 +78,7 @@ fun ListScriptPage(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        Icons.Outlined.Javascript,
+                        fileIcon,
                         contentDescription = "Javascript",
                         modifier = Modifier.size(32.dp),
                     )

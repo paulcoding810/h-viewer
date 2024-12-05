@@ -7,28 +7,33 @@ import java.io.File
 import java.io.FileOutputStream
 
 const val SCRIPTS_DIR = "scripts"
+const val CRASH_LOG_DIR = "crash_logs"
 const val CONFIG_FILE = "config.json"
 
 val Context.scriptsDir
     get() = File(filesDir, SCRIPTS_DIR)
+
+val Context.crashLogDir
+    get() = File(filesDir, CRASH_LOG_DIR)
 
 val Context.configFile
     get() = File(scriptsDir, CONFIG_FILE)
 
 fun Context.setupPaths() {
     scriptsDir.mkdir()
+    crashLogDir.mkdir()
 }
 
-fun Context.writeFile(data: String, fileName: String): File {
-    val file = File(scriptsDir, fileName)
+fun Context.writeFile(data: String, fileName: String, fileDir: File = scriptsDir): File {
+    val file = File(fileDir, fileName)
     FileOutputStream(file).use { fos ->
         fos.write(data.toByteArray())
     }
     return file
 }
 
-fun Context.readFile(fileName: String): String {
-    val file = File(scriptsDir, fileName)
+fun Context.readFile(fileName: String, fileDir: File = scriptsDir): String {
+    val file = File(fileDir, fileName)
 
     file.bufferedReader().use { reader ->
         return reader.readText()
