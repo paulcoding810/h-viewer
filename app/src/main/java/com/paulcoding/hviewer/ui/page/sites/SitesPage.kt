@@ -71,7 +71,9 @@ fun SitesPage(
             HFavoriteIcon(isFavorite = false) {
                 navToFavorite()
             }
-            HIcon(Icons.Outlined.Settings, "Settings") { }
+            HIcon(Icons.Outlined.Settings, "Settings") {
+                navToSettings()
+            }
         })
     }) {
         PullToRefreshBox(
