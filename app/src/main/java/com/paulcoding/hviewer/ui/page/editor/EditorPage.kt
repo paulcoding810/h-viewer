@@ -9,6 +9,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.helper.readFile
 import com.paulcoding.hviewer.helper.writeFile
@@ -25,6 +26,7 @@ fun EditorPage(appViewModel: AppViewModel, goBack: () -> Boolean, scriptFile: St
     val context = LocalContext.current
     val script = context.readFile(scriptFile)
     val state = rememberCodeEditorState(initialContent = Content(script))
+    val localSoftwareKeyboardController = LocalSoftwareKeyboardController.current
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -37,6 +39,8 @@ fun EditorPage(appViewModel: AppViewModel, goBack: () -> Boolean, scriptFile: St
                 HIcon(imageVector = Save) {
                     context.writeFile(state.content.toString(), scriptFile)
                     Github.refreshLocalConfigs()
+                    localSoftwareKeyboardController?.hide()
+                    goBack()
                     makeToast("Saved!")
                 }
             })
