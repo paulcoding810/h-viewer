@@ -42,10 +42,6 @@ jobs:
           keyPassword: ${{ secrets.KEY_PASSWORD }}
           buildToolsVersion: ${{ env.ANDROID_BUILD_TOOLS_VERSION }}
 
-#      - name: Rename signed APK
-#        run: |
-#          mv "${{ steps.sign_app.outputs.signedFile }}" "app-release.apk"
-
       - name: Rename apks
         run: |
           mv app/build/outputs/apk/release/app-arm64-v8a-release-unsigned-signed.apk hviewer-${{ github.ref_name }}-arm64-v8a-release.apk
@@ -53,9 +49,6 @@ jobs:
           mv app/build/outputs/apk/release/app-universal-release-unsigned-signed.apk hviewer-${{ github.ref_name }}-universal-release.apk
           mv app/build/outputs/apk/release/app-x86-release-unsigned-signed.apk hviewer-${{ github.ref_name }}-x86-release.apk
           mv app/build/outputs/apk/release/app-x86_64-release-unsigned-signed.apk hviewer-${{ github.ref_name }}-x86_64-release.apk
-          ls *.apk
-
-
 
 #      - name: Create changelog
 #        id: changelog
