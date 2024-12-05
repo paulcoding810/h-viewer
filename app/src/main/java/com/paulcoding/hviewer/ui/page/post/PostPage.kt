@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil3.compose.AsyncImage
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.helper.makeToast
@@ -116,16 +115,14 @@ fun ImageModal(url: String, dismiss: () -> Unit) {
         ) {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
                     .zoomable(
                         state = zoomableState,
                         onClick = { makeToast("Double click to dismiss") },
                         onDoubleClick = doubleClickToZoomListener
                     )
             ) {
-                AsyncImage(
-                    model = url,
-                    contentDescription = url,
+                HImage(
+                    url,
                     modifier = Modifier.align(Alignment.Center),
                 )
             }
