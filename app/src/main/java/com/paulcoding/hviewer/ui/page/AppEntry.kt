@@ -65,7 +65,10 @@ fun AppEntry() {
                     navController.navigate(Route.FAVORITE)
                 },
                 navToListScript = {
-                    navController.navigate(Route.LIST_SCRIPT)
+                    navController.navigate(Route.LIST_SCRIPT + "/script")
+                },
+                navToListCrashLog = {
+                    navController.navigate(Route.LIST_SCRIPT + "/crash_log")
                 },
                 goBack = { navController.popBackStack() })
         }
@@ -114,18 +117,24 @@ fun AppEntry() {
                 goBack = { navController.popBackStack() }
             )
         }
-        animatedComposable(Route.LIST_SCRIPT) {
+        animatedComposable(Route.LIST_SCRIPT + "/{type}") { backStackEntry ->
+            val type = backStackEntry.arguments?.getString("type")!!
+
             ListScriptPage(
                 appViewModel = appViewModel,
+                type = type,
                 goBack = { navController.popBackStack() },
                 navToEditor = {
-                    navController.navigate(Route.EDITOR + "/$it")
+                    navController.navigate(Route.EDITOR + "/$type" + "/$it")
                 })
         }
-        animatedComposable(Route.EDITOR + "/{scriptFile}") { backStackEntry ->
+        animatedComposable(Route.EDITOR + "/{type}" + "/{scriptFile}") { backStackEntry ->
+            val type = backStackEntry.arguments?.getString("type")!!
             val scriptFile = backStackEntry.arguments?.getString("scriptFile")!!
+
             EditorPage(
                 appViewModel = appViewModel,
+                type = type,
                 scriptFile = scriptFile,
                 goBack = { navController.popBackStack() })
         }

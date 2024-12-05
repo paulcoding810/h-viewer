@@ -9,8 +9,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.paulcoding.hviewer.helper.crashLogDir
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.helper.readFile
+import com.paulcoding.hviewer.helper.scriptsDir
 import com.paulcoding.hviewer.helper.writeFile
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.ui.component.HBackIcon
@@ -21,10 +23,21 @@ import io.github.rosemoe.sora.text.Content
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditorPage(appViewModel: AppViewModel, goBack: () -> Boolean, scriptFile: String) {
+fun EditorPage(
+    appViewModel: AppViewModel,
+    type: String,
+    goBack: () -> Boolean,
+    scriptFile: String
+) {
     val context = LocalContext.current
-    val script = context.readFile(scriptFile)
-    val state = rememberCodeEditorState(initialContent = Content(script))
+    val dir = when (type) {
+        "script" -> context.scriptsDir
+        "crash_log" -> context.crashLogDir
+        else -> return makeToast("Unknown type $type")
+    }
+    val editable = type == "script"
+    val script = context.readFile(scriptFile, dir)
+    val state = rememberCodeEditorState(initialContent = Content(script), editable = editable)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

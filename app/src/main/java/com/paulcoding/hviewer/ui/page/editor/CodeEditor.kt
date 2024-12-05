@@ -14,9 +14,11 @@ import io.github.rosemoe.sora.widget.CodeEditor
 
 data class CodeEditorState(
     var editor: CodeEditor? = null,
-    val initialContent: Content = Content()
+    val initialContent: Content = Content(),
+    val isEditable: Boolean = true,
 ) {
     var content by mutableStateOf(initialContent)
+    var editable by mutableStateOf(isEditable)
 }
 
 private fun setCodeEditorFactory(
@@ -26,6 +28,7 @@ private fun setCodeEditorFactory(
     val editor = CodeEditor(context)
     editor.apply {
         setText(state.content)
+        editor.editable = state.editable
     }
     state.editor = editor
     return editor
@@ -54,9 +57,11 @@ fun CodeEditor(
 
 @Composable
 fun rememberCodeEditorState(
-    initialContent: Content = Content()
+    initialContent: Content = Content(),
+    editable: Boolean = true,
 ) = remember {
     CodeEditorState(
-        initialContent = initialContent
+        initialContent = initialContent,
+        isEditable = editable,
     )
 }
