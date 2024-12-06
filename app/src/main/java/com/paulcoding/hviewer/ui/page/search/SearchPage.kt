@@ -13,7 +13,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -99,9 +100,16 @@ fun SearchPage(
                         imeAction = ImeAction.Go
                     ),
                     keyboardActions = KeyboardActions(onGo = { submit() }),
-                    modifier = Modifier.focusRequester(focusRequester)
+                    modifier = Modifier.focusRequester(focusRequester).weight(1f),
+                    trailingIcon = {
+                        if (query.isNotEmpty())
+                            HIcon(Icons.Outlined.Clear) {
+                                query = ""
+                                focusRequester.requestFocus()
+                            }
+                    }
                 )
-                HIcon(Icons.Outlined.Edit) { submit() }
+                HIcon(Icons.Outlined.Search) { submit() }
             }
             PageContent(appViewModel = appViewModel, viewModel = viewModel) { post ->
                 navToImages(post)
