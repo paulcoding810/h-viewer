@@ -2,8 +2,10 @@ package com.paulcoding.hviewer.ui.page
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.database.DatabaseProvider
+import com.paulcoding.hviewer.helper.alsoLog
 import com.paulcoding.hviewer.helper.crashLogDir
 import com.paulcoding.hviewer.helper.scriptsDir
 import com.paulcoding.hviewer.model.PostItem
@@ -34,10 +36,11 @@ class AppViewModel : ViewModel() {
         _stateFlow.update { it.copy(site = site to siteConfig) }
     }
 
+
     data class UiState(
         val post: PostItem = PostItem(),
         val site: Pair<String, SiteConfig> = "" to SiteConfig(),
-        val isDevMode: Boolean = false,
+        val isDevMode: Boolean = BuildConfig.DEBUG.alsoLog("debug"),
     )
 
     fun setDevMode(isDevMode: Boolean) {
