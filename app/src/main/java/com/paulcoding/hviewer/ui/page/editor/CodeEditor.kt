@@ -38,6 +38,7 @@ private fun setCodeEditorFactory(
 
     editor.apply {
         setText(state.content)
+        setTextSize(14f)
         editor.editable = state.editable
     }
     state.editor = editor
