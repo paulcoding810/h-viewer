@@ -1,11 +1,14 @@
 package com.paulcoding.hviewer.ui.page.post
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -26,12 +29,16 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
+import com.paulcoding.hviewer.extensions.isScrollingUp
 import com.paulcoding.hviewer.helper.makeToast
+import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HideSystemBars
 import com.paulcoding.hviewer.ui.page.AppViewModel
+import com.paulcoding.hviewer.ui.page.fadeInWithBlur
+import com.paulcoding.hviewer.ui.page.fadeOutWithBlur
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
@@ -80,12 +87,30 @@ fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
             }
             if (uiState.isLoading)
                 item {
-                    HLoading()
+                    Box(
+                        modifier = Modifier
+                            .statusBarsPadding()
+                            .statusBarsPadding()
+                    ) {
+                        HLoading()
+                    }
                 }
-
         }
 
         HGoTop(listState)
+
+        AnimatedVisibility(
+            listState.isScrollingUp().value,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(16.dp)
+                .statusBarsPadding()
+                .statusBarsPadding(),
+            enter = fadeInWithBlur(),
+            exit = fadeOutWithBlur(),
+        ) {
+            HBackIcon { goBack() }
+        }
 
         if (selectedImage != null) {
             ImageModal(url = selectedImage!!) {
