@@ -7,14 +7,14 @@ import com.paulcoding.hviewer.js.JS
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Posts
 import com.paulcoding.hviewer.model.SiteConfig
+import com.paulcoding.hviewer.model.Tag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
-    private val topicUrl = siteConfig.tags[topic] ?: ""
-
+class PostsViewModel(siteConfig: SiteConfig, tag: Tag) : ViewModel() {
+    private val topicUrl = tag.url
     private var _stateFlow = MutableStateFlow(UiState())
     val stateFlow = _stateFlow.asStateFlow()
 
@@ -75,11 +75,11 @@ class PostsViewModel(siteConfig: SiteConfig, topic: String) : ViewModel() {
 }
 
 @Suppress("UNCHECKED_CAST")
-class PostsViewModelFactory(private val siteConfig: SiteConfig, private val topic: String) :
+class PostsViewModelFactory(private val siteConfig: SiteConfig, private val tag: Tag) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PostsViewModel::class.java)) {
-            return PostsViewModel(siteConfig, topic) as T
+            return PostsViewModel(siteConfig, tag) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

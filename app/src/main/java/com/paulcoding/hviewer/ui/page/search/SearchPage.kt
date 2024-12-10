@@ -38,6 +38,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.model.PostItem
+import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HGoTop
@@ -53,6 +54,7 @@ import com.paulcoding.hviewer.ui.page.posts.PostCard
 fun SearchPage(
     appViewModel: AppViewModel,
     navToImages: (post: PostItem) -> Unit,
+    navToCustomTag: (tag: Tag) -> Unit,
     goBack: () -> Unit,
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
@@ -111,7 +113,11 @@ fun SearchPage(
                 )
                 HIcon(Icons.Outlined.Search) { submit() }
             }
-            PageContent(appViewModel = appViewModel, viewModel = viewModel) { post ->
+            PageContent(
+                appViewModel = appViewModel,
+                navToCustomTag = navToCustomTag,
+                viewModel = viewModel
+            ) { post ->
                 navToImages(post)
             }
         }
@@ -123,6 +129,7 @@ fun SearchPage(
 fun PageContent(
     appViewModel: AppViewModel,
     viewModel: SearchViewModel,
+    navToCustomTag: (Tag) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -151,8 +158,12 @@ fun PageContent(
                             appViewModel.addFavorite(post)
                         else
                             appViewModel.deleteFavorite(post)
+                    },
+                    onTagClick = {
+                        navToCustomTag(it)
                     }
-                ) {
+                )
+                {
                     onClick(post)
                 }
             }

@@ -5,11 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.database.DatabaseProvider
-import com.paulcoding.hviewer.helper.alsoLog
 import com.paulcoding.hviewer.helper.crashLogDir
 import com.paulcoding.hviewer.helper.scriptsDir
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
+import com.paulcoding.hviewer.model.Tag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -32,6 +32,12 @@ class AppViewModel : ViewModel() {
         _stateFlow.update { it.copy(post = post) }
     }
 
+    fun setCurrentTag(tag: Tag) {
+        _stateFlow.update { it.copy(tag = tag) }
+    }
+
+    fun getCurrentTag() = _stateFlow.value.tag
+
     fun setSiteConfig(site: String, siteConfig: SiteConfig) {
         _stateFlow.update { it.copy(site = site to siteConfig) }
     }
@@ -40,7 +46,8 @@ class AppViewModel : ViewModel() {
     data class UiState(
         val post: PostItem = PostItem(),
         val site: Pair<String, SiteConfig> = "" to SiteConfig(),
-        val isDevMode: Boolean = BuildConfig.DEBUG.alsoLog("debug"),
+        val tag: Tag = Tag(),
+        val isDevMode: Boolean = BuildConfig.DEBUG,
     )
 
     fun setDevMode(isDevMode: Boolean) {

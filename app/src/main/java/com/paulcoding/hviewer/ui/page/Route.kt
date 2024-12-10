@@ -5,6 +5,7 @@ object Route {
     const val SITES = "sites"
     const val TOPICS = "topics"
     const val POSTS = "posts"
+    const val CUSTOM_TAG = "custom_tag"
     const val POST = "post"
     const val SEARCH = "search"
     const val SETTINGS = "settings"
