@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfigs
+import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
@@ -27,6 +28,7 @@ import com.paulcoding.hviewer.ui.page.editor.EditorPage
 import com.paulcoding.hviewer.ui.page.editor.ListScriptPage
 import com.paulcoding.hviewer.ui.page.lock.LockPage
 import com.paulcoding.hviewer.ui.page.post.PostPage
+import com.paulcoding.hviewer.ui.page.posts.CustomTagPage
 import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.search.SearchPage
 import com.paulcoding.hviewer.ui.page.settings.SettingsPage
@@ -44,6 +46,11 @@ fun AppEntry() {
     fun navToImages(post: PostItem) {
         appViewModel.setCurrentPost(post)
         navController.navigate(Route.POST)
+    }
+
+    fun navToCustomTag(tag: Tag) {
+        appViewModel.setCurrentTag(tag)
+        navController.navigate(Route.CUSTOM_TAG)
     }
 
     val startDestination =
@@ -88,8 +95,16 @@ fun AppEntry() {
                     navToImages(post)
                 },
                 navToSearch = { navController.navigate(Route.SEARCH) },
+                navToCustomTag = { navToCustomTag(it) },
                 goBack = { navController.popBackStack() },
             )
+        }
+        animatedComposable(Route.CUSTOM_TAG) {
+            CustomTagPage(
+                appViewModel, goBack = { navController.popBackStack() }
+            ) {
+                navToImages(it)
+            }
         }
         animatedComposable(Route.POST) {
             PostPage(
@@ -104,6 +119,7 @@ fun AppEntry() {
                 navToImages = { post: PostItem ->
                     navToImages(post)
                 },
+                navToCustomTag = { navToCustomTag(it) },
                 goBack = { navController.popBackStack() },
             )
         }
@@ -114,6 +130,7 @@ fun AppEntry() {
                     appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
                     navToImages(post)
                 },
+                navToCustomTag = { navToCustomTag(it) },
                 goBack = { navController.popBackStack() }
             )
         }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.model.PostItem
+import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.page.AppViewModel
@@ -31,6 +32,7 @@ import kotlinx.coroutines.launch
 fun FavoritePage(
     appViewModel: AppViewModel,
     navToImages: (PostItem) -> Unit,
+    navToCustomTag: (Tag) -> Unit,
     goBack: () -> Boolean
 ) {
     val viewModel: AppViewModel = viewModel()
@@ -68,9 +70,11 @@ fun FavoritePage(
         }) { paddings ->
         LazyColumn(modifier = Modifier.padding(paddings)) {
             items(items = favoritePosts, key = { it.url }) { item ->
-                FavoriteItem(item, navToImages = { navToImages(item) }, deleteFavorite = {
-                    onDelete(item)
-                })
+                FavoriteItem(item, navToImages = { navToImages(item) },
+                    onTagClick = { navToCustomTag(it) },
+                    deleteFavorite = {
+                        onDelete(item)
+                    })
             }
             if (favoritePosts.isEmpty())
                 item { HEmpty() }
@@ -83,11 +87,16 @@ fun FavoritePage(
 fun FavoriteItem(
     post: PostItem,
     navToImages: () -> Unit,
+    onTagClick: (Tag) -> Unit,
     deleteFavorite: () -> Unit
 ) {
-    PostCard(post, isFavorite = true, setFavorite = {
-        deleteFavorite()
-    }) {
+    PostCard(
+        post, isFavorite = true,
+        setFavorite = {
+            deleteFavorite()
+        },
+        onTagClick = { onTagClick(it) },
+    ) {
         navToImages()
     }
 }

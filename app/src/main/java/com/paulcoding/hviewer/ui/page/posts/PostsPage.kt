@@ -54,6 +54,7 @@ fun PostsPage(
     appViewModel: AppViewModel,
     navToImages: (PostItem) -> Unit,
     navToSearch: () -> Unit,
+    navToCustomTag: (Tag) -> Unit,
     goBack: () -> Unit
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
@@ -107,6 +108,7 @@ fun PostsPage(
                     appViewModel,
                     siteConfig,
                     tag = tag,
+                    navToCustomTag = navToCustomTag,
                     onPageChange = { currentPage, total ->
                         pageProgress = currentPage to total
                     }) { post ->
@@ -123,7 +125,7 @@ fun PageContent(
     siteConfig: SiteConfig,
     tag: Tag,
     onPageChange: (Int, Int) -> Unit,
-    navToCustomTag: () -> Unit = {},
+    navToCustomTag: (Tag) -> Unit = {},
     onClick: (PostItem) -> Unit
 ) {
     val listFavorite by appViewModel.favoritePosts.collectAsState(initial = emptyList())
@@ -163,9 +165,7 @@ fun PageContent(
                     post,
                     isFavorite = listFavorite.find { it.url == post.url } != null,
                     onTagClick = {
-                        appViewModel.setCurrentTag(it)
-                        log(it, "current Tag")
-                        navToCustomTag()
+                        navToCustomTag(it)
                     },
                     setFavorite = { isFavorite ->
                         if (isFavorite)

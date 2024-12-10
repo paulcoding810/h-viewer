@@ -14,7 +14,7 @@ class Converters {
     @TypeConverter
     fun fromStringToListTag(data: String?): List<Tag>? {
         return data?.let {
-            val listType = object : TypeToken<List<String>>() {}.type
+            val listType = object : TypeToken<List<Tag>>() {}.type
             Gson().fromJson(it, listType)
         }
     }
