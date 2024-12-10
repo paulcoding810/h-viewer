@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.paulcoding.hviewer.extensions.toCapital
 import com.paulcoding.hviewer.model.PostItem
+import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.page.AppViewModel
@@ -24,6 +25,7 @@ import com.paulcoding.hviewer.ui.page.AppViewModel
 fun CustomTagPage(
     appViewModel: AppViewModel,
     goBack: () -> Unit,
+    navToCustomTag: (Tag) -> Unit,
     navToImages: (PostItem) -> Unit
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
@@ -49,6 +51,10 @@ fun CustomTagPage(
                 appViewModel,
                 siteConfig = appState.site.second,
                 tag = tag,
+                navToCustomTag = {
+                    if (it.name != tag.name)
+                        navToCustomTag(it)
+                },
                 onPageChange = { currentPage, total ->
                     pageProgress = currentPage to total
                 }) { post ->

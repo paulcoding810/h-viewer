@@ -101,7 +101,9 @@ fun AppEntry() {
         }
         animatedComposable(Route.CUSTOM_TAG) {
             CustomTagPage(
-                appViewModel, goBack = { navController.popBackStack() }
+                appViewModel,
+                navToCustomTag = { navToCustomTag(it) },
+                goBack = { navController.popBackStack() }
             ) {
                 navToImages(it)
             }
