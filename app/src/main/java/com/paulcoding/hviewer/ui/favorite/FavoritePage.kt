@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 fun FavoritePage(
     appViewModel: AppViewModel,
     navToImages: (PostItem) -> Unit,
-    navToCustomTag: (Tag) -> Unit,
+    navToCustomTag: (PostItem, Tag) -> Unit,
     goBack: () -> Boolean
 ) {
     val viewModel: AppViewModel = viewModel()
@@ -71,7 +71,7 @@ fun FavoritePage(
         LazyColumn(modifier = Modifier.padding(paddings)) {
             items(items = favoritePosts, key = { it.url }) { item ->
                 FavoriteItem(item, navToImages = { navToImages(item) },
-                    onTagClick = { navToCustomTag(it) },
+                    onTagClick = { tag -> navToCustomTag(item, tag) },
                     deleteFavorite = {
                         onDelete(item)
                     })

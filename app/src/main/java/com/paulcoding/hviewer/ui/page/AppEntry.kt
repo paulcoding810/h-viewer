@@ -130,7 +130,10 @@ fun AppEntry() {
                     appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
                     navToImages(post)
                 },
-                navToCustomTag = { navToCustomTag(it) },
+                navToCustomTag = { post, tag ->
+                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
+                    navToCustomTag(tag)
+                },
                 goBack = { navController.popBackStack() }
             )
         }
