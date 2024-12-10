@@ -1,36 +1,25 @@
 package com.paulcoding.hviewer.ui.page.posts
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,24 +28,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.toCapital
+import com.paulcoding.hviewer.helper.log
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
+import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
-import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.page.AppViewModel
@@ -74,15 +59,17 @@ fun PostsPage(
     val appState by appViewModel.stateFlow.collectAsState()
     val siteConfig = appState.site.second
 
-    val listTopic = siteConfig.tags.keys.toList()
-    val pagerState = rememberPagerState { listTopic.size }
+    val listTag: List<Tag> = siteConfig.tags.keys.map { key ->
+        Tag(name = key, url = siteConfig.tags[key]!!)
+    }
+    val pagerState = rememberPagerState { listTag.size }
     val selectedTabIndex = pagerState.currentPage
-    val currentPage = listTopic[selectedTabIndex]
+    val currentTag = listTag[selectedTabIndex]
     val scope = rememberCoroutineScope()
     var pageProgress by remember { mutableStateOf(1 to 1) }
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text(currentPage.toCapital()) }, navigationIcon = {
+        TopAppBar(title = { Text(currentTag.name.toCapital()) }, navigationIcon = {
             HBackIcon { goBack() }
         }, actions = {
             HPageProgress(pageProgress.first, pageProgress.second)
@@ -95,7 +82,7 @@ fun PostsPage(
                 modifier = Modifier.fillMaxWidth(),
                 edgePadding = 0.dp,
             ) {
-                listTopic.forEachIndexed { index, tab ->
+                listTag.forEachIndexed { index, tag ->
                     Tab(
                         selected = selectedTabIndex == index,
                         selectedContentColor = MaterialTheme.colorScheme.primary,
@@ -105,7 +92,7 @@ fun PostsPage(
                                 pagerState.animateScrollToPage(index)
                             }
                         },
-                        text = { Text(text = tab) },
+                        text = { Text(text = tag.name) },
                     )
                 }
             }
@@ -114,11 +101,12 @@ fun PostsPage(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
             ) { pageIndex ->
-                val page = listTopic[pageIndex]
+                val tag = listTag[pageIndex]
+
                 PageContent(
                     appViewModel,
                     siteConfig,
-                    page,
+                    tag = tag,
                     onPageChange = { currentPage, total ->
                         pageProgress = currentPage to total
                     }) { post ->
@@ -133,14 +121,15 @@ fun PostsPage(
 fun PageContent(
     appViewModel: AppViewModel,
     siteConfig: SiteConfig,
-    topic: String,
+    tag: Tag,
     onPageChange: (Int, Int) -> Unit,
+    navToCustomTag: () -> Unit = {},
     onClick: (PostItem) -> Unit
 ) {
     val listFavorite by appViewModel.favoritePosts.collectAsState(initial = emptyList())
     val viewModel: PostsViewModel = viewModel(
-        factory = PostsViewModelFactory(siteConfig, topic),
-        key = topic
+        factory = PostsViewModelFactory(siteConfig, tag),
+        key = tag.name
     )
     val listState = rememberLazyListState()
     val uiState by viewModel.stateFlow.collectAsState()
@@ -173,6 +162,11 @@ fun PageContent(
                 PostCard(
                     post,
                     isFavorite = listFavorite.find { it.url == post.url } != null,
+                    onTagClick = {
+                        appViewModel.setCurrentTag(it)
+                        log(it, "current Tag")
+                        navToCustomTag()
+                    },
                     setFavorite = { isFavorite ->
                         if (isFavorite)
                             appViewModel.addFavorite(post)
@@ -198,99 +192,5 @@ fun PageContent(
                 }
         }
         HGoTop(listState)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun PostCard(
-    postItem: PostItem,
-    isFavorite: Boolean = false,
-    setFavorite: (Boolean) -> Unit = {},
-    viewPost: () -> Unit
-) {
-    var isBottomSheetVisible by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState()
-
-    LaunchedEffect(isBottomSheetVisible) {
-        if (isBottomSheetVisible) {
-            bottomSheetState.show()
-        } else {
-            bottomSheetState.hide()
-        }
-    }
-
-    Card(
-        elevation = CardDefaults.cardElevation(4.dp),
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        border = CardDefaults.outlinedCardBorder(),
-        shape = CardDefaults.outlinedShape,
-        onClick = { viewPost() },
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .animateContentSize(
-                    animationSpec = tween(durationMillis = 300)
-                ),
-        ) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                HImage(
-                    url = postItem.thumbnail
-                )
-                Text(postItem.name, fontSize = 12.sp)
-            }
-            HFavoriteIcon(
-                modifier = Modifier.align(Alignment.TopEnd),
-                isFavorite = isFavorite
-            ) {
-                setFavorite(!isFavorite)
-            }
-            HIcon(Icons.Outlined.Info) {
-                isBottomSheetVisible = true
-            }
-        }
-    }
-
-//    TODO: Remove AnimatedVisibility
-    AnimatedVisibility(isBottomSheetVisible) {
-        ModalBottomSheet(
-            sheetState = bottomSheetState,
-            onDismissRequest = {
-                isBottomSheetVisible = false
-            }
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-            ) {
-                postItem.run {
-                    SelectionContainer {
-                        Text(text = name, fontSize = 20.sp)
-                    }
-                    Text(
-                        text = url,
-                        textDecoration = TextDecoration.Underline,
-                        fontSize = 12.sp,
-                        color = Color.Blue
-                    )
-                    if (size != null) {
-                        Text(text = "Size: $size")
-                    }
-                    if (views != null) {
-                        Text(text = "Views: $views")
-                    }
-                    postItem.tags?.run {
-                        forEach { tag ->
-                            TextButton(onClick = {}) {
-                                Text(text = tag.name)
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
