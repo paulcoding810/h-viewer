@@ -60,8 +60,10 @@ fun PostPage(appViewModel: AppViewModel, goBack: () -> Unit) {
     var selectedImage by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
 
-    uiState.error?.let {
-        Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
+        }
     }
 
     LaunchedEffect(Unit) {
