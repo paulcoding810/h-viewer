@@ -186,6 +186,7 @@ fun AppEntry() {
                     appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
                     navToCustomTag(tag)
                 },
+                deleteHistory = appViewModel::deleteHistory
             )
         }
     }
