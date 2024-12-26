@@ -7,11 +7,13 @@ import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.database.DatabaseProvider
 import com.paulcoding.hviewer.helper.crashLogDir
 import com.paulcoding.hviewer.helper.scriptsDir
+import com.paulcoding.hviewer.model.PostHistory
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
@@ -27,6 +29,7 @@ class AppViewModel : ViewModel() {
     val stateFlow = _stateFlow.asStateFlow()
 
     val favoritePosts = DatabaseProvider.getInstance().favoritePostDao().getAll()
+    val historyPosts = DatabaseProvider.getInstance().historyDao().getAll()
 
     fun setCurrentPost(post: PostItem) {
         _stateFlow.update { it.copy(post = post) }
@@ -67,6 +70,34 @@ class AppViewModel : ViewModel() {
     fun deleteFavorite(postItem: PostItem) {
         viewModelScope.launch {
             DatabaseProvider.getInstance().favoritePostDao().delete(postItem)
+        }
+    }
+
+    fun addHistory(postItem: PostItem) {
+        val item = PostHistory(
+            site = _stateFlow.value.site.first,
+            createdAt = System.currentTimeMillis(),
+            url = postItem.url,
+            views = postItem.views,
+            thumbnail = postItem.thumbnail,
+            name = postItem.name,
+            size = postItem.size,
+            tags = postItem.tags,
+            quantity = postItem.quantity
+        )
+        viewModelScope.launch {
+            // limit to 25 items in history
+            if (historyPosts.first().size >= 25) {
+                DatabaseProvider.getInstance().historyDao().deleteOldest()
+            }
+            DatabaseProvider.getInstance().historyDao()
+                .insert(item)
+        }
+    }
+
+    fun deleteHistory(history: PostHistory) {
+        viewModelScope.launch {
+            DatabaseProvider.getInstance().historyDao().delete(history)
         }
     }
 }

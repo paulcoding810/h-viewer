@@ -24,6 +24,34 @@ data class PostItem(
     val quantity: Int? = null,
 )
 
+// duplicated?
+@Entity(tableName = "history")
+data class PostHistory(
+    @PrimaryKey
+    val url: String = "",
+    val name: String = "",
+    val thumbnail: String = "",
+    val site: String = "",
+    val createdAt: Long = 0,
+    val tags: List<Tag>? = null,
+    val size: Int? = null,
+    val views: Int? = null,
+    val quantity: Int? = null,
+) {
+    fun toPostItem():PostItem {
+        return PostItem(
+            url = url,
+            name = name,
+            thumbnail = thumbnail,
+            site = site,
+            createdAt = createdAt,
+            tags = tags,
+            size = size,
+            views = views
+        )
+    }
+}
+
 data class Tag(
     val name: String = "",
     val url: String = "",

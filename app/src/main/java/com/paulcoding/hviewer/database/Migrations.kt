@@ -23,3 +23,11 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("ALTER TABLE favorite_posts ADD COLUMN quantity INTEGER")
     }
 }
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `history` (`url` TEXT NOT NULL, `name` TEXT NOT NULL, `thumbnail` TEXT NOT NULL, `site` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `tags` TEXT, `size` INTEGER, `views` INTEGER, `quantity` INTEGER, PRIMARY KEY(`url`))"
+        )
+    }
+}

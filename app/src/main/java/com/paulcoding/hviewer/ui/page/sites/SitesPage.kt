@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -45,6 +46,7 @@ fun SitesPage(
     goBack: () -> Unit,
     siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
+    navToHistory: () -> Unit,
     navToListCrashLog: () -> Unit,
     navToListScript: () -> Unit,
     refresh: () -> Unit,
@@ -67,6 +69,9 @@ fun SitesPage(
                 HIcon(Icons.Outlined.Edit) {
                     navToListScript()
                 }
+            }
+            HIcon(Icons.Outlined.History) {
+                navToHistory()
             }
             HFavoriteIcon(isFavorite = false) {
                 navToFavorite()

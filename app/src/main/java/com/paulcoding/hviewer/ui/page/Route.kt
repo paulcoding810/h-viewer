@@ -13,4 +13,5 @@ object Route {
     const val EDITOR = "editor"
     const val LIST_SCRIPT = "list_script"
     const val LOCK = "lock"
+    const val HISTORY = "history"
 }
