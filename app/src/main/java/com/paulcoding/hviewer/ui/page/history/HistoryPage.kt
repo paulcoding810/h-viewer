@@ -18,7 +18,7 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.posts.PostCard
+import com.paulcoding.hviewer.ui.page.posts.FavoriteCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,7 +44,7 @@ fun HistoryPage(
                 columns = StaggeredGridCells.Fixed(2),
             ) {
                 items(historyPosts) {
-                    PostCard(postItem = it.toPostItem()) {
+                    FavoriteCard(postItem = it.toPostItem()) {
                         navToImages(it.toPostItem())
                     }
                 }

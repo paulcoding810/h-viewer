@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -36,15 +37,35 @@ import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
 
+@Composable
+fun FavoriteCard(
+    postItem: PostItem,
+    isFavorite: Boolean = false,
+    setFavorite: (Boolean) -> Unit = {},
+    onTagClick: (Tag) -> Unit = {},
+    onClick: () -> Unit,
+) {
+    PostCard(
+        postItem = postItem,
+        onTagClick = onTagClick,
+        onClick = onClick
+    ) {
+        HFavoriteIcon(
+            modifier = Modifier.align(Alignment.TopEnd),
+            isFavorite = isFavorite
+        ) {
+            setFavorite(!isFavorite)
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCard(
     postItem: PostItem,
-    isFavorite: Boolean = false,
-    setFavorite: (Boolean) -> Unit = {},
     onTagClick: (Tag) -> Unit = {},
-    viewPost: () -> Unit,
+    onClick: () -> Unit,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
@@ -63,7 +84,7 @@ fun PostCard(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         border = CardDefaults.outlinedCardBorder(),
         shape = CardDefaults.outlinedShape,
-        onClick = { viewPost() },
+        onClick = { onClick() },
     ) {
         Box(
             modifier = Modifier
@@ -78,15 +99,10 @@ fun PostCard(
                 )
                 Text(postItem.name, fontSize = 12.sp)
             }
-            HFavoriteIcon(
-                modifier = Modifier.align(Alignment.TopEnd),
-                isFavorite = isFavorite
-            ) {
-                setFavorite(!isFavorite)
-            }
             HIcon(Icons.Outlined.Info) {
                 isBottomSheetVisible = true
             }
+            content()
         }
     }
 
