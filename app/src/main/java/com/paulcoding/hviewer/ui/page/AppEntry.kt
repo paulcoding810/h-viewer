@@ -179,7 +179,12 @@ fun AppEntry() {
             HistoryPage(
                 goBack = { navController.popBackStack() }, appViewModel = appViewModel,
                 navToImages = { post: PostItem ->
+                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
                     navToImages(post)
+                },
+                navToCustomTag = { post, tag ->
+                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
+                    navToCustomTag(tag)
                 },
             )
         }

@@ -65,7 +65,7 @@ fun PostCard(
     postItem: PostItem,
     onTagClick: (Tag) -> Unit = {},
     onClick: () -> Unit,
-    content: @Composable BoxScope.() -> Unit,
+    content: @Composable BoxScope.() -> Unit = {},
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()

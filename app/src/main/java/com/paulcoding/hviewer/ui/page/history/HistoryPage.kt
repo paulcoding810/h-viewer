@@ -15,16 +15,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.paulcoding.hviewer.model.PostItem
+import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.posts.FavoriteCard
+import com.paulcoding.hviewer.ui.page.posts.PostCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryPage(
     goBack: () -> Unit, appViewModel: AppViewModel,
-    navToImages: (PostItem) -> Unit
+    navToImages: (PostItem) -> Unit,
+    navToCustomTag: (PostItem, Tag) -> Unit
 ) {
     val historyPosts by appViewModel.historyPosts.collectAsState(initial = listOf())
 
@@ -44,9 +46,14 @@ fun HistoryPage(
                 columns = StaggeredGridCells.Fixed(2),
             ) {
                 items(historyPosts) {
-                    FavoriteCard(postItem = it.toPostItem()) {
-                        navToImages(it.toPostItem())
-                    }
+                    PostCard(
+                        postItem = it.toPostItem(),
+                        onTagClick = { tag ->
+                            navToCustomTag(it.toPostItem(), tag)
+                        },
+                        onClick = {
+                            navToImages(it.toPostItem())
+                        })
                 }
             }
             if (historyPosts.isEmpty())
