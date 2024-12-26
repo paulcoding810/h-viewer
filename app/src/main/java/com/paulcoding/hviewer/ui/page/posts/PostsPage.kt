@@ -34,7 +34,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.toCapital
-import com.paulcoding.hviewer.helper.log
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
@@ -161,7 +160,7 @@ fun PageContent(
             state = listState
         ) {
             items(uiState.postItems, key = { it.url }) { post ->
-                PostCard(
+                FavoriteCard(
                     post,
                     isFavorite = listFavorite.find { it.url == post.url } != null,
                     onTagClick = {

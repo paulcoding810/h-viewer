@@ -46,7 +46,7 @@ import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.posts.PostCard
+import com.paulcoding.hviewer.ui.page.posts.FavoriteCard
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -151,7 +151,7 @@ fun PageContent(
             state = listState
         ) {
             items(uiState.postItems, key = { it.url }) { post ->
-                PostCard(post,
+                FavoriteCard(post,
                     isFavorite = listFavorite.find { it.url == post.url } != null,
                     setFavorite = { isFavorite ->
                         if (isFavorite)

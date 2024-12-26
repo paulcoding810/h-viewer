@@ -24,7 +24,7 @@ import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.posts.PostCard
+import com.paulcoding.hviewer.ui.page.posts.FavoriteCard
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,7 +90,7 @@ fun FavoriteItem(
     onTagClick: (Tag) -> Unit,
     deleteFavorite: () -> Unit
 ) {
-    PostCard(
+    FavoriteCard(
         post, isFavorite = true,
         setFavorite = {
             deleteFavorite()

@@ -26,6 +26,7 @@ import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
 import com.paulcoding.hviewer.ui.page.editor.EditorPage
 import com.paulcoding.hviewer.ui.page.editor.ListScriptPage
+import com.paulcoding.hviewer.ui.page.history.HistoryPage
 import com.paulcoding.hviewer.ui.page.lock.LockPage
 import com.paulcoding.hviewer.ui.page.post.PostPage
 import com.paulcoding.hviewer.ui.page.posts.CustomTagPage
@@ -45,6 +46,7 @@ fun AppEntry() {
 
     fun navToImages(post: PostItem) {
         appViewModel.setCurrentPost(post)
+        appViewModel.addHistory(post)
         navController.navigate(Route.POST)
     }
 
@@ -76,6 +78,9 @@ fun AppEntry() {
                 },
                 navToListCrashLog = {
                     navController.navigate(Route.LIST_SCRIPT + "/crash_log")
+                },
+                navToHistory = {
+                    navController.navigate(Route.HISTORY)
                 },
                 goBack = { navController.popBackStack() })
         }
@@ -169,6 +174,20 @@ fun AppEntry() {
                     }
                 }
             })
+        }
+        animatedComposable(Route.HISTORY) {
+            HistoryPage(
+                goBack = { navController.popBackStack() }, appViewModel = appViewModel,
+                navToImages = { post: PostItem ->
+                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
+                    navToImages(post)
+                },
+                navToCustomTag = { post, tag ->
+                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
+                    navToCustomTag(tag)
+                },
+                deleteHistory = appViewModel::deleteHistory
+            )
         }
     }
 }
