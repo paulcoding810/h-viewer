@@ -14,4 +14,5 @@ object Route {
     const val LIST_SCRIPT = "list_script"
     const val LOCK = "lock"
     const val HISTORY = "history"
+    const val WEBVIEW = "webview"
 }

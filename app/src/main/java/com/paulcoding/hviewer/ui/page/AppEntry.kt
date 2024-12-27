@@ -34,6 +34,7 @@ import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.search.SearchPage
 import com.paulcoding.hviewer.ui.page.settings.SettingsPage
 import com.paulcoding.hviewer.ui.page.sites.SitesPage
+import com.paulcoding.hviewer.ui.page.web.WebPage
 
 @Composable
 fun AppEntry() {
@@ -116,6 +117,10 @@ fun AppEntry() {
         animatedComposable(Route.POST) {
             PostPage(
                 appViewModel,
+                navToWebView = {
+                    appViewModel.setWebViewUrl(it)
+                    navController.navigate(Route.WEBVIEW)
+                },
                 goBack = {
                     navController.popBackStack()
                 })
@@ -188,6 +193,10 @@ fun AppEntry() {
                 },
                 deleteHistory = appViewModel::deleteHistory
             )
+        }
+        animatedComposable(Route.WEBVIEW) {
+            val url = appViewModel.getWebViewUrl()
+            WebPage(goBack = { navController.popBackStack() }, url = url)
         }
     }
 }
