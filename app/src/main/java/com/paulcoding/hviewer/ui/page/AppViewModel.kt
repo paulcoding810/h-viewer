@@ -48,10 +48,17 @@ class AppViewModel : ViewModel() {
 
     data class UiState(
         val post: PostItem = PostItem(),
+        val url: String = "",
         val site: Pair<String, SiteConfig> = "" to SiteConfig(),
         val tag: Tag = Tag(),
         val isDevMode: Boolean = BuildConfig.DEBUG,
     )
+
+    fun setWebViewUrl(url: String) {
+        _stateFlow.update { it.copy(url = url) }
+    }
+
+    fun getWebViewUrl() = _stateFlow.value.url
 
     fun setDevMode(isDevMode: Boolean) {
         _stateFlow.update { it.copy(isDevMode = isDevMode) }
