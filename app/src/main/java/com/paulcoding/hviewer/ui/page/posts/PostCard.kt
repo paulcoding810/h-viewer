@@ -28,9 +28,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.paulcoding.hviewer.MainActivity
+import com.paulcoding.hviewer.extensions.openInBrowser
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
@@ -69,6 +72,7 @@ fun PostCard(
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
+    val context = LocalContext.current as MainActivity
 
     LaunchedEffect(isBottomSheetVisible) {
         if (isBottomSheetVisible) {
@@ -123,12 +127,19 @@ fun PostCard(
                     SelectionContainer {
                         Text(text = name, fontSize = 20.sp)
                     }
-                    Text(
-                        text = url,
-                        textDecoration = TextDecoration.Underline,
-                        fontSize = 12.sp,
-                        color = Color.Blue
-                    )
+                    TextButton(
+                        onClick = {
+                            isBottomSheetVisible = false
+                            context.openInBrowser(url)
+                        },
+                    ) {
+                        Text(
+                            text = url,
+                            textDecoration = TextDecoration.Underline,
+                            fontSize = 12.sp,
+                            color = Color.Blue
+                        )
+                    }
                     if (size != null) {
                         Text(text = "Size: $size")
                     }

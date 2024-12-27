@@ -1,8 +1,6 @@
 package com.paulcoding.hviewer.ui.page.post
 
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -40,6 +38,7 @@ import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.isScrollingUp
+import com.paulcoding.hviewer.extensions.openInBrowser
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HGoTop
@@ -120,8 +119,7 @@ fun PostPage(appViewModel: AppViewModel, navToWebView: (String) -> Unit, goBack:
                         DropdownMenuItem(
                             onClick = {
                                 showMenu.value = false
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(image))
-                                context.startActivity(intent)
+                                context.openInBrowser(image)
                             },
                             text = {
                                 Text("Open in browser")
