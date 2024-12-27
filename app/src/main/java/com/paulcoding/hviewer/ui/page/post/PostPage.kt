@@ -67,7 +67,6 @@ fun PostPage(appViewModel: AppViewModel, navToWebView: (String) -> Unit, goBack:
     val uiState by viewModel.stateFlow.collectAsState()
     var selectedImage by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
-    val context = LocalContext.current as MainActivity
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -93,39 +92,8 @@ fun PostPage(appViewModel: AppViewModel, navToWebView: (String) -> Unit, goBack:
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(uiState.images, key = { it }) { image ->
-                val showMenu = remember { mutableStateOf(false) }
-                val menuOffset = remember { mutableStateOf(Pair(0f, 0f)) }
-
-                Box(modifier = Modifier.pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = { offset ->
-                            println("pressed $image")
-                            showMenu.value = true
-                            menuOffset.value = Pair(offset.x, offset.y)
-                        },
-                        onTap = {
-                            selectedImage = image
-                        }
-                    )
-                }) {
-                    HImage(
-                        url = image
-                    )
-
-                    DropdownMenu(
-                        expanded = showMenu.value,
-                        onDismissRequest = { showMenu.value = false },
-                    ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                showMenu.value = false
-                                context.openInBrowser(image)
-                            },
-                            text = {
-                                Text("Open in browser")
-                            }
-                        )
-                    }
+                PostImage(url = image) {
+                    selectedImage = image
                 }
             }
             if (uiState.isLoading)
@@ -199,6 +167,43 @@ fun ImageModal(url: String, dismiss: () -> Unit) {
                     modifier = Modifier.align(Alignment.Center),
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun PostImage(url: String, onTap: () -> Unit = {}) {
+    val showMenu = remember { mutableStateOf(false) }
+    val menuOffset = remember { mutableStateOf(Pair(0f, 0f)) }
+    val context = LocalContext.current as MainActivity
+
+    Box(modifier = Modifier.pointerInput(Unit) {
+        detectTapGestures(
+            onLongPress = { offset ->
+                println("pressed $url")
+                showMenu.value = true
+                menuOffset.value = Pair(offset.x, offset.y)
+            },
+            onTap = { onTap() }
+        )
+    }) {
+        HImage(
+            url = url
+        )
+
+        DropdownMenu(
+            expanded = showMenu.value,
+            onDismissRequest = { showMenu.value = false },
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    showMenu.value = false
+                    context.openInBrowser(url)
+                },
+                text = {
+                    Text("Open in browser")
+                }
+            )
         }
     }
 }
