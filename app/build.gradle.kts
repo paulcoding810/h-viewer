@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.util.prefixIfNot
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -17,9 +19,12 @@ android {
     namespace = "com.paulcoding.hviewer"
     compileSdk = 35
 
-    val repoName = providers.exec {
+    val repoUrl = providers.exec {
         commandLine = "git remote get-url origin".split(' ')
-    }
+    }.standardOutput.asText.get().trim().removePrefix("https://github.com/")
+        .removePrefix("git@github.com:")
+        .removeSuffix(".git")
+        .prefixIfNot("https://github.com/")
 
     defaultConfig {
         applicationId = "com.paulcoding.hviewer"
@@ -28,7 +33,7 @@ android {
         versionCode = 1
         versionName = "1.3.2"
 
-        buildConfigField("String", "REPO_NAME", "\"$repoName\"")
+        buildConfigField("String", "REPO_URL", "\"$repoUrl\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
