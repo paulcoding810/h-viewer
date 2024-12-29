@@ -7,7 +7,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.snapshotFlow
 
 fun LazyListState.isScrolledToEnd(): Boolean {
-    return layoutInfo.visibleItemsInfo.lastOrNull()?.index == layoutInfo.totalItemsCount - 1
+    return (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) > layoutInfo.totalItemsCount - 5
 }
 
 @Composable
