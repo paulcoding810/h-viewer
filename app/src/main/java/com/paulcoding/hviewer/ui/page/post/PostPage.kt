@@ -30,12 +30,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.MainApp.Companion.appContext
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.isScrollingUp
 import com.paulcoding.hviewer.extensions.openInBrowser
@@ -158,7 +160,7 @@ fun ImageModal(url: String, dismiss: () -> Unit) {
                 modifier = Modifier
                     .zoomable(
                         state = zoomableState,
-                        onClick = { makeToast("Double click to dismiss") },
+                        onClick = { makeToast(R.string.double_click_to_dismiss) },
                         onDoubleClick = doubleClickToZoomListener
                     )
             ) {
@@ -201,7 +203,7 @@ fun PostImage(url: String, onTap: () -> Unit = {}) {
                     context.openInBrowser(url)
                 },
                 text = {
-                    Text("Open in browser")
+                    Text(stringResource(R.string.open_in_browser))
                 }
             )
         }

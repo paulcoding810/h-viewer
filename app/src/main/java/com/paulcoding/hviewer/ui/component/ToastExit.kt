@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.paulcoding.hviewer.MainActivity
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
 import java.util.concurrent.TimeUnit
 
@@ -29,7 +30,7 @@ fun ToastExit() {
     }
 
     if (showToast) {
-        makeToast("Press again to exit")
+        makeToast(R.string.press_again_to_exit)
         showToast = false
     }
 }

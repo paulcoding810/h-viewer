@@ -10,12 +10,16 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.BuildConfig
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
 
 @Composable
 fun H7Tap(modifier: Modifier = Modifier, onDevModeChange: (Boolean) -> Unit) {
+    val context = LocalContext.current
     var tapCount by remember { mutableIntStateOf(0) }
     var lastTapTime by remember { mutableLongStateOf(0L) }
     TextButton(
@@ -26,7 +30,7 @@ fun H7Tap(modifier: Modifier = Modifier, onDevModeChange: (Boolean) -> Unit) {
             } else {
                 tapCount++
                 if (tapCount >= 7) {
-                    makeToast("Dev Mode Enabled")
+                    makeToast(context.getString(R.string.dev_mode_enabled))
                     onDevModeChange(true)
                     tapCount = 0
                 }
@@ -35,6 +39,6 @@ fun H7Tap(modifier: Modifier = Modifier, onDevModeChange: (Boolean) -> Unit) {
         }, modifier = modifier
             .padding(16.dp)
     ) {
-        Text("Version ${BuildConfig.VERSION_NAME}")
+        Text(stringResource(R.string.app_version, BuildConfig.VERSION_NAME))
     }
 }

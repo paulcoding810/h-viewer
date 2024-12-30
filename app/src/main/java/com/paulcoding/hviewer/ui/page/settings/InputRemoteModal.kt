@@ -27,11 +27,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.paulcoding.hviewer.R
 
 
 @Composable
@@ -76,7 +78,7 @@ fun InputRemoteModal(
                     text,
                     onValueChange = { text = it },
                     modifier = Modifier.focusRequester(focusRequester),
-                    label = { Text("Remote Url") },
+                    label = { Text(stringResource(R.string.remote_url)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         imeAction = ImeAction.Send
@@ -96,7 +98,7 @@ fun InputRemoteModal(
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     TextButton(onClick = { submit() }) {
-                        Text("OK", color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(R.string.ok), color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }

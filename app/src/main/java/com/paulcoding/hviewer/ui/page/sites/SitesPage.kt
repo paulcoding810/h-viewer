@@ -29,7 +29,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.ui.component.HEmpty
@@ -61,7 +63,7 @@ fun SitesPage(
     val scope = rememberCoroutineScope()
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Sites") }, actions = {
+        TopAppBar(title = { Text(stringResource(R.string.sites)) }, actions = {
             if (isDevMode) {
                 HIcon(Icons.Outlined.BugReport) {
                     navToListCrashLog()

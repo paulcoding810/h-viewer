@@ -17,6 +17,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostHistory
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
@@ -40,7 +42,7 @@ fun HistoryPage(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
-                title = { Text("History") },
+                title = { Text(stringResource(R.string.history)) },
                 navigationIcon = {
                     HBackIcon { goBack() }
                 },

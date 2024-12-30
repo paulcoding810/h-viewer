@@ -13,9 +13,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
 
@@ -30,7 +31,7 @@ fun TopicsPage(
     val tags = siteConfig.tags.keys.toList()
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Topics") }, navigationIcon = {
+        TopAppBar(title = { Text(stringResource(R.string.topics)) }, navigationIcon = {
             HBackIcon {
                 goBack()
             }
