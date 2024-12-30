@@ -21,7 +21,7 @@ fun HLoading() {
                 .height(64.dp)
                 .padding(16.dp)
                 .align(Alignment.Center),
-            trackColor = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
