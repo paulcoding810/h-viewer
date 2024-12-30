@@ -29,10 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paulcoding.hviewer.MainActivity
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.openInBrowser
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
@@ -141,10 +143,10 @@ fun PostCard(
                         )
                     }
                     if (size != null) {
-                        Text(text = "Size: $size")
+                        Text(text = stringResource(R.string.post_size, size))
                     }
                     if (views != null) {
-                        Text(text = "Views: $views")
+                        Text(text = stringResource(R.string.post_views, views))
                     }
                     postItem.tags?.run {
                         forEach { tag ->

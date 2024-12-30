@@ -16,7 +16,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HOTP
@@ -26,6 +29,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun LockPage(onUnlocked: () -> Unit) {
     val focusRequester = remember { FocusRequester() }
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         delay(300)
@@ -35,7 +39,7 @@ fun LockPage(onUnlocked: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Lock") },
+                title = { Text(stringResource(R.string.lock)) },
             )
         }
     ) { paddings ->
@@ -45,13 +49,13 @@ fun LockPage(onUnlocked: () -> Unit) {
                 .fillMaxSize()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Enter your PIN:")
+                Text(stringResource(R.string.enter_your_pin))
                 Spacer(modifier = Modifier.height(12.dp))
                 HOTP(modifier = Modifier.focusRequester(focusRequester)) {
                     if (it == Preferences.pin) {
                         onUnlocked()
                     } else {
-                        makeToast("Wrong PIN")
+                        makeToast(context.getString(R.string.wrong_pin))
                     }
                 }
             }

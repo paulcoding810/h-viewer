@@ -25,9 +25,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.MainActivity
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
@@ -65,7 +67,7 @@ fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean, onLockEnable
     }
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Settings") }, navigationIcon = {
+        TopAppBar(title = { Text(stringResource(R.string.settings)) }, navigationIcon = {
             HBackIcon { goBack() }
         })
     }) { paddings ->
@@ -83,7 +85,7 @@ fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean, onLockEnable
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Remote Url", modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.remote_url), modifier = Modifier.weight(1f))
                     HIcon(Icons.Outlined.Edit) {
                         modalVisible = true
                     }
@@ -97,7 +99,10 @@ fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean, onLockEnable
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Enable secure screen", modifier = Modifier.weight(1f))
+                    Text(
+                        stringResource(R.string.enable_secure_screen),
+                        modifier = Modifier.weight(1f)
+                    )
                     Switch(checked = secureScreen, onCheckedChange = {
                         secureScreen = it
                         Preferences.secureScreen = it
@@ -109,7 +114,7 @@ fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean, onLockEnable
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Lock Screen", modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.lock_screen), modifier = Modifier.weight(1f))
                     Switch(checked = appLockEnabled, onCheckedChange = { locked ->
                         if (locked) {
                             lockModalVisible = true

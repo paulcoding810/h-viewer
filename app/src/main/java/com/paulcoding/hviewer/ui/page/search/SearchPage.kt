@@ -31,11 +31,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
@@ -79,7 +81,7 @@ fun SearchPage(
     }
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Search") }, navigationIcon = {
+        TopAppBar(title = { Text(stringResource(R.string.search)) }, navigationIcon = {
             HBackIcon { goBack() }
         },
             actions = {
@@ -102,7 +104,9 @@ fun SearchPage(
                         imeAction = ImeAction.Go
                     ),
                     keyboardActions = KeyboardActions(onGo = { submit() }),
-                    modifier = Modifier.focusRequester(focusRequester).weight(1f),
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .weight(1f),
                     trailingIcon = {
                         if (query.isNotEmpty())
                             HIcon(Icons.Outlined.Clear) {

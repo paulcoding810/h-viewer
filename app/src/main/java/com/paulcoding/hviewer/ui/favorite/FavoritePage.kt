@@ -18,7 +18,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
@@ -35,6 +38,7 @@ fun FavoritePage(
     navToCustomTag: (PostItem, Tag) -> Unit,
     goBack: () -> Boolean
 ) {
+    val context = LocalContext.current
     val viewModel: AppViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -45,8 +49,8 @@ fun FavoritePage(
 
         scope.launch {
             val result = snackbarHostState.showSnackbar(
-                "${post.name} removed from favorite",
-                "Undo",
+                context.getString(R.string.post_removed_from_favorite, post.name),
+                context.getString(R.string.undo),
                 duration = SnackbarDuration.Short
             )
             when (result) {
@@ -64,7 +68,7 @@ fun FavoritePage(
         modifier = Modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(title = { Text("Favorite") }, navigationIcon = {
+            TopAppBar(title = { Text(stringResource(R.string.favorite)) }, navigationIcon = {
                 HBackIcon { goBack() }
             })
         }) { paddings ->

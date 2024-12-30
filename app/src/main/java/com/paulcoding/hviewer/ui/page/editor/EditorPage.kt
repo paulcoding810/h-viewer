@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.crashLogDir
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.helper.readFile
@@ -49,7 +51,7 @@ fun EditorPage(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(text = "Editor") }, navigationIcon = {
+            TopAppBar(title = { Text(text = stringResource(R.string.editor)) }, navigationIcon = {
                 HBackIcon {
                     goBack()
                 }
@@ -59,7 +61,7 @@ fun EditorPage(
                     Github.refreshLocalConfigs()
                     localSoftwareKeyboardController?.hide()
                     goBack()
-                    makeToast("Saved!")
+                    makeToast(R.string.saved)
                 }
             })
         },

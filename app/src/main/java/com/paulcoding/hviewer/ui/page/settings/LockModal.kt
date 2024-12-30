@@ -17,8 +17,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.ui.component.HOTP
 
 @Composable
@@ -32,18 +34,21 @@ fun LockModal(onDismiss: () -> Unit, onPinConfirmed: (String) -> Unit = {}) {
     Dialog(onDismissRequest = { dismiss() }) {
         Surface {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Enter New Pin")
+                Text(stringResource(R.string.enter_new_pin))
                 HOTP {
                     pin = it
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(modifier = Modifier.align(Alignment.End)) {
                     TextButton(onClick = { dismiss() }) {
-                        Text("Cancel", color = MaterialTheme.colorScheme.error)
+                        Text(
+                            stringResource(R.string.cancel),
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     TextButton(onClick = { onPinConfirmed(pin) }) {
-                        Text("OK", color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(R.string.ok), color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
