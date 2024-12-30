@@ -1,0 +1,6 @@
+files:
+  - source: app/src/main/res/values/strings.xml
+    translation: app/src/main/res/values/strings-%language%.xml
+    multilingual: 1
+    translatable_elements:
+      - app/src/main/res/values/strings.xml
