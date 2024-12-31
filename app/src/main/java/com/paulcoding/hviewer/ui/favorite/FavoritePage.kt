@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.favorite
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,7 +21,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
@@ -39,10 +39,9 @@ fun FavoritePage(
     goBack: () -> Boolean
 ) {
     val context = LocalContext.current
-    val viewModel: AppViewModel = viewModel()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    val favoritePosts by viewModel.favoritePosts.collectAsState(initial = emptyList())
+    val favoritePosts by appViewModel.favoritePosts.collectAsState(initial = emptyList())
 
     fun onDelete(post: PostItem) {
         appViewModel.deleteFavorite(post)
@@ -72,16 +71,22 @@ fun FavoritePage(
                 HBackIcon { goBack() }
             })
         }) { paddings ->
-        LazyColumn(modifier = Modifier.padding(paddings)) {
-            items(items = favoritePosts, key = { it.url }) { item ->
-                FavoriteItem(item, navToImages = { navToImages(item) },
-                    onTagClick = { tag -> navToCustomTag(item, tag) },
-                    deleteFavorite = {
-                        onDelete(item)
-                    })
+        Column(
+            modifier = Modifier
+                .padding(paddings)
+                .fillMaxSize()
+        ) {
+            LazyColumn {
+                items(items = favoritePosts, key = { it.url }) { item ->
+                    FavoriteItem(item, navToImages = { navToImages(item) },
+                        onTagClick = { tag -> navToCustomTag(item, tag) },
+                        deleteFavorite = {
+                            onDelete(item)
+                        })
+                }
             }
             if (favoritePosts.isEmpty())
-                item { HEmpty() }
+                HEmpty()
         }
     }
 
