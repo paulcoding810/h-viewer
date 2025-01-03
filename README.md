@@ -40,6 +40,16 @@ For sample scripts and usage examples, visit:
 
 - [VBook Extensions](https://github.com/Darkrai9x/vbook-extensions)
 
+## Disclaimer
+
+Any legal issues regarding the content on this application should be taken up with the actual file hosts and providers themselves as we are not affiliated with them.
+
+The app is purely for educational and personal use.
+
+It is the responsibility of user to avoid any actions that might violate the laws governing his/her locality.
+
+H-Viewer does not host any content on the app, and has no control over what media is put up or taken down.
+
 ## License
 
 [MIT](./LICENSE)
