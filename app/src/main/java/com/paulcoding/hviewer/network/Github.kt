@@ -38,14 +38,15 @@ object Github {
     suspend fun checkVersionOrUpdate() {
         withContext(Dispatchers.IO) {
             try {
-                _stateFlow.update { it.copy(isLoading = true) }
                 if (_stateFlow.value.remoteUrl != Preferences.getRemote()) {
                     Preferences.setRemote(_stateFlow.value.remoteUrl)
+                    _stateFlow.update { it.copy(isLoading = true) }
                     downloadAndGetConfig()
                     return@withContext
                 }
                 if (!appContext.configFile.exists()) {
                     log("Config file not exist, downloading from remote...", "check update")
+                    _stateFlow.update { it.copy(isLoading = true) }
                     downloadAndGetConfig()
                     return@withContext
                 }
@@ -55,6 +56,7 @@ object Github {
 
                 if (currentConfigs == null) {
                     log("Can not read config file, downloading from remote...", "check update")
+                    _stateFlow.update { it.copy(isLoading = true) }
                     downloadAndGetConfig()
                 } else {
                     val siteConfigs = getSiteConfigs()
