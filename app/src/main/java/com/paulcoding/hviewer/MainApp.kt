@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import com.paulcoding.hviewer.helper.CrashHandler
 import com.paulcoding.hviewer.helper.setupPaths
+import com.paulcoding.js.JS
 import com.tencent.mmkv.MMKV
 
 class MainApp : Application() {
@@ -12,6 +13,7 @@ class MainApp : Application() {
         super.onCreate()
         appContext = this
         MMKV.initialize(this)
+        JS.initialize(this)
 
         setupPaths()
     }

@@ -1,9 +1,5 @@
-package com.paulcoding.hviewer.js
+package com.paulcoding.js
 
-import com.paulcoding.hviewer.MainApp.Companion.appContext
-import com.paulcoding.hviewer.helper.log
-import com.paulcoding.hviewer.helper.readFile
-import com.paulcoding.hviewer.network.ktorClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.runBlocking
@@ -12,6 +8,7 @@ import org.mozilla.javascript.BaseFunction
 import org.mozilla.javascript.Context
 import org.mozilla.javascript.NativeJSON
 import org.mozilla.javascript.Scriptable
+import java.io.File
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -82,11 +79,11 @@ val importFunction = object : BaseFunction() {
         thisObj: Scriptable?,
         args: Array<out Any?>
     ) {
-        val filePath = args.getOrNull(0) as? String
+        val fileName = args.getOrNull(0) as? String
             ?: throw IllegalArgumentException("File path is required")
 
-        val script = appContext.readFile(filePath)
-        cx?.evaluateString(scope, script, filePath, 1, null)
+        val file = File(JS.root, fileName)
+        cx?.evaluateReader(scope, file.reader(), file.name, 1, null)
     }
 }
 

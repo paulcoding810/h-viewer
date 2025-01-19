@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "H Viewer"
 include(":app")
- 
+include(":js")
