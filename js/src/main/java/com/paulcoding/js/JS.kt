@@ -1,12 +1,8 @@
-package com.paulcoding.hviewer.js
+package com.paulcoding.js
 
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
-import com.paulcoding.hviewer.MainApp.Companion.appContext
-import com.paulcoding.hviewer.helper.scriptsDir
-import com.paulcoding.hviewer.model.SiteConfig
-import com.tencent.mmkv.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.mozilla.javascript.Context
@@ -33,13 +29,21 @@ fun toJsonElement(jsObject: Any?, gson: Gson = Gson()): JsonElement {
     }
 }
 
-class JS(siteConfig: SiteConfig? = null) {
+class JS(file: File, properties: Map<String, String>? = null) {
     var scope: ScriptableObject
     val gson = Gson()
 
+    constructor(rootName: String, fileName: String, properties: Map<String, String>? = null) : this(
+        File(
+            appContext.filesDir.absolutePath + "/$rootName", fileName
+        ), properties
+    )
+
+    constructor(fileRelativePath: String, properties: Map<String, String>? = null) : this(File(appContext.filesDir.absolutePath, fileRelativePath), properties)
+
     fun prepareContext(): Context {
         val context: Context = Context.enter()
-        context.optimizationLevel = -1
+        context.setInterpretedMode(true)
         context.setGeneratingDebug(BuildConfig.DEBUG)
 
         return context
@@ -47,6 +51,7 @@ class JS(siteConfig: SiteConfig? = null) {
 
     init {
         val context = prepareContext()
+        root = file.absolutePath
         scope = context.initStandardObjects()
         ScriptableObject.putProperty(scope, "import", importFunction)
         ScriptableObject.putProperty(scope, "fetch", fetchFunction)
@@ -57,19 +62,18 @@ class JS(siteConfig: SiteConfig? = null) {
         })
 
         try {
-            siteConfig?.let {
-                val fileName = it.scriptFile
-
+            properties?.forEach { (key, value) ->
                 ScriptableObject.putProperty(
                     scope,
-                    "baseUrl",
-                    Context.javaToJS(it.baseUrl, scope)
+                    key,
+                    Context.javaToJS(value, scope)
                 )
-                val reader = FileReader(File(appContext.scriptsDir, fileName))
-                context.evaluateReader(scope, reader, fileName, 1, null)
-                Context.exit()
-                reader.close()
             }
+
+            val reader = FileReader(file)
+            context.evaluateReader(scope, reader, file.name, 1, null)
+            Context.exit()
+            reader.close()
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -108,6 +112,16 @@ class JS(siteConfig: SiteConfig? = null) {
         val jsonElement = toJsonElement(result)
         val type = object : TypeToken<T>() {}.type
         return gson.fromJson(jsonElement, type) as T
+    }
+
+
+    companion object {
+        lateinit var appContext: android.content.Context
+        lateinit var root: String
+
+        fun initialize(context: android.content.Context) {
+            appContext = context
+        }
     }
 }
 

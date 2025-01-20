@@ -3,11 +3,12 @@ package com.paulcoding.hviewer.ui.page.posts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.paulcoding.hviewer.js.JS
+import com.paulcoding.hviewer.helper.SCRIPTS_DIR
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Posts
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
+import com.paulcoding.js.JS
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,7 +19,10 @@ class PostsViewModel(siteConfig: SiteConfig, tag: Tag) : ViewModel() {
     private var _stateFlow = MutableStateFlow(UiState())
     val stateFlow = _stateFlow.asStateFlow()
 
-    private val js = JS(siteConfig)
+    private val js = JS(
+        fileRelativePath = SCRIPTS_DIR + "/${siteConfig.scriptFile}",
+        properties = mapOf("baseUrl" to siteConfig.baseUrl)
+    )
 
     data class UiState(
         val postItems: List<PostItem> = listOf(),

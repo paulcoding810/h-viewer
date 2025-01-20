@@ -77,6 +77,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":js"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -96,7 +97,6 @@ dependencies {
     implementation(libs.coil.video)
     implementation(libs.ksoup.lite)
     implementation(libs.accompanist.permissions)
-    implementation(libs.rhino)
     implementation(libs.androidx.javascriptengine)
     implementation(libs.androidx.concurrent.futures.ktx)
     implementation(libs.jsoup)

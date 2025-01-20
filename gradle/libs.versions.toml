@@ -33,6 +33,8 @@ roomRuntime = "2.6.1"
 webkit = "1.13.0-alpha02"
 zoomable = "0.14.0"
 material3 = "1.3.1"
+appcompat = "1.7.0"
+material = "1.12.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -80,9 +82,12 @@ lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 rhino = { module = "org.mozilla:rhino", version.ref = "rhino" }
 zoomable = { module = "me.saket.telephoto:zoomable", version.ref = "zoomable" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
 
