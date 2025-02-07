@@ -74,19 +74,20 @@ fun AppEntry() {
                 navToFavorite = {
                     navController.navigate(Route.FAVORITE)
                 },
-                navToListScript = {
-                    navController.navigate(Route.LIST_SCRIPT + "/script")
-                },
-                navToListCrashLog = {
-                    navController.navigate(Route.LIST_SCRIPT + "/crash_log")
-                },
                 navToHistory = {
                     navController.navigate(Route.HISTORY)
                 },
                 goBack = { navController.popBackStack() })
         }
         animatedComposable(Route.SETTINGS) {
-            SettingsPage(appViewModel = appViewModel, onLockEnabled = {
+            SettingsPage(appViewModel = appViewModel,
+                navToListScript = {
+                    navController.navigate(Route.LIST_SCRIPT + "/script")
+                },
+                navToListCrashLog = {
+                    navController.navigate(Route.LIST_SCRIPT + "/crash_log")
+                },
+                onLockEnabled = {
                 navController.navigate(Route.LOCK) {
                     popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     launchSingleTop = true

@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BugReport
+import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -40,8 +42,15 @@ import com.paulcoding.hviewer.ui.page.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean, onLockEnabled: () -> Unit) {
+fun SettingsPage(
+    appViewModel: AppViewModel,
+    goBack: () -> Boolean,
+    navToListScript: () -> Unit,
+    navToListCrashLog: () -> Unit,
+    onLockEnabled: () -> Unit
+) {
     val githubState by Github.stateFlow.collectAsState()
+    val appState by appViewModel.stateFlow.collectAsState()
     val prevSiteConfigs = remember { githubState.siteConfigs }
     var modalVisible by remember { mutableStateOf(false) }
     var secureScreen by remember { mutableStateOf(Preferences.secureScreen) }
@@ -122,6 +131,36 @@ fun SettingsPage(appViewModel: AppViewModel, goBack: () -> Boolean, onLockEnable
                             onAppLockDisabled()
                         }
                     })
+                }
+
+                if (appState.isDevMode) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.open_crash_log),
+                            modifier = Modifier.weight(1f)
+                        )
+                        HIcon(Icons.Outlined.BugReport) {
+                            navToListCrashLog()
+                        }
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            stringResource(R.string.edit_local_scripts),
+                            modifier = Modifier.weight(1f)
+                        )
+                        HIcon(Icons.Outlined.Description) {
+                            navToListScript()
+                        }
+                    }
+
+
                 }
 
                 Box(

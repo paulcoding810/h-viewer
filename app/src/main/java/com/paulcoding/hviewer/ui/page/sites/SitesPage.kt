@@ -49,8 +49,6 @@ fun SitesPage(
     siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
     navToHistory: () -> Unit,
-    navToListCrashLog: () -> Unit,
-    navToListScript: () -> Unit,
     refresh: () -> Unit,
     navToFavorite: () -> Unit,
 ) {
@@ -64,14 +62,6 @@ fun SitesPage(
 
     Scaffold(topBar = {
         TopAppBar(title = { Text(stringResource(R.string.sites)) }, actions = {
-            if (isDevMode) {
-                HIcon(Icons.Outlined.BugReport) {
-                    navToListCrashLog()
-                }
-                HIcon(Icons.Outlined.Edit) {
-                    navToListScript()
-                }
-            }
             HIcon(Icons.Outlined.History) {
                 navToHistory()
             }
