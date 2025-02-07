@@ -77,7 +77,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":js"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -88,6 +87,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    implementation(libs.js)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.mmkv)
@@ -99,8 +99,6 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.javascriptengine)
     implementation(libs.androidx.concurrent.futures.ktx)
-    implementation(libs.jsoup)
-    implementation(libs.gson)
     implementation(libs.mmkv)
     implementation(libs.commons.compress)
     implementation(libs.lottie.compose)
