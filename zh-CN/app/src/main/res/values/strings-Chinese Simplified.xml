@@ -28,4 +28,6 @@
     <string name="double_click_to_dismiss">Double click to dismiss</string>
     <string name="post_removed_from_favorite">%1$s removed from favorite</string>
     <string name="undo">Undo</string>
+    <string name="open_crash_log">Open crash logs</string>
+    <string name="edit_local_scripts">Edit local scripts</string>
 </resources>
