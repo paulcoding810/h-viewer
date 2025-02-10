@@ -12,6 +12,7 @@ An Android application for extracting image content from websites.
 ## Screenshots
 
 ![screenshot-01](https://github.com/user-attachments/assets/51a3257a-8026-488d-9d24-bd4d0eafd909)
+---
 ![screenshot-02](https://github.com/user-attachments/assets/a0cf9521-0bf9-4a28-a28f-11cd6303aed6)
 
 
