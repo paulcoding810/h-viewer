@@ -5,8 +5,15 @@ An Android application for extracting image content from websites.
 ## Features
 
 - Web content extraction
-- Image downloading and viewing
 - Custom JavaScript parsing
+- Favorites management
+- JS editor
+
+## Screenshots
+
+![screenshot-01](https://github.com/user-attachments/assets/51a3257a-8026-488d-9d24-bd4d0eafd909)
+![screenshot-02](https://github.com/user-attachments/assets/a0cf9521-0bf9-4a28-a28f-11cd6303aed6)
+
 
 ## How It Works
 
@@ -14,41 +21,33 @@ H Viewer uses Rhino JavaScript engine to parse and extract content from web page
 
 ## Technical Stack
 
-- **UI**: Jetpack Compose
-- **Networking**: Ktor
-- **Database**: Room
-- **HTML Parsing**: JSoup
-- **Image Loading**: Coil
-- **JavaScript Engine**: Rhino
+- **UI**: [Jetpack Compose](https://github.com/androidx/androidx)  
+- **Networking**: [Ktor](https://github.com/ktorio/ktor)  
+- **Database**: [Room](https://github.com/androidx/androidx)  
+- **HTML Parsing**: [JSoup](https://github.com/jhy/jsoup)  
+- **Image Loading**: [Coil](https://github.com/coil-kt/coil)  
+- **JavaScript Engine**: [Rhino](https://github.com/mozilla/rhino)  
 
 ## Usage Guide
 
 ### Available Helper Functions
 
-| Function | Description |
-|----------|-------------|
-| `fetch()` | Synchronous Ktor request to get Document (JSoup) |
-| `xhr()` | Synchronous Ktor request to get JSON response |
-| `atob()` | Base64 string decoder |
+For a list of available helper functions, visit:
+[Android JavaScript Helper Functions Repository](https://github.com/paulcoding810/js?tab=readme-ov-file#built-in-functions)
 
 ### Example Scripts
 
 For sample scripts and usage examples, visit:
 [H Viewer Scripts Repository](https://github.com/paulcoding810/h-viewer-scripts)
 
-## References
-
-- [VBook Extensions](https://github.com/Darkrai9x/vbook-extensions)
-
 ## Disclaimer
 
-Any legal issues regarding the content on this application should be taken up with the actual file hosts and providers themselves as we are not affiliated with them.
+For educational purposes only, do not use this for illegal activities. The developer is not responsible for any misuse of the information provided here.
 
-The app is purely for educational and personal use.
+## Credits
 
-It is the responsibility of user to avoid any actions that might violate the laws governing his/her locality.
+[VBook Extensions](https://github.com/Darkrai9x/vbook-extensions)
 
-H-Viewer does not host any content on the app, and has no control over what media is put up or taken down.
 
 ## License
 
