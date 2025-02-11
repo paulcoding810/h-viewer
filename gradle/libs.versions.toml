@@ -1,7 +1,7 @@
 [versions]
 accompanistPermissions = "0.36.0"
 agp = "8.7.3"
-bom = "0.23.4"
+bom = "0.23.5"
 coilNetworkOkhttp = "3.0.2"
 commonsCompress = "1.27.1"
 concurrentFuturesKtx = "1.2.0"
