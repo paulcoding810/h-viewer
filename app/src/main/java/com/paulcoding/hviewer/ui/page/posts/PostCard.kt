@@ -50,7 +50,7 @@ fun FavoriteCard(
     isFavorite: Boolean = false,
     setFavorite: (Boolean) -> Unit = {},
     onTagClick: (Tag) -> Unit = {},
-    onAddToTabs: () -> Unit = {},
+    onAddToTabs: (() -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     PostCard(
@@ -75,7 +75,7 @@ fun PostCard(
     postItem: PostItem,
     onTagClick: (Tag) -> Unit = {},
     onClick: () -> Unit,
-    onAddToTabs: () -> Unit = {},
+    onAddToTabs: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
@@ -112,9 +112,10 @@ fun PostCard(
             HIcon(Icons.Outlined.Info) {
                 isBottomSheetVisible = true
             }
-            HIcon(Icons.Outlined.Tab, modifier = Modifier.align(Alignment.TopCenter)) {
-                onAddToTabs()
-            }
+            if (onAddToTabs != null)
+                HIcon(Icons.Outlined.Tab, modifier = Modifier.align(Alignment.TopCenter)) {
+                    onAddToTabs()
+                }
             content()
         }
     }
