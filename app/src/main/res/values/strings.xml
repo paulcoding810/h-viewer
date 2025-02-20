@@ -31,4 +31,5 @@
     <string name="edit_local_scripts">Edit local scripts</string>
     <string name="added_to_tabs">Added to tabs</string>
     <string name="tabs">Tabs</string>
+    <string name="invalid_url">Invalid URL %1$s</string>
 </resources>

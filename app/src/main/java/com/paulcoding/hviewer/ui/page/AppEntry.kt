@@ -13,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -21,6 +22,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.model.Tag
@@ -48,6 +51,7 @@ fun AppEntry(intent: Intent?) {
     val siteConfigs = githubState.siteConfigs ?: SiteConfigs()
     val appViewModel: AppViewModel = viewModel()
     val appState by appViewModel.stateFlow.collectAsState()
+    val context = LocalContext.current
 
     fun navToImages(post: PostItem) {
         appViewModel.setCurrentPost(post)
@@ -68,7 +72,11 @@ fun AppEntry(intent: Intent?) {
 
     fun handleIntentUrl(url: String) {
         val postItem = PostItem(url = url)
-        navToImages(postItem)
+        if (postItem.getSiteConfig(siteConfigs.toHostsMap()) != null) {
+            navToImages(postItem)
+        } else {
+            makeToast(context.getString(R.string.invalid_url, url))
+        }
     }
 
     LaunchedEffect(updatedIntent) {
