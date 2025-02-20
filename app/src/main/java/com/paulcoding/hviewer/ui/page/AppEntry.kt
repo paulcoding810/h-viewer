@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page
 
+import android.content.Intent
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -7,9 +8,11 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -38,7 +41,7 @@ import com.paulcoding.hviewer.ui.page.tabs.TabsPage
 import com.paulcoding.hviewer.ui.page.web.WebPage
 
 @Composable
-fun AppEntry() {
+fun AppEntry(intent: Intent?) {
     val navController = rememberNavController()
 
     val githubState by Github.stateFlow.collectAsState()
@@ -59,6 +62,35 @@ fun AppEntry() {
 
     val startDestination =
         remember { if (Preferences.pin.isNotEmpty()) Route.LOCK else Route.SITES }
+
+    // handle intent
+    val updatedIntent by rememberUpdatedState(intent)
+
+    fun handleIntentUrl(url: String) {
+        val postItem = PostItem(url = url)
+        navToImages(postItem)
+    }
+
+    LaunchedEffect(updatedIntent) {
+        updatedIntent?.apply {
+            when (action) {
+                Intent.ACTION_SEND -> {
+                    if ("text/plain" == type) {
+                        getStringExtra(Intent.EXTRA_TEXT)?.let {
+                            handleIntentUrl(it)
+                        }
+                    }
+                }
+
+                Intent.ACTION_VIEW -> {
+                    handleIntentUrl(data.toString())
+                }
+
+                else -> {
+                }
+            }
+        }
+    }
 
     NavHost(navController, startDestination = startDestination) {
         animatedComposable(Route.SITES) {
@@ -124,6 +156,7 @@ fun AppEntry() {
                     appViewModel.setWebViewUrl(it)
                     navController.navigate(Route.WEBVIEW)
                 },
+                hostMap = siteConfigs.toHostsMap(),
                 goBack = {
                     navController.popBackStack()
                 })
