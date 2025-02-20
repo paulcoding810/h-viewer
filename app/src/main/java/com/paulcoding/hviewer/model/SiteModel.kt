@@ -36,4 +36,10 @@ data class SiteConfig(
 data class SiteConfigs(
     val version: Int = 1,
     val sites: Map<String, SiteConfig> = mapOf()
-)
+) {
+    fun toHostsMap(): Map<String, SiteConfig> {
+        return sites.map {
+            it.value.baseUrl.split('/')[2] to it.value
+        }.toMap()
+    }
+}

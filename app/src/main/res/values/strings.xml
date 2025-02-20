@@ -29,4 +29,6 @@
     <string name="undo">Undo</string>
     <string name="open_crash_log">Open crash logs</string>
     <string name="edit_local_scripts">Edit local scripts</string>
+    <string name="added_to_tabs">Added to tabs</string>
+    <string name="tabs">Tabs</string>
 </resources>
