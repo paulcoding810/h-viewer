@@ -59,6 +59,7 @@ import me.saket.telephoto.zoomable.zoomable
 @Composable
 fun ImageList(postUrl: String, siteConfig: SiteConfig, goBack: () -> Unit) {
     val viewModel: PostViewModel = viewModel(
+        key = postUrl,
         factory = PostViewModelFactory(postUrl, siteConfig = siteConfig)
     )
 

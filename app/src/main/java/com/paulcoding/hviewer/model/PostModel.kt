@@ -23,7 +23,7 @@ data class PostItem(
     val views: Int? = null,
     val quantity: Int? = null,
 ) {
-    private fun getHost(): String {
+    fun getHost(): String {
         return url.split("/")[2]
     }
 
@@ -47,7 +47,7 @@ data class PostHistory(
     val views: Int? = null,
     val quantity: Int? = null,
 ) {
-    fun toPostItem():PostItem {
+    fun toPostItem(): PostItem {
         return PostItem(
             url = url,
             name = name,

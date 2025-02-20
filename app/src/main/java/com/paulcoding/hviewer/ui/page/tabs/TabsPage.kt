@@ -21,13 +21,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.helper.alsoLog
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.page.AppViewModel
+import com.paulcoding.hviewer.ui.page.post.ImageList
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +69,6 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                     edgePadding = 0.dp,
                 ) {
                     tabs.forEachIndexed { index, tab ->
-                        val siteConfig = tab.getSiteConfig(hostsMap)
                         Tab(
                             selected = selectedTabIndex == index,
                             selectedContentColor = MaterialTheme.colorScheme.primary,
@@ -76,7 +78,7 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                                     pagerState.animateScrollToPage(index)
                                 }
                             },
-                            text = { Text(text = tab.url) },
+                            text = { Text(text = tab.getHost()) },
                         )
                     }
                 }
@@ -84,9 +86,19 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                 HorizontalPager(
                     state = pagerState,
                     modifier = Modifier.fillMaxSize(),
+                    key = { tabs[it].url }
                 ) { pageIndex ->
-                    val tab = tabs[pageIndex]
-                    Text(tab.url)
+                    val tab = tabs[pageIndex].alsoLog("tab")
+                    val siteConfig = tab.getSiteConfig(hostsMap).alsoLog("siteConfig")
+
+                    if (siteConfig != null)
+                        ImageList(tab.url, siteConfig = siteConfig, goBack = goBack)
+                    else
+                        Text(
+                            "Site config not found for ${tab.url}",
+                            modifier = Modifier.padding(16.dp),
+                            color = Color.Red
+                        )
                 }
             }
         }
