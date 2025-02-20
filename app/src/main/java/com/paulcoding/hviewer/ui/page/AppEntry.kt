@@ -202,7 +202,10 @@ fun AppEntry() {
             WebPage(goBack = { navController.popBackStack() }, url = url)
         }
         animatedComposable(Route.TABS) {
-            TabsPage(goBack = { navController.popBackStack() }, appViewModel = appViewModel,siteConfigs = siteConfigs)
+            TabsPage(goBack = {
+                navController.popBackStack()
+                appViewModel.clearTabs()
+            }, appViewModel = appViewModel, siteConfigs = siteConfigs)
         }
     }
 }
