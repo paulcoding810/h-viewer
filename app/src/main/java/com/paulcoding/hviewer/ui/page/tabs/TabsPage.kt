@@ -20,7 +20,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.paulcoding.hviewer.helper.alsoLog
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.page.AppViewModel
@@ -70,8 +69,8 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                 modifier = Modifier.fillMaxSize(),
                 key = { tabs[it].url }
             ) { pageIndex ->
-                val tab = tabs[pageIndex].alsoLog("tab")
-                val siteConfig = tab.getSiteConfig(hostsMap).alsoLog("siteConfig")
+                val tab = tabs[pageIndex]
+                val siteConfig = tab.getSiteConfig(hostsMap)
 
                 if (siteConfig != null)
                     ImageList(tab.url, siteConfig = siteConfig, goBack = goBack)
