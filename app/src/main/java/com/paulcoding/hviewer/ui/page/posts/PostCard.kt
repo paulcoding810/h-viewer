@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page.posts
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -64,6 +65,7 @@ fun FavoriteCard(
     }
 }
 
+@SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCard(
