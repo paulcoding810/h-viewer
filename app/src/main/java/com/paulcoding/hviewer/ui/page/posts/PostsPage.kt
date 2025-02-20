@@ -13,6 +13,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Tab
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -32,8 +33,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.toCapital
+import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
@@ -54,9 +57,12 @@ fun PostsPage(
     navToImages: (PostItem) -> Unit,
     navToSearch: () -> Unit,
     navToCustomTag: (Tag) -> Unit,
+    navToTabs: () -> Unit,
     goBack: () -> Unit
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
+    val tabs by appViewModel.tabs.collectAsState(initial = listOf())
+
     val siteConfig = appState.site.second
 
     val listTag: List<Tag> = siteConfig.tags.keys.map { key ->
@@ -74,6 +80,9 @@ fun PostsPage(
         }, actions = {
             HPageProgress(pageProgress.first, pageProgress.second)
             HIcon(imageVector = Icons.Outlined.Search) { navToSearch() }
+            if (tabs.isNotEmpty()) {
+            HIcon(imageVector = Icons.Outlined.Tab) { navToTabs() }
+            }
         })
     }) { paddings ->
         Column(modifier = Modifier.padding(paddings)) {
@@ -165,6 +174,10 @@ fun PageContent(
                     isFavorite = listFavorite.find { it.url == post.url } != null,
                     onTagClick = {
                         navToCustomTag(it)
+                    },
+                    onAddToTabs = {
+                        appViewModel.addTab(post)
+                        makeToast(R.string.added_to_tabs)
                     },
                     setFavorite = { isFavorite ->
                         if (isFavorite)

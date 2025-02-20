@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Tab
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,11 +50,13 @@ fun FavoriteCard(
     isFavorite: Boolean = false,
     setFavorite: (Boolean) -> Unit = {},
     onTagClick: (Tag) -> Unit = {},
+    onAddToTabs: () -> Unit = {},
     onClick: () -> Unit,
 ) {
     PostCard(
         postItem = postItem,
         onTagClick = onTagClick,
+        onAddToTabs = onAddToTabs,
         onClick = onClick
     ) {
         HFavoriteIcon(
@@ -72,6 +75,7 @@ fun PostCard(
     postItem: PostItem,
     onTagClick: (Tag) -> Unit = {},
     onClick: () -> Unit,
+    onAddToTabs: () -> Unit = {},
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
@@ -88,8 +92,6 @@ fun PostCard(
 
     Card(
         elevation = CardDefaults.cardElevation(4.dp),
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 12.dp),
         border = CardDefaults.outlinedCardBorder(),
         shape = CardDefaults.outlinedShape,
         onClick = { onClick() },
@@ -109,6 +111,9 @@ fun PostCard(
             }
             HIcon(Icons.Outlined.Info) {
                 isBottomSheetVisible = true
+            }
+            HIcon(Icons.Outlined.Tab, modifier = Modifier.align(Alignment.TopCenter)) {
+                onAddToTabs()
             }
             content()
         }

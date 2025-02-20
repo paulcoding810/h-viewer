@@ -22,7 +22,16 @@ data class PostItem(
     val size: Int? = null,
     val views: Int? = null,
     val quantity: Int? = null,
-)
+) {
+    private fun getHost(): String {
+        return url.split("/")[2]
+    }
+
+    fun getSiteConfig(hostsMap: Map<String, SiteConfig>): SiteConfig? {
+        val host = getHost()
+        return hostsMap[host]
+    }
+}
 
 // duplicated?
 @Entity(tableName = "history")

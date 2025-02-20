@@ -34,6 +34,7 @@ import com.paulcoding.hviewer.ui.page.posts.PostsPage
 import com.paulcoding.hviewer.ui.page.search.SearchPage
 import com.paulcoding.hviewer.ui.page.settings.SettingsPage
 import com.paulcoding.hviewer.ui.page.sites.SitesPage
+import com.paulcoding.hviewer.ui.page.tabs.TabsPage
 import com.paulcoding.hviewer.ui.page.web.WebPage
 
 @Composable
@@ -88,12 +89,12 @@ fun AppEntry() {
                     navController.navigate(Route.LIST_SCRIPT + "/crash_log")
                 },
                 onLockEnabled = {
-                navController.navigate(Route.LOCK) {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                    launchSingleTop = true
-                    restoreState = false
-                }
-            }, goBack = { navController.popBackStack() })
+                    navController.navigate(Route.LOCK) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                        launchSingleTop = true
+                        restoreState = false
+                    }
+                }, goBack = { navController.popBackStack() })
         }
         animatedComposable(Route.POSTS) {
             PostsPage(
@@ -103,6 +104,7 @@ fun AppEntry() {
                 },
                 navToSearch = { navController.navigate(Route.SEARCH) },
                 navToCustomTag = { navToCustomTag(it) },
+                navToTabs = { navController.navigate(Route.TABS) },
                 goBack = { navController.popBackStack() },
             )
         }
@@ -198,6 +200,9 @@ fun AppEntry() {
         animatedComposable(Route.WEBVIEW) {
             val url = appViewModel.getWebViewUrl()
             WebPage(goBack = { navController.popBackStack() }, url = url)
+        }
+        animatedComposable(Route.TABS) {
+            TabsPage(goBack = { navController.popBackStack() }, appViewModel = appViewModel,siteConfigs = siteConfigs)
         }
     }
 }
