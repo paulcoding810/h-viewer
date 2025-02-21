@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.BugReport
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,7 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SitesPage(
     isDevMode: Boolean,
-    navToTopics: (site: String) -> Unit,
+    navToTopics: (siteConfig: SiteConfig) -> Unit,
     goBack: () -> Unit,
     siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
@@ -102,7 +100,7 @@ fun SitesPage(
                                 key = site,
                                 site = siteConfig
                             ) {
-                                navToTopics(site)
+                                navToTopics(siteConfig)
                             }
                         }
                     }

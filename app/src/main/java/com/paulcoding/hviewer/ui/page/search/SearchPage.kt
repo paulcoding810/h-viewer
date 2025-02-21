@@ -56,14 +56,11 @@ import com.paulcoding.hviewer.ui.page.posts.FavoriteCard
 fun SearchPage(
     appViewModel: AppViewModel,
     navToImages: (post: PostItem) -> Unit,
-    navToCustomTag: (tag: Tag) -> Unit,
+    navToCustomTag: (PostItem, Tag) -> Unit,
     goBack: () -> Unit,
 ) {
-    val appState by appViewModel.stateFlow.collectAsState()
-    val siteConfig = appState.site.second
-
     val viewModel: SearchViewModel = viewModel(
-        factory = SearchViewModelFactory(siteConfig),
+        factory = SearchViewModelFactory(appViewModel.getCurrentSiteConfig()),
     )
     val uiState by viewModel.stateFlow.collectAsState()
     var query by remember { mutableStateOf(viewModel.stateFlow.value.query) }
@@ -128,12 +125,12 @@ fun SearchPage(
     }
 }
 
-
+// TODO: duplicated PageContent
 @Composable
 fun PageContent(
     appViewModel: AppViewModel,
     viewModel: SearchViewModel,
-    navToCustomTag: (Tag) -> Unit,
+    navToCustomTag: (PostItem, Tag) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -164,7 +161,7 @@ fun PageContent(
                             appViewModel.deleteFavorite(post)
                     },
                     onTagClick = {
-                        navToCustomTag(it)
+                        navToCustomTag(post, it)
                     }
                 )
                 {
