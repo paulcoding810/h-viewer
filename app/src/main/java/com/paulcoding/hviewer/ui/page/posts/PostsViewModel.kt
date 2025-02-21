@@ -3,6 +3,7 @@ package com.paulcoding.hviewer.ui.page.posts
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.paulcoding.hviewer.database.DatabaseProvider
 import com.paulcoding.hviewer.helper.SCRIPTS_DIR
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Posts
@@ -60,6 +61,8 @@ class PostsViewModel(siteConfig: SiteConfig, tag: Tag) : ViewModel() {
                             nextPage = postsData.next
                         )
                     }
+                    // store all posts to database.
+                    DatabaseProvider.getInstance().postItemDao().addPosts(postsData.posts)
                 }
                 .onFailure {
                     setError(it)
