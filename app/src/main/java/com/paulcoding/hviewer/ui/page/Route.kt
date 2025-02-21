@@ -15,4 +15,5 @@ object Route {
     const val LOCK = "lock"
     const val HISTORY = "history"
     const val WEBVIEW = "webview"
+    const val TABS = "tabs"
 }

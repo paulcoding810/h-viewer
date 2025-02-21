@@ -28,6 +28,9 @@ class AppViewModel : ViewModel() {
     private var _stateFlow = MutableStateFlow(UiState())
     val stateFlow = _stateFlow.asStateFlow()
 
+    private var _tabs = MutableStateFlow(listOf<PostItem>())
+    val tabs = _tabs.asStateFlow()
+
     val favoritePosts = DatabaseProvider.getInstance().favoritePostDao().getAll()
     val historyPosts = DatabaseProvider.getInstance().historyDao().getAll()
 
@@ -105,6 +108,25 @@ class AppViewModel : ViewModel() {
     fun deleteHistory(history: PostHistory) {
         viewModelScope.launch {
             DatabaseProvider.getInstance().historyDao().delete(history)
+        }
+    }
+
+    fun addTab(postItem: PostItem) {
+        if (!_tabs.value.contains(postItem))
+            _tabs.update {
+                it + postItem
+            }
+    }
+
+    fun removeTab(postItem: PostItem) {
+        _tabs.update {
+            it - postItem
+        }
+    }
+
+    fun clearTabs() {
+        _tabs.update {
+            emptyList()
         }
     }
 }

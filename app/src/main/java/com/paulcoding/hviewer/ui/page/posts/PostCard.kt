@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page.posts
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -48,11 +50,13 @@ fun FavoriteCard(
     isFavorite: Boolean = false,
     setFavorite: (Boolean) -> Unit = {},
     onTagClick: (Tag) -> Unit = {},
+    onAddToTabs: (() -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     PostCard(
         postItem = postItem,
         onTagClick = onTagClick,
+        onAddToTabs = onAddToTabs,
         onClick = onClick
     ) {
         HFavoriteIcon(
@@ -64,12 +68,14 @@ fun FavoriteCard(
     }
 }
 
+@SuppressLint("ContextCastToActivity")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCard(
     postItem: PostItem,
     onTagClick: (Tag) -> Unit = {},
     onClick: () -> Unit,
+    onAddToTabs: (() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
@@ -86,8 +92,6 @@ fun PostCard(
 
     Card(
         elevation = CardDefaults.cardElevation(4.dp),
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 12.dp),
         border = CardDefaults.outlinedCardBorder(),
         shape = CardDefaults.outlinedShape,
         onClick = { onClick() },
@@ -108,6 +112,13 @@ fun PostCard(
             HIcon(Icons.Outlined.Info) {
                 isBottomSheetVisible = true
             }
+            if (onAddToTabs != null)
+                HIcon(
+                    Icons.AutoMirrored.Outlined.OpenInNew,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                ) {
+                    onAddToTabs()
+                }
             content()
         }
     }
