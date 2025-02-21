@@ -31,3 +31,38 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
         )
     }
 }
+
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Step 1: Create a new table post_items
+        db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS post_items (
+                url TEXT NOT NULL, 
+                name TEXT NOT NULL, 
+                thumbnail TEXT NOT NULL, 
+                createdAt INTEGER NOT NULL, 
+                tags TEXT, 
+                size INTEGER, 
+                views INTEGER, 
+                quantity INTEGER, 
+                favorite INTEGER NOT NULL, 
+                favoriteAt INTEGER NOT NULL, 
+                viewed INTEGER NOT NULL, 
+                viewedAt INTEGER NOT NULL, 
+                PRIMARY KEY(`url`)
+            )
+        """.trimIndent()
+        )
+
+        // Step 2: Copy data from favorite_posts to post_items
+        db.execSQL("""
+            INSERT INTO post_items (url, name, thumbnail, createdAt, tags, size, views, quantity, favorite, favoriteAt, viewed, viewedAt)
+            SELECT url, name, thumbnail, createdAt, tags, size, views, quantity, 1, createdAt, 1, createdAt FROM favorite_posts
+        """.trimIndent())
+
+        // Step 3: Drop tables
+        db.execSQL("DROP TABLE favorite_posts")
+        db.execSQL("DROP TABLE history")
+    }
+}

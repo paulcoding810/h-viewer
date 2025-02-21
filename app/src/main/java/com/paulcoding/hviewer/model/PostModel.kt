@@ -10,18 +10,21 @@ data class PostData(
 )
 
 
-@Entity(tableName = "favorite_posts")
+@Entity(tableName = "post_items")
 data class PostItem(
     @PrimaryKey
     val url: String = "",
     val name: String = "",
     val thumbnail: String = "",
-    val site: String = "",
     val createdAt: Long = 0,
     val tags: List<Tag>? = null,
     val size: Int? = null,
     val views: Int? = null,
     val quantity: Int? = null,
+    val favorite: Boolean = false,
+    val favoriteAt: Long = 0,
+    val viewed: Boolean = false,
+    val viewedAt: Long = 0,
 ) {
     fun getHost(): String {
         return url.split("/").getOrNull(2) ?: ""
@@ -30,34 +33,6 @@ data class PostItem(
     fun getSiteConfig(hostsMap: Map<String, SiteConfig>): SiteConfig? {
         val host = getHost()
         return hostsMap[host]
-    }
-}
-
-// duplicated?
-@Entity(tableName = "history")
-data class PostHistory(
-    @PrimaryKey
-    val url: String = "",
-    val name: String = "",
-    val thumbnail: String = "",
-    val site: String = "",
-    val createdAt: Long = 0,
-    val tags: List<Tag>? = null,
-    val size: Int? = null,
-    val views: Int? = null,
-    val quantity: Int? = null,
-) {
-    fun toPostItem(): PostItem {
-        return PostItem(
-            url = url,
-            name = name,
-            thumbnail = thumbnail,
-            site = site,
-            createdAt = createdAt,
-            tags = tags,
-            size = size,
-            views = views
-        )
     }
 }
 
