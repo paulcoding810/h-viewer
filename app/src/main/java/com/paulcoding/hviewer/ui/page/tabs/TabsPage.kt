@@ -1,15 +1,16 @@
 package com.paulcoding.hviewer.ui.page.tabs
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Tab
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ChevronLeft
+import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -22,8 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.ui.component.HEmpty
+import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.page.AppViewModel
 import com.paulcoding.hviewer.ui.page.post.ImageList
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
@@ -31,39 +34,14 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
     appViewModel.stateFlow
     val tabs by appViewModel.tabs.collectAsState(initial = listOf())
     val pagerState = rememberPagerState { tabs.size }
-    val selectedTabIndex by remember { derivedStateOf { pagerState.currentPage } }
     val scope = rememberCoroutineScope()
     val hostsMap by remember { derivedStateOf { siteConfigs.toHostsMap() } }
 
-    Column {
-        if (tabs.isEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                HEmpty()
-            }
-        } else {
-            ScrollableTabRow(
-                selectedTabIndex = selectedTabIndex,
-                modifier = Modifier.fillMaxWidth(),
-                edgePadding = 0.dp,
-            ) {
-                tabs.forEachIndexed { index, tab ->
-                    Tab(
-                        selected = selectedTabIndex == index,
-                        selectedContentColor = MaterialTheme.colorScheme.primary,
-                        unselectedContentColor = MaterialTheme.colorScheme.outline,
-                        onClick = {
-                            scope.launch {
-                                pagerState.animateScrollToPage(index)
-                            }
-                        },
-                        text = { Text(text = tab.getHost()) },
-                    )
-                }
-            }
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (tabs.isEmpty()) {
+            HEmpty()
+        } else {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
@@ -73,7 +51,14 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                 val siteConfig = tab.getSiteConfig(hostsMap)
 
                 if (siteConfig != null)
-                    ImageList(tab.url, siteConfig = siteConfig, goBack = goBack)
+                    ImageList(
+                        tab.url,
+                        siteConfig = siteConfig,
+                        goBack = goBack,
+                        bottomRowActions = {
+                            BottomRowActions(pageIndex, scope, pagerState)
+                        }
+                    )
                 else
                     Text(
                         "Site config not found for ${tab.url}",
@@ -81,6 +66,35 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                         color = Color.Red
                     )
             }
+        }
+    }
+}
+
+@Composable
+internal fun BottomRowActions(pageIndex: Int, scope: CoroutineScope, pagerState: PagerState) {
+    HIcon(
+        Icons.Outlined.ChevronLeft,
+        size = 32,
+        rounded = true,
+        enabled = pageIndex > 0
+    ) {
+        scope.launch {
+            pagerState.animateScrollToPage(
+                pageIndex.dec()
+            )
+        }
+    }
+    Spacer(modifier = Modifier.width(16.dp))
+    HIcon(
+        Icons.Outlined.ChevronRight,
+        size = 32,
+        rounded = true,
+        enabled = pageIndex < pagerState.pageCount - 1
+    ) {
+        scope.launch {
+            pagerState.animateScrollToPage(
+                pageIndex.inc()
+            )
         }
     }
 }

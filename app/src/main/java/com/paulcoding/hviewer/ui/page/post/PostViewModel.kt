@@ -29,6 +29,7 @@ class PostViewModel(private val postUrl: String, siteConfig: SiteConfig) : ViewM
         val isLoading: Boolean = false,
         val error: Throwable? = null,
         val currentPostUrl: String = "",
+        val isSystemBarHidden: Boolean = true,
     )
 
     private fun setError(th: Throwable) {
@@ -78,6 +79,10 @@ class PostViewModel(private val postUrl: String, siteConfig: SiteConfig) : ViewM
 
     fun canLoadMorePostData(): Boolean {
         return _stateFlow.value.postPage < _stateFlow.value.postTotalPage
+    }
+
+    fun toggleSystemBarHidden() {
+        _stateFlow.update { it.copy(isSystemBarHidden = !it.isSystemBarHidden) }
     }
 }
 

@@ -2,21 +2,29 @@ package com.paulcoding.hviewer.ui.page.post
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,12 +33,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -39,17 +49,15 @@ import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
-import com.paulcoding.hviewer.extensions.isScrollingUp
 import com.paulcoding.hviewer.extensions.openInBrowser
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HBackIcon
-import com.paulcoding.hviewer.ui.component.HGoTop
+import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
-import com.paulcoding.hviewer.ui.component.HideSystemBars
-import com.paulcoding.hviewer.ui.page.fadeInWithBlur
-import com.paulcoding.hviewer.ui.page.fadeOutWithBlur
+import com.paulcoding.hviewer.ui.component.SystemBar
+import kotlinx.coroutines.launch
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
@@ -57,7 +65,12 @@ import me.saket.telephoto.zoomable.zoomable
 
 
 @Composable
-fun ImageList(postUrl: String, siteConfig: SiteConfig, goBack: () -> Unit) {
+fun ImageList(
+    postUrl: String,
+    siteConfig: SiteConfig,
+    goBack: () -> Unit,
+    bottomRowActions: @Composable (RowScope.() -> Unit) = {},
+) {
     val viewModel: PostViewModel = viewModel(
         key = postUrl,
         factory = PostViewModelFactory(postUrl, siteConfig = siteConfig)
@@ -66,6 +79,12 @@ fun ImageList(postUrl: String, siteConfig: SiteConfig, goBack: () -> Unit) {
     val uiState by viewModel.stateFlow.collectAsState()
     var selectedImage by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+
+    val translationY by animateDpAsState(
+        targetValue = if (uiState.isSystemBarHidden) (-100).dp else 0.dp,
+        animationSpec = tween(200)
+    )
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -83,7 +102,7 @@ fun ImageList(postUrl: String, siteConfig: SiteConfig, goBack: () -> Unit) {
         }
     }
 
-    HideSystemBars()
+    SystemBar(uiState.isSystemBarHidden)
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -92,6 +111,7 @@ fun ImageList(postUrl: String, siteConfig: SiteConfig, goBack: () -> Unit) {
         ) {
             items(uiState.images, key = { it }) { image ->
                 PostImage(url = image) {
+                    viewModel.toggleSystemBarHidden()
                     selectedImage = image
                 }
             }
@@ -105,33 +125,52 @@ fun ImageList(postUrl: String, siteConfig: SiteConfig, goBack: () -> Unit) {
                 }
         }
 
-        HGoTop(listState)
-
-        AnimatedVisibility(
-            listState.isScrollingUp().value,
+        Row(
             modifier = Modifier
-                .align(Alignment.TopStart)
+                .fillMaxWidth()
+                .offset {
+                    IntOffset(x = 0, y = translationY.roundToPx())
+                }
                 .padding(16.dp)
-                .statusBarsPadding()
                 .statusBarsPadding(),
-            enter = fadeInWithBlur(),
-            exit = fadeOutWithBlur(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+            HBackIcon { goBack() }
+            Text("${uiState.postPage}/${uiState.postTotalPage}")
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset {
+                    IntOffset(x = 0, y = -translationY.roundToPx())
+                }
+                .align(Alignment.BottomStart)
+                .padding(16.dp)
+                .navigationBarsPadding(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            bottomRowActions()
+            Spacer(modifier = Modifier.weight(1f))
+            HIcon(
+                Icons.Outlined.KeyboardArrowUp,
+                size = 32,
+                tint = MaterialTheme.colorScheme.primary,
+                rounded = true
             ) {
-                HBackIcon { goBack() }
-                Text("${uiState.postPage}/${uiState.postTotalPage}")
+                scope.launch {
+                    listState.animateScrollToItem(0, 0)
+                }
             }
         }
 
-        if (selectedImage != null) {
-            ImageModal(url = selectedImage!!) {
-                selectedImage = null
-            }
-        }
+//        if (selectedImage != null) {
+//            ImageModal(url = selectedImage!!) {
+//                selectedImage = null
+//            }
+//        }
     }
 }
 
