@@ -141,8 +141,10 @@ fun PageContent(
     val listState = rememberLazyListState()
     val uiState by viewModel.stateFlow.collectAsState()
 
-    uiState.error?.let {
-        Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
+        }
     }
 
     LaunchedEffect(uiState.postItems) {

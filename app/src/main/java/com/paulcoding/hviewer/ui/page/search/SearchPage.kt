@@ -137,8 +137,10 @@ fun PageContent(
     val uiState by viewModel.stateFlow.collectAsState()
     val listFavorite by appViewModel.favoritePosts.collectAsState(initial = emptyList())
 
-    uiState.error?.let {
-        Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let {
+            Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
+        }
     }
 
     LaunchedEffect(listState.firstVisibleItemIndex) {
