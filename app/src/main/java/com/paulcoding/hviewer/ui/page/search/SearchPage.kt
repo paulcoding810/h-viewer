@@ -151,7 +151,9 @@ fun PageContent(
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            state = listState
+            state = listState,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(uiState.postItems, key = { it.url }) { post ->
                 FavoriteCard(post,

@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.favorite
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,6 +22,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
@@ -76,7 +78,10 @@ fun FavoritePage(
                 .padding(paddings)
                 .fillMaxSize()
         ) {
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 items(items = favoritePosts, key = { it.url }) { item ->
                     FavoriteItem(item, navToImages = { navToImages(item) },
                         onTagClick = { tag -> navToCustomTag(item, tag) },

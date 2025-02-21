@@ -1,6 +1,7 @@
 package com.paulcoding.hviewer.ui.page.posts
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -164,7 +165,9 @@ fun PageContent(
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
-            state = listState
+            state = listState,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(uiState.postItems, key = { it.url }) { post ->
                 FavoriteCard(

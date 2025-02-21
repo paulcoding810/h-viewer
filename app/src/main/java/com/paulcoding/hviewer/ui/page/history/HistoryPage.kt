@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page.history
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
@@ -51,6 +53,9 @@ fun HistoryPage(
         Column(modifier = Modifier.padding(paddings)) {
             LazyVerticalStaggeredGrid(
                 columns = StaggeredGridCells.Fixed(2),
+                modifier = Modifier.padding(horizontal = 12.dp),
+                verticalItemSpacing = 12.dp,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(historyPosts) {
                     PostCard(
