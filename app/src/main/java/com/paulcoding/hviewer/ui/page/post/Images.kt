@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,7 +65,12 @@ import me.saket.telephoto.zoomable.zoomable
 
 
 @Composable
-fun ImageList(postUrl: String, siteConfig: SiteConfig, goBack: () -> Unit) {
+fun ImageList(
+    postUrl: String,
+    siteConfig: SiteConfig,
+    goBack: () -> Unit,
+    bottomRowActions: @Composable (RowScope.() -> Unit) = {},
+) {
     val viewModel: PostViewModel = viewModel(
         key = postUrl,
         factory = PostViewModelFactory(postUrl, siteConfig = siteConfig)
@@ -146,6 +152,7 @@ fun ImageList(postUrl: String, siteConfig: SiteConfig, goBack: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            bottomRowActions()
             Spacer(modifier = Modifier.weight(1f))
             HIcon(
                 Icons.Outlined.KeyboardArrowUp,

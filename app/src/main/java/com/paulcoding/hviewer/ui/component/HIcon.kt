@@ -52,10 +52,12 @@ fun HIcon(
     modifier: Modifier = Modifier,
     tint: Color = LocalContentColor.current,
     rounded: Boolean = false,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     IconButton(
         onClick = { onClick() },
+        enabled = enabled,
         modifier = if (rounded) modifier
             .clip(CircleShape)
             .background(Color.White)
