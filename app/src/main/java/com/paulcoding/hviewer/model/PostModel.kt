@@ -24,7 +24,7 @@ data class PostItem(
     val quantity: Int? = null,
 ) {
     fun getHost(): String {
-        return url.split("/")[2]
+        return url.split("/").getOrNull(2) ?: ""
     }
 
     fun getSiteConfig(hostsMap: Map<String, SiteConfig>): SiteConfig? {

@@ -25,7 +25,7 @@ import com.paulcoding.hviewer.ui.page.AppViewModel
 fun CustomTagPage(
     appViewModel: AppViewModel,
     goBack: () -> Unit,
-    navToCustomTag: (Tag) -> Unit,
+    navToCustomTag: (PostItem, Tag) -> Unit,
     navToImages: (PostItem) -> Unit
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
@@ -49,11 +49,10 @@ fun CustomTagPage(
 
             PageContent(
                 appViewModel,
-                siteConfig = appState.site.second,
                 tag = tag,
-                navToCustomTag = {
-                    if (it.name != tag.name)
-                        navToCustomTag(it)
+                navToCustomTag = { post, newTag ->
+                    if (newTag.name != tag.name)
+                        navToCustomTag(post, tag)
                 },
                 onPageChange = { currentPage, total ->
                     pageProgress = currentPage to total

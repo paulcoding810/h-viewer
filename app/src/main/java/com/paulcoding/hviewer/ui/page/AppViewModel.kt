@@ -11,6 +11,7 @@ import com.paulcoding.hviewer.model.PostHistory
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
+import com.paulcoding.hviewer.network.Github
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
@@ -44,15 +45,9 @@ class AppViewModel : ViewModel() {
 
     fun getCurrentTag() = _stateFlow.value.tag
 
-    fun setSiteConfig(site: String, siteConfig: SiteConfig) {
-        _stateFlow.update { it.copy(site = site to siteConfig) }
-    }
-
-
     data class UiState(
         val post: PostItem = PostItem(),
         val url: String = "",
-        val site: Pair<String, SiteConfig> = "" to SiteConfig(),
         val tag: Tag = Tag(),
         val isDevMode: Boolean = BuildConfig.DEBUG,
     )
@@ -70,7 +65,6 @@ class AppViewModel : ViewModel() {
     fun addFavorite(postItem: PostItem, reAdded: Boolean = false) {
         viewModelScope.launch {
             val item = if (reAdded) postItem else postItem.copy(
-                site = _stateFlow.value.site.first,
                 createdAt = System.currentTimeMillis()
             )
             DatabaseProvider.getInstance().favoritePostDao().insert(item)
@@ -85,7 +79,6 @@ class AppViewModel : ViewModel() {
 
     fun addHistory(postItem: PostItem) {
         val item = PostHistory(
-            site = _stateFlow.value.site.first,
             createdAt = System.currentTimeMillis(),
             url = postItem.url,
             views = postItem.views,
@@ -128,5 +121,13 @@ class AppViewModel : ViewModel() {
         _tabs.update {
             emptyList()
         }
+    }
+
+    fun getCurrentSiteConfig(): SiteConfig {
+        val hostMap = Github.stateFlow.value.siteConfigs?.toHostsMap()
+        if (hostMap != null) {
+            return _stateFlow.value.post.getSiteConfig(hostMap) ?: SiteConfig()
+        }
+        return SiteConfig()
     }
 }

@@ -38,7 +38,6 @@ import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.toCapital
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.PostItem
-import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
@@ -56,14 +55,14 @@ fun PostsPage(
     appViewModel: AppViewModel,
     navToImages: (PostItem) -> Unit,
     navToSearch: () -> Unit,
-    navToCustomTag: (Tag) -> Unit,
+    navToCustomTag: (PostItem, Tag) -> Unit,
     navToTabs: () -> Unit,
     goBack: () -> Unit
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
     val tabs by appViewModel.tabs.collectAsState(initial = listOf())
 
-    val siteConfig = appState.site.second
+    val siteConfig = appViewModel.getCurrentSiteConfig()
 
     val listTag: List<Tag> = siteConfig.tags.keys.map { key ->
         Tag(name = key, url = siteConfig.tags[key]!!)
@@ -81,7 +80,7 @@ fun PostsPage(
             HPageProgress(pageProgress.first, pageProgress.second)
             HIcon(imageVector = Icons.Outlined.Search) { navToSearch() }
             if (tabs.isNotEmpty()) {
-            HIcon(imageVector = Icons.Outlined.Tab) { navToTabs() }
+                HIcon(imageVector = Icons.Outlined.Tab) { navToTabs() }
             }
         })
     }) { paddings ->
@@ -114,7 +113,6 @@ fun PostsPage(
 
                 PageContent(
                     appViewModel,
-                    siteConfig,
                     tag = tag,
                     navToCustomTag = navToCustomTag,
                     onPageChange = { currentPage, total ->
@@ -130,15 +128,14 @@ fun PostsPage(
 @Composable
 fun PageContent(
     appViewModel: AppViewModel,
-    siteConfig: SiteConfig,
     tag: Tag,
     onPageChange: (Int, Int) -> Unit,
-    navToCustomTag: (Tag) -> Unit = {},
+    navToCustomTag: (PostItem, Tag) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
     val listFavorite by appViewModel.favoritePosts.collectAsState(initial = emptyList())
     val viewModel: PostsViewModel = viewModel(
-        factory = PostsViewModelFactory(siteConfig, tag),
+        factory = PostsViewModelFactory(appViewModel.getCurrentSiteConfig(), tag),
         key = tag.name
     )
     val listState = rememberLazyListState()
@@ -172,8 +169,8 @@ fun PageContent(
                 FavoriteCard(
                     post,
                     isFavorite = listFavorite.find { it.url == post.url } != null,
-                    onTagClick = {
-                        navToCustomTag(it)
+                    onTagClick = { tag ->
+                        navToCustomTag(post, tag)
                     },
                     onAddToTabs = {
                         appViewModel.addTab(post)

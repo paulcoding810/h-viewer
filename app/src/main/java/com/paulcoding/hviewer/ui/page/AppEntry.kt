@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -48,7 +49,7 @@ fun AppEntry(intent: Intent?) {
     val navController = rememberNavController()
 
     val githubState by Github.stateFlow.collectAsState()
-    val siteConfigs = githubState.siteConfigs ?: SiteConfigs()
+    val siteConfigs by remember { derivedStateOf { githubState.siteConfigs ?: SiteConfigs() } }
     val appViewModel: AppViewModel = viewModel()
     val appState by appViewModel.stateFlow.collectAsState()
     val context = LocalContext.current
@@ -59,7 +60,8 @@ fun AppEntry(intent: Intent?) {
         navController.navigate(Route.POST)
     }
 
-    fun navToCustomTag(tag: Tag) {
+    fun navToCustomTag(post: PostItem, tag: Tag) {
+        appViewModel.setCurrentPost(post)
         appViewModel.setCurrentTag(tag)
         navController.navigate(Route.CUSTOM_TAG)
     }
@@ -106,8 +108,8 @@ fun AppEntry(intent: Intent?) {
                 isDevMode = appState.isDevMode,
                 siteConfigs = siteConfigs,
                 refresh = { Github.refreshLocalConfigs() },
-                navToTopics = { site ->
-                    appViewModel.setSiteConfig(site, siteConfigs.sites[site]!!)
+                navToTopics = { siteConfig ->
+                    appViewModel.setCurrentPost(PostItem(siteConfig.baseUrl))
                     navController.navigate(Route.POSTS)
                 }, navToSettings = {
                     navController.navigate(Route.SETTINGS)
@@ -143,7 +145,7 @@ fun AppEntry(intent: Intent?) {
                     navToImages(post)
                 },
                 navToSearch = { navController.navigate(Route.SEARCH) },
-                navToCustomTag = { navToCustomTag(it) },
+                navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
                 navToTabs = { navController.navigate(Route.TABS) },
                 goBack = { navController.popBackStack() },
             )
@@ -151,7 +153,7 @@ fun AppEntry(intent: Intent?) {
         animatedComposable(Route.CUSTOM_TAG) {
             CustomTagPage(
                 appViewModel,
-                navToCustomTag = { navToCustomTag(it) },
+                navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
                 goBack = { navController.popBackStack() }
             ) {
                 navToImages(it)
@@ -175,7 +177,7 @@ fun AppEntry(intent: Intent?) {
                 navToImages = { post: PostItem ->
                     navToImages(post)
                 },
-                navToCustomTag = { navToCustomTag(it) },
+                navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
                 goBack = { navController.popBackStack() },
             )
         }
@@ -183,12 +185,10 @@ fun AppEntry(intent: Intent?) {
             FavoritePage(
                 appViewModel = appViewModel,
                 navToImages = { post: PostItem ->
-                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
                     navToImages(post)
                 },
                 navToCustomTag = { post, tag ->
-                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
-                    navToCustomTag(tag)
+                    navToCustomTag(post, tag)
                 },
                 goBack = { navController.popBackStack() }
             )
@@ -228,12 +228,10 @@ fun AppEntry(intent: Intent?) {
             HistoryPage(
                 goBack = { navController.popBackStack() }, appViewModel = appViewModel,
                 navToImages = { post: PostItem ->
-                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
                     navToImages(post)
                 },
                 navToCustomTag = { post, tag ->
-                    appViewModel.setSiteConfig(post.site, siteConfigs.sites[post.site]!!)
-                    navToCustomTag(tag)
+                    navToCustomTag(post, tag)
                 },
                 deleteHistory = appViewModel::deleteHistory
             )
