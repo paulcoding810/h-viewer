@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -39,13 +40,20 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         setContent {
-            Content()
+            Content(intent)
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setContent {
+            Content(intent)
         }
     }
 }
 
 @Composable
-fun Content() {
+fun Content(intent: Intent?) {
     val githubState by Github.stateFlow.collectAsState()
     val repoUrl = githubState.remoteUrl
 
@@ -65,7 +73,7 @@ fun Content() {
     HViewerTheme {
         if (githubState.isLoading)
             UpdateDialog()
-        AppEntry()
+        AppEntry(intent)
     }
 }
 
