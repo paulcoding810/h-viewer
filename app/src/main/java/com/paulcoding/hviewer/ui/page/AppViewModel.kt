@@ -7,14 +7,12 @@ import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.database.DatabaseProvider
 import com.paulcoding.hviewer.helper.crashLogDir
 import com.paulcoding.hviewer.helper.scriptsDir
-import com.paulcoding.hviewer.model.PostHistory
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
@@ -32,8 +30,8 @@ class AppViewModel : ViewModel() {
     private var _tabs = MutableStateFlow(listOf<PostItem>())
     val tabs = _tabs.asStateFlow()
 
-    val favoritePosts = DatabaseProvider.getInstance().favoritePostDao().getAll()
-    val historyPosts = DatabaseProvider.getInstance().historyDao().getAll()
+    val favoritePosts = DatabaseProvider.getInstance().postItemDao().getFavoritePosts()
+    val historyPosts = DatabaseProvider.getInstance().postItemDao().getViewedPosts()
 
     fun setCurrentPost(post: PostItem) {
         _stateFlow.update { it.copy(post = post) }
@@ -64,43 +62,34 @@ class AppViewModel : ViewModel() {
 
     fun addFavorite(postItem: PostItem, reAdded: Boolean = false) {
         viewModelScope.launch {
-            val item = if (reAdded) postItem else postItem.copy(
-                createdAt = System.currentTimeMillis()
+            val item = postItem.copy(
+                favorite = true,
+                favoriteAt = if (!reAdded) System.currentTimeMillis() else postItem.favoriteAt,
             )
-            DatabaseProvider.getInstance().favoritePostDao().insert(item)
+            DatabaseProvider.getInstance().postItemDao().updatePost(item)
         }
     }
 
     fun deleteFavorite(postItem: PostItem) {
         viewModelScope.launch {
-            DatabaseProvider.getInstance().favoritePostDao().delete(postItem)
+            DatabaseProvider.getInstance().postItemDao().updatePost(
+                postItem.copy(favorite = false)
+            )
         }
     }
 
     fun addHistory(postItem: PostItem) {
-        val item = PostHistory(
-            createdAt = System.currentTimeMillis(),
-            url = postItem.url,
-            views = postItem.views,
-            thumbnail = postItem.thumbnail,
-            name = postItem.name,
-            size = postItem.size,
-            tags = postItem.tags,
-            quantity = postItem.quantity
-        )
         viewModelScope.launch {
-            // limit to 25 items in history
-            if (historyPosts.first().size >= 25) {
-                DatabaseProvider.getInstance().historyDao().deleteOldest()
-            }
-            DatabaseProvider.getInstance().historyDao()
-                .insert(item)
+            DatabaseProvider.getInstance().postItemDao()
+                .updatePost(postItem.copy(viewed = true, viewedAt = System.currentTimeMillis()))
         }
     }
 
-    fun deleteHistory(history: PostHistory) {
+    fun deleteHistory(postItem: PostItem) {
         viewModelScope.launch {
-            DatabaseProvider.getInstance().historyDao().delete(history)
+            DatabaseProvider.getInstance().postItemDao()
+                .updatePost(postItem.copy(viewed = false))
+
         }
     }
 

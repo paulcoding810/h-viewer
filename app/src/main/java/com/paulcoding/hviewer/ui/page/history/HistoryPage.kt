@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.paulcoding.hviewer.R
-import com.paulcoding.hviewer.model.PostHistory
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
@@ -34,7 +33,7 @@ fun HistoryPage(
     goBack: () -> Unit, appViewModel: AppViewModel,
     navToImages: (PostItem) -> Unit,
     navToCustomTag: (PostItem, Tag) -> Unit,
-    deleteHistory: (post: PostHistory) -> Unit
+    deleteHistory: (post: PostItem) -> Unit
 ) {
     val historyPosts by appViewModel.historyPosts.collectAsState(initial = listOf())
 
@@ -55,12 +54,12 @@ fun HistoryPage(
             ) {
                 items(historyPosts) {
                     PostCard(
-                        postItem = it.toPostItem(),
+                        postItem = it,
                         onTagClick = { tag ->
-                            navToCustomTag(it.toPostItem(), tag)
+                            navToCustomTag(it, tag)
                         },
                         onClick = {
-                            navToImages(it.toPostItem())
+                            navToImages(it)
                         }) {
                         HIcon(
                             Icons.Outlined.Delete,
@@ -80,4 +79,3 @@ fun HistoryPage(
         }
     }
 }
-
