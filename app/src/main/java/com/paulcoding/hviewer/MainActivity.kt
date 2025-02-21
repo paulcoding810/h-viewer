@@ -60,7 +60,7 @@ fun Content(intent: Intent?) {
     ToastExit()
 
     LaunchedEffect(repoUrl) {
-        if (repoUrl.isNotEmpty())
+        if (repoUrl.isNotEmpty() && !BuildConfig.DEBUG)
             Github.checkVersionOrUpdate()
     }
 
