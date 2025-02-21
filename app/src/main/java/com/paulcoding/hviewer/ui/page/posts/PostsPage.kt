@@ -59,7 +59,6 @@ fun PostsPage(
     navToTabs: () -> Unit,
     goBack: () -> Unit
 ) {
-    val appState by appViewModel.stateFlow.collectAsState()
     val tabs by appViewModel.tabs.collectAsState(initial = listOf())
 
     val siteConfig = appViewModel.getCurrentSiteConfig()

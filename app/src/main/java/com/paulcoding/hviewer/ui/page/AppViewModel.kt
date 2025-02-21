@@ -62,18 +62,18 @@ class AppViewModel : ViewModel() {
 
     fun addFavorite(postItem: PostItem, reAdded: Boolean = false) {
         viewModelScope.launch {
-            val item = postItem.copy(
+            DatabaseProvider.getInstance().postItemDao().setFavorite(
+                postItem.url,
                 favorite = true,
                 favoriteAt = if (!reAdded) System.currentTimeMillis() else postItem.favoriteAt,
             )
-            DatabaseProvider.getInstance().postItemDao().updatePost(item)
         }
     }
 
     fun deleteFavorite(postItem: PostItem) {
         viewModelScope.launch {
-            DatabaseProvider.getInstance().postItemDao().updatePost(
-                postItem.copy(favorite = false)
+            DatabaseProvider.getInstance().postItemDao().setFavorite(
+                postItem.url, false
             )
         }
     }
@@ -81,14 +81,14 @@ class AppViewModel : ViewModel() {
     fun addHistory(postItem: PostItem) {
         viewModelScope.launch {
             DatabaseProvider.getInstance().postItemDao()
-                .updatePost(postItem.copy(viewed = true, viewedAt = System.currentTimeMillis()))
+                .setViewed(postItem.url, viewed = true)
         }
     }
 
     fun deleteHistory(postItem: PostItem) {
         viewModelScope.launch {
             DatabaseProvider.getInstance().postItemDao()
-                .updatePost(postItem.copy(viewed = false))
+                .setViewed(postItem.url, false)
 
         }
     }
@@ -98,6 +98,12 @@ class AppViewModel : ViewModel() {
             _tabs.update {
                 it + postItem
             }
+
+        // mark as viewed
+        viewModelScope.launch {
+            DatabaseProvider.getInstance().postItemDao()
+                .setViewed(postItem.url)
+        }
     }
 
     fun removeTab(postItem: PostItem) {

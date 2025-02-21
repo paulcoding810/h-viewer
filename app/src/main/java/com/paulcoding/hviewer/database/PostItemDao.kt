@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PostItemDao {
+    @Query("SELECT * FROM post_items ORDER BY viewedAt DESC")
+    fun getPosts(): Flow<List<PostItem>>
+
     @Query("SELECT * FROM post_items WHERE favorite = 1 ORDER BY favoriteAt DESC")
     fun getFavoritePosts(): Flow<List<PostItem>>
 
@@ -24,4 +27,18 @@ interface PostItemDao {
 
     @Update
     suspend fun updatePost(postItem: PostItem)
+
+    @Query("UPDATE post_items SET viewed = :viewed, viewedAt = :viewedAt WHERE url = :url")
+    suspend fun setViewed(
+        url: String,
+        viewed: Boolean = true,
+        viewedAt: Long = System.currentTimeMillis()
+    )
+
+    @Query("UPDATE post_items SET favorite = :favorite, favoriteAt = :favoriteAt WHERE url = :url")
+    suspend fun setFavorite(
+        url: String,
+        favorite: Boolean,
+        favoriteAt: Long = System.currentTimeMillis()
+    )
 }
