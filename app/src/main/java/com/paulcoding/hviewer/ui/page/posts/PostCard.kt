@@ -1,6 +1,7 @@
 package com.paulcoding.hviewer.ui.page.posts
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.tween
@@ -29,13 +30,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.openInBrowser
 import com.paulcoding.hviewer.model.PostItem
@@ -47,13 +49,15 @@ import com.paulcoding.hviewer.ui.component.HImage
 @Composable
 fun FavoriteCard(
     postItem: PostItem,
+    modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     setFavorite: (Boolean) -> Unit = {},
     onTagClick: (Tag) -> Unit = {},
-    onAddToTabs: (() -> Unit)? = null,
+    onAddToTabs: ((Offset) -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     PostCard(
+        modifier = modifier,
         postItem = postItem,
         onTagClick = onTagClick,
         onAddToTabs = onAddToTabs,
@@ -69,26 +73,17 @@ fun FavoriteCard(
 }
 
 @SuppressLint("ContextCastToActivity")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCard(
+    modifier: Modifier = Modifier,
     postItem: PostItem,
     onTagClick: (Tag) -> Unit = {},
     onClick: () -> Unit,
-    onAddToTabs: (() -> Unit)? = null,
+    onAddToTabs: ((Offset) -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
-    val bottomSheetState = rememberModalBottomSheetState()
-    val context = LocalContext.current as MainActivity
-
-    LaunchedEffect(isBottomSheetVisible) {
-        if (isBottomSheetVisible) {
-            bottomSheetState.show()
-        } else {
-            bottomSheetState.hide()
-        }
-    }
+    var startPos by remember { mutableStateOf(Offset.Zero) }
 
     Card(
         elevation = CardDefaults.cardElevation(4.dp),
@@ -112,24 +107,50 @@ fun PostCard(
             HIcon(Icons.Outlined.Info) {
                 isBottomSheetVisible = true
             }
-            if (onAddToTabs != null)
-                HIcon(
-                    Icons.AutoMirrored.Outlined.OpenInNew,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                ) {
-                    onAddToTabs()
-                }
+            if (onAddToTabs != null) HIcon(
+                Icons.AutoMirrored.Outlined.OpenInNew,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .onGloballyPositioned { startPos = it.positionInRoot() },
+            ) {
+                onAddToTabs(startPos)
+            }
             content()
         }
     }
 
-//    TODO: Remove AnimatedVisibility
-    AnimatedVisibility(isBottomSheetVisible) {
+    InfoBottomSheet(
+        visible = isBottomSheetVisible,
+        postItem = postItem,
+        onDismissRequest = { isBottomSheetVisible = false },
+        onTagClick = {
+            onTagClick(it)
+        },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InfoBottomSheet(
+    visible: Boolean,
+    postItem: PostItem,
+    onDismissRequest: () -> Unit,
+    onTagClick: (Tag) -> Unit
+) {
+    val bottomSheetState = rememberModalBottomSheetState()
+    val activity = LocalActivity.current
+
+    LaunchedEffect(visible) {
+        if (visible) {
+            bottomSheetState.show()
+        } else {
+            bottomSheetState.hide()
+        }
+    }
+
+    AnimatedVisibility(visible) {
         ModalBottomSheet(
-            sheetState = bottomSheetState,
-            onDismissRequest = {
-                isBottomSheetVisible = false
-            }
+            sheetState = bottomSheetState, onDismissRequest = onDismissRequest
         ) {
             Column(
                 modifier = Modifier
@@ -140,12 +161,10 @@ fun PostCard(
                     SelectionContainer {
                         Text(text = name, fontSize = 20.sp)
                     }
-                    TextButton(
-                        onClick = {
-                            isBottomSheetVisible = false
-                            context.openInBrowser(url)
-                        },
-                    ) {
+                    TextButton(onClick = {
+                        onDismissRequest()
+                        activity?.openInBrowser(url)
+                    }) {
                         Text(
                             text = url,
                             textDecoration = TextDecoration.Underline,
@@ -162,7 +181,7 @@ fun PostCard(
                     postItem.tags?.run {
                         forEach { tag ->
                             TextButton(onClick = {
-                                isBottomSheetVisible = false
+                                onDismissRequest()
                                 onTagClick(tag)
                             }) {
                                 Text(text = tag.name)
