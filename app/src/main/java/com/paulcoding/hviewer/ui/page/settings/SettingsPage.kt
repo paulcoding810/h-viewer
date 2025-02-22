@@ -141,7 +141,10 @@ fun SettingsPage(
                 HorizontalDivider()
 
                 if (appState.isDevMode) {
-                    SettingRow(stringResource(R.string.open_crash_log)) {
+                    SettingRow(
+                        stringResource(R.string.open_crash_log),
+                        onClick = navToListCrashLog
+                    ) {
                         Icon(Icons.Outlined.BugReport, "Open crash log files", Modifier.size(24.dp))
                     }
                     HorizontalDivider()

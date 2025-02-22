@@ -22,7 +22,8 @@ class AppViewModel : ViewModel() {
         get() = appContext.scriptsDir.listFiles()?.toList() ?: listOf()
 
     val listCrashLogFiles: List<File>
-        get() = appContext.crashLogDir.listFiles()?.toList() ?: listOf()
+        get() = appContext.crashLogDir.listFiles()?.filter { it.isFile }
+            ?.sortedByDescending { it.lastModified() } ?: listOf()
 
     private var _stateFlow = MutableStateFlow(UiState())
     val stateFlow = _stateFlow.asStateFlow()
