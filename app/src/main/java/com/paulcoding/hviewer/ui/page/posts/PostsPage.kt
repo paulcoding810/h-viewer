@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Tab
@@ -30,17 +31,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
-import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.toCapital
-import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
@@ -87,9 +90,23 @@ fun PostsPage(
             HPageProgress(pageProgress.first, pageProgress.second)
             HIcon(imageVector = Icons.Outlined.Search) { navToSearch() }
             if (tabs.isNotEmpty()) {
-                HIcon(imageVector = Icons.Outlined.Tab, modifier = Modifier.onGloballyPositioned {
-                    endPos = it.positionInRoot()
-                }) { navToTabs() }
+                Box(modifier = Modifier
+                    .onGloballyPositioned {
+                        endPos = it.positionInRoot()
+                    }) {
+                    HIcon(
+                        imageVector = Icons.Outlined.Tab,
+                    ) { navToTabs() }
+                    Text(
+                        tabs.size.toString(),
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .clip(CircleShape),
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                }
             }
         })
     }) { paddings ->
@@ -194,7 +211,6 @@ fun PageContent(
                         startPos = it
                         isAnimating = true
                         appViewModel.addTab(post)
-                        makeToast(R.string.added_to_tabs)
                     },
                     setFavorite = { isFavorite ->
                         if (isFavorite)
