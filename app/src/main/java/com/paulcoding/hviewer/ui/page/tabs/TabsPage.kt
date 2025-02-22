@@ -57,6 +57,7 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
+                beyondViewportPageCount = 2,
                 key = { reversedTabs[it].url }
             ) { pageIndex ->
                 val tab = reversedTabs[pageIndex]
