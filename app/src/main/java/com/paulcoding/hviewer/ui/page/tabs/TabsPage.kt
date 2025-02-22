@@ -72,7 +72,7 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                 val tab = reversedTabs[pageIndex]
                 val siteConfig = tab.getSiteConfig(hostsMap)
 
-                if (siteConfig != null)
+                if (siteConfig != null) {
                     ImageList(
                         tab.url,
                         siteConfig = siteConfig,
@@ -89,23 +89,23 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                                 })
                         }
                     )
-                else
+                } else
                     Text(
                         "Site config not found for ${tab.url}",
                         modifier = Modifier.padding(16.dp),
                         color = Color.Red
                     )
-                InfoBottomSheet(
-                    visible = infoSheetVisible, postItem = tab,
-                    onDismissRequest = {
-                        infoSheetVisible = false
-                    },
-                    onTagClick = {
-                        infoSheetVisible = false
-                        println(it)
-                    },
-                )
             }
+            InfoBottomSheet(
+                visible = infoSheetVisible, postItem = reversedTabs[pagerState.currentPage],
+                onDismissRequest = {
+                    infoSheetVisible = false
+                },
+                onTagClick = {
+                    infoSheetVisible = false
+                    println(it)
+                },
+            )
         }
     }
 }
