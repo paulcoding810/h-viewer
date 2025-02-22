@@ -41,4 +41,7 @@ interface PostItemDao {
         favorite: Boolean,
         favoriteAt: Long = System.currentTimeMillis()
     )
+
+    @Query("SELECT favorite FROM post_items WHERE url = :url")
+    suspend fun isFavorite(url: String): Boolean
 }
