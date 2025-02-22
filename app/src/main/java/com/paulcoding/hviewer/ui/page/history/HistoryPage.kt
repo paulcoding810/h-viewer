@@ -69,7 +69,6 @@ fun HistoryPage(
                         HIcon(
                             Icons.Outlined.Delete,
                             "Delete",
-                            modifier = Modifier.align(Alignment.TopEnd)
                         ) {
                             deleteHistory(it)
                         }
