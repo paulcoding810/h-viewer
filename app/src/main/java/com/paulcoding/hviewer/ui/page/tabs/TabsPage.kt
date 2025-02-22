@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page.tabs
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +38,17 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
     val scope = rememberCoroutineScope()
     val hostsMap by remember { derivedStateOf { siteConfigs.toHostsMap() } }
 
+    BackHandler {
+        if (pagerState.currentPage > 0) {
+            scope.launch {
+                pagerState.animateScrollToPage(
+                    pagerState.currentPage.dec()
+                )
+            }
+        } else {
+            goBack()
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (tabs.isEmpty()) {
