@@ -7,6 +7,7 @@ const val REMOTE_URL = "remote_url"
 const val SECURE_SCREEN = "secure_screen"
 const val PIN = "pin"
 const val PIN_COUNT = "pin_count"
+const val SHOWED_TUT_HIDE_IMAGE_MODAL = "showed_tut_hide_image_modal"
 
 object Preferences {
     private val kv: MMKV = MMKV.defaultMMKV()
@@ -33,5 +34,11 @@ object Preferences {
         get() = kv.getString(PIN, "")!!
         set(value) {
             kv.putString(PIN, value)
+        }
+
+    var showedTutHideImageModal: Boolean
+        get() = kv.getBoolean(SHOWED_TUT_HIDE_IMAGE_MODAL, false)
+        set(value) {
+            kv.putBoolean(SHOWED_TUT_HIDE_IMAGE_MODAL, value)
         }
 }

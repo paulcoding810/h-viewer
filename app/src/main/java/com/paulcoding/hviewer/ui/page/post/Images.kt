@@ -53,6 +53,7 @@ import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.openInBrowser
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.SiteConfig
+import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
@@ -206,7 +207,12 @@ fun ImageModal(url: String, dismiss: () -> Unit) {
                 modifier = Modifier
                     .zoomable(
                         state = zoomableState,
-                        onClick = { makeToast(R.string.double_click_to_dismiss) },
+                        onClick = {
+                            if (!Preferences.showedTutHideImageModal) {
+                                makeToast(R.string.double_click_to_dismiss)
+                                Preferences.showedTutHideImageModal = true
+                            }
+                        },
                         onDoubleClick = doubleClickToZoomListener
                     )
             ) {
