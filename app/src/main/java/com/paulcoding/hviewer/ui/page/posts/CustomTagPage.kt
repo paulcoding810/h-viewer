@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import com.paulcoding.hviewer.extensions.toCapital
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
@@ -50,12 +51,13 @@ fun CustomTagPage(
             PageContent(
                 appViewModel,
                 tag = tag,
+                endPos = Offset.Zero,
+                onPageChange = { currentPage, total ->
+                    pageProgress = currentPage to total
+                },
                 navToCustomTag = { post, newTag ->
                     if (newTag.name != tag.name)
                         navToCustomTag(post, tag)
-                },
-                onPageChange = { currentPage, total ->
-                    pageProgress = currentPage to total
                 }) { post ->
                 navToImages(post)
             }

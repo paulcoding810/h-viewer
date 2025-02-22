@@ -31,6 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
@@ -47,6 +50,7 @@ import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.page.AppViewModel
+import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
 import kotlinx.coroutines.launch
 
 
@@ -73,6 +77,9 @@ fun PostsPage(
     val scope = rememberCoroutineScope()
     var pageProgress by remember { mutableStateOf(1 to 1) }
 
+    var endPos by remember { mutableStateOf(Offset.Zero) }
+
+
     Scaffold(topBar = {
         TopAppBar(title = { Text(currentTag.name.toCapital()) }, navigationIcon = {
             HBackIcon { goBack() }
@@ -80,7 +87,9 @@ fun PostsPage(
             HPageProgress(pageProgress.first, pageProgress.second)
             HIcon(imageVector = Icons.Outlined.Search) { navToSearch() }
             if (tabs.isNotEmpty()) {
-                HIcon(imageVector = Icons.Outlined.Tab) { navToTabs() }
+                HIcon(imageVector = Icons.Outlined.Tab, modifier = Modifier.onGloballyPositioned {
+                    endPos = it.positionInRoot()
+                }) { navToTabs() }
             }
         })
     }) { paddings ->
@@ -114,6 +123,7 @@ fun PostsPage(
                 PageContent(
                     appViewModel,
                     tag = tag,
+                    endPos = endPos,
                     navToCustomTag = navToCustomTag,
                     onPageChange = { currentPage, total ->
                         pageProgress = currentPage to total
@@ -129,6 +139,7 @@ fun PostsPage(
 fun PageContent(
     appViewModel: AppViewModel,
     tag: Tag,
+    endPos: Offset,
     onPageChange: (Int, Int) -> Unit,
     navToCustomTag: (PostItem, Tag) -> Unit,
     onClick: (PostItem) -> Unit
@@ -140,6 +151,9 @@ fun PageContent(
     )
     val listState = rememberLazyListState()
     val uiState by viewModel.stateFlow.collectAsState()
+
+    var startPos by remember { mutableStateOf(Offset.Zero) }
+    var isAnimating by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -171,12 +185,14 @@ fun PageContent(
         ) {
             items(uiState.postItems, key = { it.url }) { post ->
                 FavoriteCard(
-                    post,
+                    postItem = post,
                     isFavorite = listFavorite.find { it.url == post.url } != null,
                     onTagClick = { tag ->
                         navToCustomTag(post, tag)
                     },
                     onAddToTabs = {
+                        startPos = it
+                        isAnimating = true
                         appViewModel.addTab(post)
                         makeToast(R.string.added_to_tabs)
                     },
@@ -205,5 +221,13 @@ fun PageContent(
                 }
         }
         HGoTop(listState)
+
+
+        AddToCartAnimation(
+            isAnimating = isAnimating,
+            startPosition = startPos,
+            endPosition = endPos.copy(y = endPos.y - 100),
+            onAnimationEnd = { isAnimating = false },
+        )
     }
 }

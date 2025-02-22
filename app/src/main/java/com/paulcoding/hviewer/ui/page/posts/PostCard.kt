@@ -29,7 +29,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
@@ -43,17 +46,20 @@ import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
+import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
 
 @Composable
 fun FavoriteCard(
     postItem: PostItem,
+    modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     setFavorite: (Boolean) -> Unit = {},
     onTagClick: (Tag) -> Unit = {},
-    onAddToTabs: (() -> Unit)? = null,
+    onAddToTabs: ((Offset) -> Unit)? = null,
     onClick: () -> Unit,
 ) {
     PostCard(
+        modifier = modifier,
         postItem = postItem,
         onTagClick = onTagClick,
         onAddToTabs = onAddToTabs,
@@ -72,15 +78,19 @@ fun FavoriteCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostCard(
+    modifier: Modifier = Modifier,
     postItem: PostItem,
     onTagClick: (Tag) -> Unit = {},
     onClick: () -> Unit,
-    onAddToTabs: (() -> Unit)? = null,
+    onAddToTabs: ((Offset) -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit = {},
 ) {
     var isBottomSheetVisible by remember { mutableStateOf(false) }
     val bottomSheetState = rememberModalBottomSheetState()
     val context = LocalContext.current as MainActivity
+
+
+    var startPos by remember { mutableStateOf(Offset.Zero) }
 
     LaunchedEffect(isBottomSheetVisible) {
         if (isBottomSheetVisible) {
@@ -115,9 +125,11 @@ fun PostCard(
             if (onAddToTabs != null)
                 HIcon(
                     Icons.AutoMirrored.Outlined.OpenInNew,
-                    modifier = Modifier.align(Alignment.TopCenter)
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .onGloballyPositioned { startPos = it.positionInRoot() },
                 ) {
-                    onAddToTabs()
+                    onAddToTabs(startPos)
                 }
             content()
         }
