@@ -32,9 +32,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteConfigs) {
-    appViewModel.stateFlow
     val tabs by appViewModel.tabs.collectAsState(initial = listOf())
-    val pagerState = rememberPagerState { tabs.size }
+    val reversedTabs by remember { derivedStateOf { tabs.reversed() } }
+    val pagerState = rememberPagerState { reversedTabs.size }
     val scope = rememberCoroutineScope()
     val hostsMap by remember { derivedStateOf { siteConfigs.toHostsMap() } }
 
@@ -51,15 +51,15 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (tabs.isEmpty()) {
+        if (reversedTabs.isEmpty()) {
             HEmpty()
         } else {
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize(),
-                key = { tabs[it].url }
+                key = { reversedTabs[it].url }
             ) { pageIndex ->
-                val tab = tabs[pageIndex]
+                val tab = reversedTabs[pageIndex]
                 val siteConfig = tab.getSiteConfig(hostsMap)
 
                 if (siteConfig != null)
