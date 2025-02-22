@@ -109,7 +109,7 @@ fun ImageList(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(uiState.images, key = { it }) { image ->
+            items(uiState.images.toList(), key = { it }) { image ->
                 PostImage(url = image) {
                     viewModel.toggleSystemBarHidden()
                     selectedImage = image

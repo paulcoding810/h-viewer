@@ -22,7 +22,7 @@ class PostViewModel(private val postUrl: String, siteConfig: SiteConfig) : ViewM
     )
 
     data class UiState(
-        val images: List<String> = listOf(),
+        val images: Set<String> = setOf(),
         val postPage: Int = 1,
         val postTotalPage: Int = 1,
         val nextPage: String? = null,
