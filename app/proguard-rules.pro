@@ -48,3 +48,6 @@
 -keep class io.github.rosemoe.sora.** { *; }
 -keep class org.eclipse.tm4e.** { *; }
 -keep class org.joni.ast.** { *; }
+
+### R8
+-dontwarn kotlin.Cloneable$DefaultImpls
