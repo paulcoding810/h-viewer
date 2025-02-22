@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -104,16 +105,25 @@ fun ImageList(
 
     SystemBar(uiState.isSystemBarHidden)
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .clickable {
+            viewModel.toggleSystemBarHidden()
+        }) {
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(uiState.images.toList(), key = { it }) { image ->
-                PostImage(url = image) {
-                    viewModel.toggleSystemBarHidden()
-                    selectedImage = image
-                }
+                PostImage(
+                    url = image,
+                    onDoubleTap = {
+                        selectedImage = image
+                    },
+                    onTap = {
+                        viewModel.toggleSystemBarHidden()
+                    },
+                )
             }
             if (uiState.isLoading)
                 item {
@@ -166,11 +176,11 @@ fun ImageList(
             }
         }
 
-//        if (selectedImage != null) {
-//            ImageModal(url = selectedImage!!) {
-//                selectedImage = null
-//            }
-//        }
+        if (selectedImage != null) {
+            ImageModal(url = selectedImage!!) {
+                selectedImage = null
+            }
+        }
     }
 }
 
@@ -211,7 +221,7 @@ fun ImageModal(url: String, dismiss: () -> Unit) {
 
 @SuppressLint("ContextCastToActivity")
 @Composable
-fun PostImage(url: String, onTap: () -> Unit = {}) {
+fun PostImage(url: String, onDoubleTap: () -> Unit = {}, onTap: () -> Unit = {}) {
     val showMenu = remember { mutableStateOf(false) }
     val menuOffset = remember { mutableStateOf(Pair(0f, 0f)) }
     val context = LocalContext.current as MainActivity
@@ -223,6 +233,7 @@ fun PostImage(url: String, onTap: () -> Unit = {}) {
                 showMenu.value = true
                 menuOffset.value = Pair(offset.x, offset.y)
             },
+            onDoubleTap = { onDoubleTap() },
             onTap = { onTap() }
         )
     }) {
