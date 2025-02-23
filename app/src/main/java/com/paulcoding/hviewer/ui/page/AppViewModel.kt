@@ -120,10 +120,10 @@ class AppViewModel : ViewModel() {
     }
 
     fun getCurrentSiteConfig(): SiteConfig {
-        val hostMap = Github.stateFlow.value.siteConfigs?.toHostsMap()
-        if (hostMap != null) {
-            return _stateFlow.value.post.getSiteConfig(hostMap) ?: SiteConfig()
-        }
-        return SiteConfig()
+        val hostMap =
+            Github.stateFlow.value.siteConfigs?.toHostsMap()
+                ?: throw Exception("Host map is null: ${Github.stateFlow.value.siteConfigs}")
+        return hostMap[_stateFlow.value.post.getHost()]
+            ?: throw (Exception("No site config found for ${stateFlow.value.post.url}"))
     }
 }
