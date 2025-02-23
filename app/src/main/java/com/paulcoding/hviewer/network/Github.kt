@@ -24,7 +24,6 @@ object Github {
     val stateFlow = _stateFlow.asStateFlow()
 
     data class GithubState(
-        val remoteUrl: String = Preferences.getRemote(),
         val isLoading: Boolean = false,
         val error: Throwable? = null,
         val siteConfigs: SiteConfigs? = appContext.readConfigFile<SiteConfigs>().getOrNull()
@@ -35,11 +34,16 @@ object Github {
         _stateFlow.update { it.copy(error = throwable) }
     }
 
-    suspend fun checkVersionOrUpdate() {
+    suspend fun checkVersionOrUpdate(remoteUrl: String = Preferences.getRemote()) {
+        if (remoteUrl.isEmpty()) {
+            return setError(Exception("Remote url is empty"))
+        }
         withContext(Dispatchers.IO) {
+            _stateFlow.update { it.copy(isLoading = true) }
+
             try {
-                if (_stateFlow.value.remoteUrl != Preferences.getRemote()) {
-                    Preferences.setRemote(_stateFlow.value.remoteUrl)
+                if (remoteUrl != Preferences.getRemote()) {
+                    Preferences.setRemote(remoteUrl)
                     _stateFlow.update { it.copy(isLoading = true) }
                     downloadAndGetConfig()
                     return@withContext
@@ -137,13 +141,14 @@ object Github {
         return owner to repo
     }
 
-    fun updateRemoteUrl(url: String) {
-        kotlin.runCatching {
+    fun parseRemoteUrl(url: String): String? {
+        try {
             val (owner, repo) = parseRepo(url)
             val remoteUrl = "https://github.com/$owner/$repo/"
-            _stateFlow.update { it.copy(remoteUrl = remoteUrl) }
-        }.onFailure {
-            setError(it)
+            return remoteUrl
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
         }
     }
 }

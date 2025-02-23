@@ -55,12 +55,11 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Content(intent: Intent?) {
     val githubState by Github.stateFlow.collectAsState()
-    val repoUrl = githubState.remoteUrl
 
     ToastExit()
 
-    LaunchedEffect(repoUrl) {
-        if (repoUrl.isNotEmpty() && !BuildConfig.DEBUG)
+    LaunchedEffect(Unit) {
+        if (!BuildConfig.DEBUG)
             Github.checkVersionOrUpdate()
     }
 

@@ -1,8 +1,6 @@
 package com.paulcoding.hviewer.ui.page.settings
 
-import android.provider.Settings
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -19,11 +16,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -38,10 +33,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -54,6 +49,7 @@ import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.H7Tap
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.page.AppViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,6 +70,7 @@ fun SettingsPage(
     var lockModalVisible by remember { mutableStateOf(false) }
     var appLockEnabled by remember { mutableStateOf(Preferences.pin.isNotEmpty()) }
     val scrollState = rememberScrollState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(githubState.siteConfigs) {
         if (prevSiteConfigs != githubState.siteConfigs) {
@@ -108,7 +105,8 @@ fun SettingsPage(
                     .verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 SettingRow(stringResource(R.string.remote_url),
-                    description = githubState.remoteUrl.ifEmpty { "https://github.com/{OWNER}/{REPO}/" },
+                    description = Preferences.getRemote()
+                        .ifEmpty { "https://github.com/{OWNER}/{REPO}/" },
                     onClick = {
                         modalVisible = true
                     }) {
@@ -168,10 +166,12 @@ fun SettingsPage(
         }
     }
 
-    if (modalVisible) InputRemoteModal(initialText = githubState.remoteUrl, setVisible = {
+    if (modalVisible) InputRemoteModal(initialText = Preferences.getRemote(), setVisible = {
         modalVisible = it
     }) {
-        Github.updateRemoteUrl(it)
+        scope.launch {
+            Github.checkVersionOrUpdate(it)
+        }
     }
 
     if (lockModalVisible) LockModal(onDismiss = { lockModalVisible = false }) {

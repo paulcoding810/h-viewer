@@ -26,14 +26,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.helper.makeToast
+import com.paulcoding.hviewer.network.Github
 
 
 @Composable
@@ -42,12 +47,17 @@ fun InputRemoteModal(
     setVisible: (Boolean) -> Unit,
     onSubmit: (url: String) -> Unit
 ) {
-    var text by remember { mutableStateOf(initialText) }
+    var textFieldValue by remember { mutableStateOf(TextFieldValue(initialText)) }
     val focusRequester = remember { FocusRequester() }
 
     fun submit() {
-        setVisible(false)
-        onSubmit(text)
+        val url = Github.parseRemoteUrl(textFieldValue.text)
+        if (url.isNullOrEmpty()) {
+            return makeToast(R.string.invalid_repo)
+        } else {
+            setVisible(false)
+            onSubmit(textFieldValue.text)
+        }
     }
 
     fun dismiss() {
@@ -75,9 +85,20 @@ fun InputRemoteModal(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedTextField(
-                    text,
-                    onValueChange = { text = it },
-                    modifier = Modifier.focusRequester(focusRequester),
+                    textFieldValue,
+                    onValueChange = { textFieldValue = it },
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .onFocusChanged { focusState ->
+                            if (focusState.isFocused) {
+                                textFieldValue = textFieldValue.copy(
+                                    selection = TextRange(
+                                        0,
+                                        textFieldValue.text.length
+                                    )
+                                )
+                            }
+                        },
                     label = { Text(stringResource(R.string.remote_url)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
