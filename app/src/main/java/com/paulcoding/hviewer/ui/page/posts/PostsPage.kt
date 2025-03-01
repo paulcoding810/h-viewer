@@ -1,16 +1,11 @@
 package com.paulcoding.hviewer.ui.page.posts
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -43,18 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
-import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.toCapital
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
-import com.paulcoding.hviewer.ui.component.HEmpty
-import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
 import kotlinx.coroutines.launch
 
 
@@ -154,7 +144,7 @@ fun PostsPage(
 }
 
 @Composable
-fun PageContent(
+internal fun PageContent(
     appViewModel: AppViewModel,
     tag: Tag,
     endPos: Offset,
@@ -167,27 +157,15 @@ fun PageContent(
         factory = PostsViewModelFactory(appViewModel.getCurrentSiteConfig(), tag),
         key = tag.name
     )
-    val listState = rememberLazyListState()
     val uiState by viewModel.stateFlow.collectAsState()
-
-    var startPos by remember { mutableStateOf(Offset.Zero) }
-    var isAnimating by remember { mutableStateOf(false) }
-
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
             Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
         }
     }
-
     LaunchedEffect(uiState.postItems) {
         if (uiState.postItems.isEmpty()) {
             viewModel.getPosts(1)
-        }
-    }
-
-    LaunchedEffect(listState.firstVisibleItemIndex) {
-        if (viewModel.canLoadMorePostsData() && !uiState.isLoading && listState.isScrolledToEnd()) {
-            viewModel.getNextPosts()
         }
     }
 
@@ -195,57 +173,23 @@ fun PageContent(
         onPageChange(uiState.postsPage, uiState.postsTotalPage)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(uiState.postItems, key = { it.url }) { post ->
-                FavoriteCard(
-                    postItem = post,
-                    isFavorite = listFavorite.find { it.url == post.url } != null,
-                    onTagClick = { tag ->
-                        navToCustomTag(post, tag)
-                    },
-                    onAddToTabs = {
-                        startPos = it
-                        isAnimating = true
-                        appViewModel.addTab(post)
-                    },
-                    setFavorite = { isFavorite ->
-                        if (isFavorite)
-                            appViewModel.addFavorite(post)
-                        else
-                            appViewModel.deleteFavorite(post)
-                    }
-                ) {
-                    onClick(post)
-                }
-            }
-            if (uiState.isLoading)
-                item {
-                    HLoading()
-                }
-            else if (uiState.postItems.isEmpty())
-                item {
-                    HEmpty(
-                        title = "No posts found",
-                        message = "Refresh?"
-                    ) {
-                        viewModel.getPosts(1)
-                    }
-                }
-        }
-        HGoTop(listState)
-
-
-        AddToCartAnimation(
-            isAnimating = isAnimating,
-            startPosition = startPos,
-            endPosition = endPos.copy(y = endPos.y - 100),
-            onAnimationEnd = { isAnimating = false },
-        )
-    }
+    PostList(
+        listFavorite = listFavorite,
+        endPos = endPos,
+        onLoadMore = {
+            if (viewModel.canLoadMorePostsData() && !uiState.isLoading) viewModel.getNextPosts()
+        },
+        onAddToTabs = appViewModel::addTab,
+        setFavorite = { post, isFavorite ->
+            if (isFavorite)
+                appViewModel.addFavorite(post)
+            else
+                appViewModel.deleteFavorite(post)
+        },
+        navToCustomTag = navToCustomTag,
+        isLoading = uiState.isLoading,
+        onRefresh = { viewModel.getPosts(1) },
+        onClick = onClick,
+        listPosts = uiState.postItems,
+    )
 }
