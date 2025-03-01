@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.toCapital
+import com.paulcoding.hviewer.helper.BasePaginationHelper
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
@@ -158,6 +159,7 @@ internal fun PageContent(
         key = tag.name
     )
     val uiState by viewModel.stateFlow.collectAsState()
+
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
             Toast.makeText(appContext, it.message ?: it.toString(), Toast.LENGTH_SHORT).show()
@@ -173,12 +175,19 @@ internal fun PageContent(
         onPageChange(uiState.postsPage, uiState.postsTotalPage)
     }
 
+    val paginationHelper = remember {
+        BasePaginationHelper(
+            buffer = 5,
+            isLoading = { uiState.isLoading },
+            hasMore = viewModel::canLoadMorePostsData,
+            loadMore = viewModel::getNextPosts
+        )
+    }
+
     PostList(
+        paginationHelper = paginationHelper,
         favoriteSet = favoriteSet,
         endPos = endPos,
-        onLoadMore = {
-            if (viewModel.canLoadMorePostsData() && !uiState.isLoading) viewModel.getNextPosts()
-        },
         onAddToTabs = appViewModel::addTab,
         setFavorite = { post, isFavorite ->
             if (isFavorite)

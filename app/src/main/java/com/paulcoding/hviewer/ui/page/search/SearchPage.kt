@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.helper.BasePaginationHelper
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
@@ -140,13 +141,21 @@ fun PageContent(
         }
     }
 
+    val paginationHelper = remember {
+        BasePaginationHelper(
+            buffer = 5,
+            isLoading = { uiState.isLoading },
+            hasMore = viewModel::canLoadMorePostsData,
+            loadMore = viewModel::getNextPosts
+        )
+    }
+
+
     PostList(
+        paginationHelper = paginationHelper,
         favoriteSet = favoriteSet,
         endPos = Offset.Zero,
         hidesEmpty = true, // TODO: hide empty on queried & empty
-        onLoadMore = {
-            if (viewModel.canLoadMorePostsData() && !uiState.isLoading) viewModel.getNextPosts()
-        },
         onAddToTabs = appViewModel::addTab,
         setFavorite = { post, isFavorite ->
             if (isFavorite)

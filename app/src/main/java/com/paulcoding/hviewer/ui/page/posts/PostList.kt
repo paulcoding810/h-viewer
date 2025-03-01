@@ -9,7 +9,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,7 +16,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import com.paulcoding.hviewer.extensions.isScrolledToEnd
+import com.paulcoding.hviewer.helper.BasePaginationHelper
+import com.paulcoding.hviewer.helper.LoadMoreHandler
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HEmpty
@@ -27,13 +27,13 @@ import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
 
 @Composable
 fun PostList(
+    paginationHelper: BasePaginationHelper,
     listPosts: List<PostItem>,
     favoriteSet: Set<String>,
     endPos: Offset,
     isLoading: Boolean = false,
     hidesEmpty: Boolean = false,
     navToCustomTag: (PostItem, Tag) -> Unit,
-    onLoadMore: () -> Unit,
     onAddToTabs: (PostItem) -> Unit,
     onRefresh: () -> Unit = {},
     setFavorite: (PostItem, Boolean) -> Unit,
@@ -45,11 +45,7 @@ fun PostList(
     var startPos by remember { mutableStateOf(Offset.Zero) }
     var isAnimating by remember { mutableStateOf(false) }
 
-    LaunchedEffect(listState.firstVisibleItemIndex) {
-        if (listState.isScrolledToEnd()) {
-            onLoadMore()
-        }
-    }
+    LoadMoreHandler(listPosts.size, listState, paginationHelper)
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(

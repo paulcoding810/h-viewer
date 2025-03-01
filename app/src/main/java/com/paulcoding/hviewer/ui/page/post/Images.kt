@@ -53,8 +53,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.R
-import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.extensions.openInBrowser
+import com.paulcoding.hviewer.helper.BasePaginationHelper
+import com.paulcoding.hviewer.helper.LoadMoreHandler
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.preference.Preferences
@@ -101,11 +102,16 @@ fun ImageList(
         viewModel.getImages()
     }
 
-    LaunchedEffect(listState.firstVisibleItemIndex) {
-        if (viewModel.canLoadMorePostData() && !uiState.isLoading && listState.isScrolledToEnd()) {
-            viewModel.getNextImages()
-        }
+    val paginationHelper = remember {
+        BasePaginationHelper(
+            buffer = 5,
+            isLoading = { uiState.isLoading },
+            hasMore = viewModel::canLoadMorePostData,
+            loadMore = viewModel::getNextImages
+        )
     }
+
+    LoadMoreHandler(uiState.images.size, listState, paginationHelper)
 
     SystemBar(uiState.isSystemBarHidden)
 
