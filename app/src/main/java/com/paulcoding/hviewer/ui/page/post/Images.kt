@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -54,7 +55,6 @@ import com.paulcoding.hviewer.extensions.openInBrowser
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.preference.Preferences
-import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HImage
 import com.paulcoding.hviewer.ui.component.HLoading
@@ -147,7 +147,7 @@ fun ImageList(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            HBackIcon { goBack() }
+            HIcon(Icons.AutoMirrored.Outlined.ArrowBack, rounded = true) { goBack() }
             Text("${uiState.postPage}/${uiState.postTotalPage}")
         }
 
