@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.database.DatabaseProvider
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfigs
+import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
@@ -39,10 +40,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteConfigs) {
+fun TabsPage(
+    goBack: () -> Unit,
+    navToCustomTag: (PostItem, Tag) -> Unit,
+    appViewModel: AppViewModel,
+    siteConfigs: SiteConfigs
+) {
     val tabs by appViewModel.tabs.collectAsState(initial = listOf())
     val reversedTabs by remember { derivedStateOf { tabs.reversed() } }
     val pagerState = rememberPagerState { reversedTabs.size }
+    val currentPost by remember { derivedStateOf { reversedTabs[pagerState.currentPage] } }
     val scope = rememberCoroutineScope()
     val hostsMap by remember { derivedStateOf { siteConfigs.toHostsMap() } }
     var infoSheetVisible by remember { mutableStateOf(false) }
@@ -97,13 +104,14 @@ fun TabsPage(goBack: () -> Unit, appViewModel: AppViewModel, siteConfigs: SiteCo
                     )
             }
             InfoBottomSheet(
-                visible = infoSheetVisible, postItem = reversedTabs[pagerState.currentPage],
+                visible = infoSheetVisible,
+                postItem = currentPost,
                 onDismissRequest = {
                     infoSheetVisible = false
                 },
                 onTagClick = {
                     infoSheetVisible = false
-                    println(it)
+                    navToCustomTag(currentPost, it)
                 },
             )
         }

@@ -241,10 +241,14 @@ fun AppEntry(intent: Intent?) {
             WebPage(goBack = { navController.popBackStack() }, url = url)
         }
         animatedComposable(Route.TABS) {
-            TabsPage(goBack = {
-                navController.popBackStack()
-                appViewModel.clearTabs()
-            }, appViewModel = appViewModel, siteConfigs = siteConfigs)
+            TabsPage(
+                goBack = {
+                    navController.popBackStack()
+                    appViewModel.clearTabs()
+                },
+                navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
+                appViewModel = appViewModel, siteConfigs = siteConfigs
+            )
         }
     }
 }
