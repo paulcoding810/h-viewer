@@ -56,7 +56,7 @@ class SearchViewModel(siteConfig: SiteConfig) : ViewModel() {
         }
     }
 
-    private fun getPosts(page: Int) {
+     fun getPosts(page: Int) {
         val url = _stateFlow.value.queryUrl ?: return setError(Exception("Next page null"))
         launchAndLoad {
             js.callFunction<Posts>("search", arrayOf(url, page))

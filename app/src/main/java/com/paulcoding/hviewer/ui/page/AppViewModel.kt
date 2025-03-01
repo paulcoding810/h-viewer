@@ -12,7 +12,10 @@ import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
@@ -32,6 +35,8 @@ class AppViewModel : ViewModel() {
     val tabs = _tabs.asStateFlow()
 
     val favoritePosts = DatabaseProvider.getInstance().postItemDao().getFavoritePosts()
+    val favoriteSet = favoritePosts.map { it.map { post -> post.url }.toSet() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
     val historyPosts = DatabaseProvider.getInstance().postItemDao().getViewedPosts()
 
     fun setCurrentPost(post: PostItem) {

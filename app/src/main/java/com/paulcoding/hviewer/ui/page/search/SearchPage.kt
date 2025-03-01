@@ -2,15 +2,9 @@ package com.paulcoding.hviewer.ui.page.search
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -31,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -39,17 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.R
-import com.paulcoding.hviewer.extensions.isScrolledToEnd
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
-import com.paulcoding.hviewer.ui.component.HEmpty
-import com.paulcoding.hviewer.ui.component.HGoTop
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.posts.FavoriteCard
+import com.paulcoding.hviewer.ui.page.posts.PostList
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -126,7 +117,6 @@ fun SearchPage(
     }
 }
 
-// TODO: duplicated PageContent
 @Composable
 fun PageContent(
     appViewModel: AppViewModel,
@@ -134,9 +124,8 @@ fun PageContent(
     navToCustomTag: (PostItem, Tag) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
-    val listState = rememberLazyListState()
     val uiState by viewModel.stateFlow.collectAsState()
-    val listFavorite by appViewModel.favoritePosts.collectAsState(initial = emptyList())
+    val favoriteSet by appViewModel.favoriteSet.collectAsState()
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -144,48 +133,25 @@ fun PageContent(
         }
     }
 
-    LaunchedEffect(listState.firstVisibleItemIndex) {
-        if (viewModel.canLoadMorePostsData() && !uiState.isLoading && listState.isScrolledToEnd()) {
-            viewModel.getNextPosts()
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier.padding(horizontal = 12.dp),
-            contentPadding = PaddingValues(vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(uiState.postItems, key = { it.url }) { post ->
-                FavoriteCard(post,
-                    isFavorite = listFavorite.find { it.url == post.url } != null,
-                    setFavorite = { isFavorite ->
-                        if (isFavorite)
-                            appViewModel.addFavorite(post)
-                        else
-                            appViewModel.deleteFavorite(post)
-                    },
-                    onTagClick = {
-                        navToCustomTag(post, it)
-                    }
-                )
-                {
-                    onClick(post)
-                }
-            }
-            if (uiState.isLoading)
-                item {
-                    HLoading()
-                }
-            else if (uiState.postItems.isEmpty() && uiState.query.isNotEmpty())
-                item {
-                    HEmpty(
-                        title = "No posts found",
-                    )
-                }
-        }
-        HGoTop(listState)
-    }
+    PostList(
+        favoriteSet = favoriteSet,
+        endPos = Offset.Zero,
+        hidesEmpty = uiState.query.isEmpty(),
+        onLoadMore = {
+            if (viewModel.canLoadMorePostsData() && !uiState.isLoading) viewModel.getNextPosts()
+        },
+        onAddToTabs = appViewModel::addTab,
+        setFavorite = { post, isFavorite ->
+            if (isFavorite)
+                appViewModel.addFavorite(post)
+            else
+                appViewModel.deleteFavorite(post)
+        },
+        navToCustomTag = navToCustomTag,
+        isLoading = uiState.isLoading,
+        onRefresh = { viewModel.getPosts(1) },
+        onClick = onClick,
+        listPosts = uiState.postItems,
+    )
 }
 

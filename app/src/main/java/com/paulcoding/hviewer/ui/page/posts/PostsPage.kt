@@ -152,7 +152,7 @@ internal fun PageContent(
     navToCustomTag: (PostItem, Tag) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
-    val listFavorite by appViewModel.favoritePosts.collectAsState(initial = emptyList())
+    val favoriteSet by appViewModel.favoriteSet.collectAsState()
     val viewModel: PostsViewModel = viewModel(
         factory = PostsViewModelFactory(appViewModel.getCurrentSiteConfig(), tag),
         key = tag.name
@@ -174,7 +174,7 @@ internal fun PageContent(
     }
 
     PostList(
-        listFavorite = listFavorite,
+        favoriteSet = favoriteSet,
         endPos = endPos,
         onLoadMore = {
             if (viewModel.canLoadMorePostsData() && !uiState.isLoading) viewModel.getNextPosts()

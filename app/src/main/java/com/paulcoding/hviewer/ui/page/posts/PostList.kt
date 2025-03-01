@@ -28,7 +28,7 @@ import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
 @Composable
 fun PostList(
     listPosts: List<PostItem>,
-    listFavorite: List<PostItem>,
+    favoriteSet: Set<String>,
     endPos: Offset,
     isLoading: Boolean = false,
     hidesEmpty: Boolean = false,
@@ -61,7 +61,7 @@ fun PostList(
             items(listPosts, key = { it.url }) { post ->
                 FavoriteCard(
                     postItem = post,
-                    isFavorite = listFavorite.find { it.url == post.url } != null,
+                    isFavorite = favoriteSet.contains(post.url),
                     onTagClick = { tag ->
                         navToCustomTag(post, tag)
                     },
@@ -83,9 +83,9 @@ fun PostList(
                 }
             else if (listPosts.isEmpty())
                 item {
-                    if (hidesEmpty) HEmpty(
+                    if (!hidesEmpty) HEmpty(
                         title = "No posts found",
-                        message = "Refresh?"
+                        // message = "Refresh?",
                     ) {
                         onRefresh()
                     }
