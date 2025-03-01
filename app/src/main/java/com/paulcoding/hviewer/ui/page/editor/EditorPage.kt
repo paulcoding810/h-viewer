@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package com.paulcoding.hviewer.ui.page.editor
 
 import androidx.compose.foundation.layout.fillMaxSize

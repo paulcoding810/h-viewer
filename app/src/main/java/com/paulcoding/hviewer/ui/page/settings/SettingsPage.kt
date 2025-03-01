@@ -205,7 +205,7 @@ internal fun SettingSwitch(
     checked: Boolean,
     onCheckedChange: ((Boolean) -> Unit)?,
     modifier: Modifier = Modifier,
-    thumbContent: @Composable() (() -> Unit)? = null,
+    thumbContent: @Composable (() -> Unit)? = null,
     enabled: Boolean = true,
     colors: SwitchColors = SwitchDefaults.colors(),
     interactionSource: MutableInteractionSource? = null

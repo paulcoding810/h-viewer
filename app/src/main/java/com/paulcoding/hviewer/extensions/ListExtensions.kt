@@ -6,10 +6,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.snapshotFlow
 
-fun LazyListState.isScrolledToEnd(): Boolean {
-    return (layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0) > layoutInfo.totalItemsCount - 5
-}
-
 @Composable
 fun LazyListState.isScrollingUp(): State<Boolean> {
     return produceState(initialValue = true) {

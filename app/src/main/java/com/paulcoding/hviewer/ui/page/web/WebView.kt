@@ -14,7 +14,7 @@ fun HWebView(
     modifier: Modifier = Modifier,
     url: String,
 ) {
-    class WebAppInterface() {
+    class WebAppInterface {
         @JavascriptInterface
         fun senData(data: String) {
             println(data)
