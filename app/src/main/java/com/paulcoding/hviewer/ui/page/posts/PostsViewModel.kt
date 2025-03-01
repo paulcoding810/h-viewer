@@ -8,16 +8,18 @@ import com.paulcoding.hviewer.helper.SCRIPTS_DIR
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Posts
 import com.paulcoding.hviewer.model.SiteConfig
-import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.js.JS
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class PostsViewModel(siteConfig: SiteConfig, tag: Tag) : ViewModel() {
-    private val topicUrl = tag.url
-    private var _stateFlow = MutableStateFlow(UiState())
+class PostsViewModel(
+    siteConfig: SiteConfig,
+    postUrl: String,
+    private val isSearch: Boolean = false
+) : ViewModel() {
+    private var _stateFlow = MutableStateFlow(UiState().copy(currentPage = postUrl))
     val stateFlow = _stateFlow.asStateFlow()
 
     private val js = JS(
@@ -29,10 +31,22 @@ class PostsViewModel(siteConfig: SiteConfig, tag: Tag) : ViewModel() {
         val postItems: List<PostItem> = listOf(),
         val postsPage: Int = 1,
         val postsTotalPage: Int = 1,
+        val currentPage: String = "",
         val nextPage: String? = null,
         val isLoading: Boolean = false,
         val error: Throwable? = null,
     )
+
+    fun setQueryAndSearch(query: String) {
+        viewModelScope.launch {
+            js.callFunction<String>("getSearchUrl", arrayOf(query))
+                .onSuccess { queryUrl ->
+                    _stateFlow.update { UiState(currentPage = queryUrl) }
+                    getPosts(1)
+                }
+                .onFailure { setError(it) }
+        }
+    }
 
     private fun setError(th: Throwable) {
         th.printStackTrace()
@@ -48,11 +62,13 @@ class PostsViewModel(siteConfig: SiteConfig, tag: Tag) : ViewModel() {
     }
 
     fun getPosts(page: Int) {
-        val url = if (page == 1) topicUrl else _stateFlow.value.nextPage ?: return setError(
-            Exception("Next page null")
-        )
+        val url = if (page == 1) _stateFlow.value.currentPage else _stateFlow.value.nextPage
+            ?: return setError(
+                Exception("Next page null")
+            )
         launchAndLoad {
-            js.callFunction<Posts>("getPosts", arrayOf(url, page))
+            val functionName = if (isSearch) "search" else "getPosts"
+            js.callFunction<Posts>(functionName, arrayOf(url, page))
                 .onSuccess { postsData ->
                     _stateFlow.update {
                         it.copy(
@@ -82,11 +98,15 @@ class PostsViewModel(siteConfig: SiteConfig, tag: Tag) : ViewModel() {
 }
 
 @Suppress("UNCHECKED_CAST")
-class PostsViewModelFactory(private val siteConfig: SiteConfig, private val tag: Tag) :
+class PostsViewModelFactory(
+    private val siteConfig: SiteConfig,
+    private val postUrl: String,
+    private val isSearch: Boolean = false,
+) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PostsViewModel::class.java)) {
-            return PostsViewModel(siteConfig, tag) as T
+            return PostsViewModel(siteConfig, postUrl, isSearch) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

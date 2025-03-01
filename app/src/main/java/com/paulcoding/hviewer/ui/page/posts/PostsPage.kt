@@ -154,7 +154,7 @@ internal fun PageContent(
 ) {
     val favoriteSet by appViewModel.favoriteSet.collectAsState()
     val viewModel: PostsViewModel = viewModel(
-        factory = PostsViewModelFactory(appViewModel.getCurrentSiteConfig(), tag),
+        factory = PostsViewModelFactory(appViewModel.getCurrentSiteConfig(), tag.url),
         key = tag.name
     )
     val uiState by viewModel.stateFlow.collectAsState()

@@ -41,6 +41,8 @@ import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HPageProgress
 import com.paulcoding.hviewer.ui.page.AppViewModel
 import com.paulcoding.hviewer.ui.page.posts.PostList
+import com.paulcoding.hviewer.ui.page.posts.PostsViewModel
+import com.paulcoding.hviewer.ui.page.posts.PostsViewModelFactory
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,11 +53,16 @@ fun SearchPage(
     navToCustomTag: (PostItem, Tag) -> Unit,
     goBack: () -> Unit,
 ) {
-    val viewModel: SearchViewModel = viewModel(
-        factory = SearchViewModelFactory(appViewModel.getCurrentSiteConfig()),
+    var query by remember { mutableStateOf("") }
+
+    val viewModel: PostsViewModel = viewModel(
+        factory = PostsViewModelFactory(
+            appViewModel.getCurrentSiteConfig(),
+            postUrl = "",
+            isSearch = true
+        ),
     )
     val uiState by viewModel.stateFlow.collectAsState()
-    var query by remember { mutableStateOf(viewModel.stateFlow.value.query) }
     val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
     val focusManager = LocalFocusManager.current
 
@@ -120,7 +127,7 @@ fun SearchPage(
 @Composable
 fun PageContent(
     appViewModel: AppViewModel,
-    viewModel: SearchViewModel,
+    viewModel: PostsViewModel,
     navToCustomTag: (PostItem, Tag) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
@@ -136,7 +143,7 @@ fun PageContent(
     PostList(
         favoriteSet = favoriteSet,
         endPos = Offset.Zero,
-        hidesEmpty = uiState.query.isEmpty(),
+        hidesEmpty = true, // TODO: hide empty on queried & empty
         onLoadMore = {
             if (viewModel.canLoadMorePostsData() && !uiState.isLoading) viewModel.getNextPosts()
         },
