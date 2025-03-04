@@ -170,15 +170,21 @@ fun ImageList(
             }
         }
 
-        Text(
-            "${uiState.postPage}/${uiState.postTotalPage}",
+        Box(
             modifier = Modifier
-                .background(Color.Gray.copy(alpha = 0.5f))
-                .padding(horizontal = 4.dp)
-                .align(Alignment.BottomEnd),
-            fontSize = 10.sp,
-            maxLines = 1,
-            color = Color.White,
-        )
+                .fillMaxWidth()
+                .background(Color.Gray.copy(alpha = 0.4f))
+                .align(Alignment.BottomEnd)
+                .padding(horizontal = 28.dp),
+        ) {
+            Text(
+                "${uiState.postPage}/${uiState.postTotalPage}",
+                modifier = Modifier.align(Alignment.BottomEnd),
+                fontSize = 10.sp,
+                maxLines = 1,
+                color = Color.White,
+            )
+        }
+
     }
 }
