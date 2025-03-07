@@ -81,11 +81,11 @@ fun PostsPage(
         }, actions = {
             HPageProgress(pageProgress.first, pageProgress.second)
             HIcon(imageVector = Icons.Outlined.Search) { navToSearch() }
-            if (tabs.isNotEmpty()) {
-                Box(modifier = Modifier
-                    .onGloballyPositioned {
-                        endPos = it.positionInRoot()
-                    }) {
+            Box(modifier = Modifier
+                .onGloballyPositioned {
+                    endPos = it.positionInRoot()
+                }) {
+                if (tabs.isNotEmpty()) {
                     HIcon(
                         imageVector = Icons.Outlined.Tab,
                     ) { navToTabs() }
