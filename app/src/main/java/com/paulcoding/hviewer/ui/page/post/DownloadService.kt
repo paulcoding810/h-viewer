@@ -4,12 +4,14 @@ import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.Environment
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.core.content.FileProvider
 import com.paulcoding.hviewer.helper.ImageDownloader
 import com.paulcoding.hviewer.helper.SCRIPTS_DIR
 import com.paulcoding.hviewer.model.PostData
@@ -129,6 +131,7 @@ class DownloadService : Service() {
                 async {
                     val file =
                         File(outputDir, "img_${index.toString().padStart(paddingLength, '0')}.jpg")
+
                     val success = ImageDownloader.downloadImage(url, file)
                     if (!success) {
                         println("❌ Failed to download: $url")
@@ -179,11 +182,23 @@ class DownloadService : Service() {
     }
 
     private fun showDownloadCompleteNotification(file: File) {
+        val uri = FileProvider.getUriForFile(
+            this,
+            "${applicationContext.packageName}.fileprovider",
+            file
+        )
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "*/*")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        val pendingIntent =
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
         val completedNotification =
             NotificationCompat.Builder(this, channelId).setContentTitle("Download Complete")
                 .setContentText("Tap to open")
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
-                // .setContentIntent(pendingIntent) // TODO: Add the pending intent here
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true).build()
 
         notificationManager.notify(notificationId, completedNotification)
