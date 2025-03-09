@@ -66,11 +66,11 @@ class DownloadService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         reset()
 
-        startForeground(notificationId, createNotification("Downloading..."))
         val postUrl = intent.getStringExtra("postUrl")
         val postName = intent.getStringExtra("postName")
         val siteConfig = intent.getParcelableExtra<SiteConfig>("siteConfig")
         if (postUrl != null && postName != null && siteConfig != null) {
+            startForeground(notificationId, createNotification("Downloading $postName"))
             download(postUrl, postName, siteConfig)
         } else {
             throw IllegalArgumentException("Missing required parameters")
@@ -99,7 +99,6 @@ class DownloadService : Service() {
         )
 
         nextPage = postUrl
-        createNotification("Downloading $postName")
 
         try {
             // fetch image urls
@@ -125,10 +124,11 @@ class DownloadService : Service() {
                     mkdirs()
                 }
             }
+            val paddingLength = images.size.toString().length
             val downloadJobs = images.mapIndexed { index, url ->
                 async {
                     val file =
-                        File(outputDir, "img_%0${images.size / 10}d.jpg".format(index))
+                        File(outputDir, "img_${index.toString().padStart(paddingLength, '0')}.jpg")
                     val success = ImageDownloader.downloadImage(url, file)
                     if (!success) {
                         println("❌ Failed to download: $url")
@@ -138,8 +138,9 @@ class DownloadService : Service() {
             var totalProgress = 0
             downloadJobs.chunked(5).forEach { chunkedJobs ->
                 chunkedJobs.awaitAll()
+                delay(500)
                 totalProgress += chunkedJobs.size
-                updateNotification("Downloading ${totalProgress}/${images.size} images")
+                updateNotification("${totalProgress}/${images.size} images")
             }
             println("✅ All images downloaded successfully!")
             showDownloadCompleteNotification(downloadDir)
@@ -148,11 +149,11 @@ class DownloadService : Service() {
     }
 
 
-    private fun createNotification(content: String): Notification {
+    private fun createNotification(title: String): Notification {
         notificationBuilder =
             NotificationCompat.Builder(this, channelId)
-                .setContentTitle(this.application.applicationInfo.name)
-                .setContentText(content).setSmallIcon(android.R.drawable.stat_sys_download)
+                .setContentTitle(title)
+                .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setProgress(0, 0, true)
         val notification = notificationBuilder.build()

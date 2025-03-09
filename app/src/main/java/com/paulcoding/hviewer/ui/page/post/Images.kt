@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page.post
 
+import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.widget.Toast
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.helper.BasePaginationHelper
@@ -71,9 +73,19 @@ fun ImageList(
         factory = PostViewModelFactory(post.url, siteConfig = siteConfig)
     )
     val storagePermission =
-        rememberPermissionState(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
+        rememberPermissionState(Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
             if (!granted)
                 makeToast("Permission Denied!")
+        }
+
+    val notificationPermission =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            rememberPermissionState(Manifest.permission.POST_NOTIFICATIONS) { granted ->
+                if (!granted)
+                    makeToast("Notification permission Denied!")
+            }
+        } else {
+            null
         }
 
     val uiState by viewModel.stateFlow.collectAsState()
@@ -107,6 +119,9 @@ fun ImageList(
     }
 
     fun checkPermissionOrDownload(block: () -> Unit) {
+        if (notificationPermission != null && !notificationPermission.status.isGranted) {
+            notificationPermission.launchPermissionRequest()
+        }
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q || storagePermission.status == PermissionStatus.Granted) {
             block()
         } else {
