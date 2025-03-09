@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.model
 
+import android.os.Parcelable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -12,11 +13,12 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.paulcoding.hviewer.R
 
+@kotlinx.parcelize.Parcelize
 data class SiteConfig(
     val baseUrl: String = "",
     val scriptFile: String = "",
     val tags: Map<String, String> = mapOf(),
-) {
+) : Parcelable {
     private val icon
         get() = "https://www.google.com/s2/favicons?sz=64&domain=$baseUrl"
 

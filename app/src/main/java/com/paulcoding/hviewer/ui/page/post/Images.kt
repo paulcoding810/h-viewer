@@ -1,5 +1,7 @@
 package com.paulcoding.hviewer.ui.page.post
 
+import android.content.Intent
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -21,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,13 +38,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.helper.BasePaginationHelper
 import com.paulcoding.hviewer.helper.LoadMoreHandler
+import com.paulcoding.hviewer.helper.makeToast
+import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HLoading
@@ -49,22 +58,29 @@ import com.paulcoding.hviewer.ui.component.SystemBar
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun ImageList(
-    postUrl: String,
+    post: PostItem,
     siteConfig: SiteConfig,
     goBack: () -> Unit,
     bottomRowActions: @Composable (RowScope.() -> Unit) = {},
 ) {
     val viewModel: PostViewModel = viewModel(
-        key = postUrl,
-        factory = PostViewModelFactory(postUrl, siteConfig = siteConfig)
+        key = post.url,
+        factory = PostViewModelFactory(post.url, siteConfig = siteConfig)
     )
+    val storagePermission =
+        rememberPermissionState(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) { granted ->
+            if (!granted)
+                makeToast("Permission Denied!")
+        }
 
     val uiState by viewModel.stateFlow.collectAsState()
     var selectedImage by remember { mutableStateOf<String?>(null) }
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     val translationY by animateDpAsState(
         targetValue = if (uiState.isSystemBarHidden) (-100).dp else 0.dp,
@@ -88,6 +104,14 @@ fun ImageList(
             hasMore = viewModel::canLoadMorePostData,
             loadMore = viewModel::getNextImages
         )
+    }
+
+    fun checkPermissionOrDownload(block: () -> Unit) {
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q || storagePermission.status == PermissionStatus.Granted) {
+            block()
+        } else {
+            storagePermission.launchPermissionRequest()
+        }
     }
 
     LoadMoreHandler(uiState.images.size, listState, paginationHelper)
@@ -151,6 +175,22 @@ fun ImageList(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             bottomRowActions()
+            HIcon(
+                Icons.Outlined.Download,
+                size = 32,
+                rounded = true,
+                enabled = true,
+                onClick = {
+                    checkPermissionOrDownload {
+                        val intent = Intent(context, DownloadService::class.java).apply {
+                            putExtra("postUrl", post.url)
+                            putExtra("postName", post.name)
+                            putExtra("siteConfig", siteConfig)
+                        }
+                        context.startForegroundService(intent)
+                    }
+                }
+            )
             Spacer(modifier = Modifier.weight(1f))
             HIcon(
                 Icons.Outlined.KeyboardArrowUp,
