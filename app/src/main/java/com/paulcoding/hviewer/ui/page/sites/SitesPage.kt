@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +48,7 @@ fun SitesPage(
     siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
     navToHistory: () -> Unit,
+    navToDownloads: () -> Unit,
     refresh: () -> Unit,
     navToFavorite: () -> Unit,
 ) {
@@ -60,6 +62,9 @@ fun SitesPage(
 
     Scaffold(topBar = {
         TopAppBar(title = { Text(stringResource(R.string.sites)) }, actions = {
+            HIcon(Icons.Outlined.Download) {
+                navToDownloads()
+            }
             HIcon(Icons.Outlined.History) {
                 navToHistory()
             }

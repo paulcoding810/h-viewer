@@ -1,6 +1,7 @@
 package com.paulcoding.hviewer.helper
 
 import android.content.Context
+import android.os.Environment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
@@ -19,9 +20,21 @@ val Context.crashLogDir
 val Context.configFile
     get() = File(scriptsDir, CONFIG_FILE)
 
+val downloadDir: File = File(
+    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "HViewer"
+)
+
 fun Context.setupPaths() {
     scriptsDir.mkdir()
     crashLogDir.mkdir()
+
+    if (!downloadDir.exists()) {
+        downloadDir.mkdirs()
+        val nomediaFile = File(downloadDir, ".nomedia")
+        if (!nomediaFile.exists()) {
+            nomediaFile.createNewFile()
+        }
+    }
 }
 
 fun Context.writeFile(data: String, fileName: String, fileDir: File = scriptsDir): File {

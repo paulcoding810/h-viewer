@@ -8,12 +8,12 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.Build
-import android.os.Environment
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import com.paulcoding.hviewer.helper.ImageDownloader
 import com.paulcoding.hviewer.helper.SCRIPTS_DIR
+import com.paulcoding.hviewer.helper.downloadDir
 import com.paulcoding.hviewer.model.PostData
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.js.JS
@@ -37,20 +37,6 @@ class DownloadService : Service() {
     private var postTotalPage: Int = 1
     private var nextPage: String? = null
     private var images: MutableList<String> = mutableListOf()
-
-    private var downloadDir: File = File(
-        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "HViewer"
-    )
-
-    init {
-        if (!downloadDir.exists()) {
-            downloadDir.mkdirs()
-            val nomediaFile = File(downloadDir, ".nomedia")
-            if (!nomediaFile.exists()) {
-                nomediaFile.createNewFile()
-            }
-        }
-    }
 
     private fun reset() {
         postPage = 1

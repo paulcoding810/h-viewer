@@ -31,6 +31,7 @@ import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
+import com.paulcoding.hviewer.ui.page.downloads.DownloadsPage
 import com.paulcoding.hviewer.ui.page.editor.EditorPage
 import com.paulcoding.hviewer.ui.page.editor.ListScriptPage
 import com.paulcoding.hviewer.ui.page.history.HistoryPage
@@ -119,6 +120,9 @@ fun AppEntry(intent: Intent?) {
                 },
                 navToHistory = {
                     navController.navigate(Route.HISTORY)
+                },
+                navToDownloads = {
+                    navController.navigate(Route.DOWNLOADS)
                 },
                 goBack = { navController.popBackStack() })
         }
@@ -248,6 +252,11 @@ fun AppEntry(intent: Intent?) {
                 },
                 navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
                 appViewModel = appViewModel, siteConfigs = siteConfigs
+            )
+        }
+        animatedComposable(Route.DOWNLOADS) {
+            DownloadsPage(
+                goBack = navController::popBackStack
             )
         }
     }
