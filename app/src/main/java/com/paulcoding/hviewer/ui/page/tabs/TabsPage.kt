@@ -81,7 +81,7 @@ fun TabsPage(
 
                 if (siteConfig != null) {
                     ImageList(
-                        tab.url,
+                        tab,
                         siteConfig = siteConfig,
                         goBack = goBack,
                         bottomRowActions = {

@@ -20,9 +20,12 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.PostItem
@@ -31,6 +34,7 @@ import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
+import com.paulcoding.hviewer.ui.page.downloads.DownloadsPage
 import com.paulcoding.hviewer.ui.page.editor.EditorPage
 import com.paulcoding.hviewer.ui.page.editor.ListScriptPage
 import com.paulcoding.hviewer.ui.page.history.HistoryPage
@@ -82,6 +86,7 @@ fun AppEntry(intent: Intent?) {
     }
 
     LaunchedEffect(updatedIntent) {
+
         updatedIntent?.apply {
             when (action) {
                 Intent.ACTION_SEND -> {
@@ -93,7 +98,13 @@ fun AppEntry(intent: Intent?) {
                 }
 
                 Intent.ACTION_VIEW -> {
-                    handleIntentUrl(data.toString())
+                    // TODO: why deeplink not working
+                    if (data.toString().startsWith("hviewer://")) {
+                        val route = data.toString().substringAfter("hviewer://")
+                        navController.navigate(route)
+                    } else {
+                        handleIntentUrl(data.toString())
+                    }
                 }
 
                 else -> {
@@ -119,6 +130,9 @@ fun AppEntry(intent: Intent?) {
                 },
                 navToHistory = {
                     navController.navigate(Route.HISTORY)
+                },
+                navToDownloads = {
+                    navController.navigate("downloads/")
                 },
                 goBack = { navController.popBackStack() })
         }
@@ -248,6 +262,17 @@ fun AppEntry(intent: Intent?) {
                 },
                 navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
                 appViewModel = appViewModel, siteConfigs = siteConfigs
+            )
+        }
+        animatedComposable(
+            route = "downloads/{path}",
+            arguments = listOf(navArgument("path") { type = NavType.StringType }),
+            deepLinks = listOf(navDeepLink { uriPattern = "hviewer://downloads/{path}" })
+        ) { backStackEntry ->
+            val path = backStackEntry.arguments?.getString("path")
+            DownloadsPage(
+                goBack = navController::popBackStack,
+                initialDir = path
             )
         }
     }

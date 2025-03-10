@@ -31,4 +31,5 @@
     <string name="edit_local_scripts">Edit local scripts</string>
     <string name="invalid_url">Invalid URL %1$s</string>
     <string name="invalid_repo">Invalid Repo</string>
+    <string name="downloads">Downloads</string>
 </resources>
