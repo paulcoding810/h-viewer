@@ -26,6 +26,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -46,6 +49,8 @@ class DownloadService : Service() {
         postTotalPage = 1
         nextPage = null
         images = mutableListOf()
+
+        _downloadStatusFlow.update { DownloadStatus.IDLE }
     }
 
     override fun onCreate() {
@@ -93,6 +98,7 @@ class DownloadService : Service() {
 
         try {
             // fetch image urls
+            _downloadStatusFlow.update { DownloadStatus.DOWNLOADING }
             CoroutineScope(Dispatchers.IO).launch {
                 while (postPage <= postTotalPage) {
                     delay(1000) // add some delay to avoid getting blocked by the server
@@ -105,6 +111,8 @@ class DownloadService : Service() {
         } catch (e: Exception) {
             e.printStackTrace()
             stopSelf() // stop the service if an exception occurs
+        } finally {
+            _downloadStatusFlow.update { DownloadStatus.IDLE }
         }
     }
 
@@ -195,4 +203,14 @@ class DownloadService : Service() {
 
         notificationManager.notify(notificationId, completedNotification)
     }
+
+    companion object {
+        private val _downloadStatusFlow = MutableStateFlow(DownloadStatus.IDLE)
+        val downloadStatusFlow = _downloadStatusFlow.asStateFlow()
+    }
+}
+
+enum class DownloadStatus {
+    IDLE,
+    DOWNLOADING,
 }

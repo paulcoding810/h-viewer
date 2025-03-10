@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -98,6 +99,8 @@ fun ImageList(
         targetValue = if (uiState.isSystemBarHidden) (-100).dp else 0.dp,
         animationSpec = tween(200)
     )
+
+    val downloadState by DownloadService.downloadStatusFlow.collectAsState()
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
@@ -191,10 +194,10 @@ fun ImageList(
         ) {
             bottomRowActions()
             HIcon(
-                Icons.Outlined.Download,
+                imageVector = if (downloadState == DownloadStatus.IDLE) Icons.Outlined.Download else Icons.Outlined.Downloading,
                 size = 32,
                 rounded = true,
-                enabled = true,
+                enabled = downloadState == DownloadStatus.IDLE,
                 onClick = {
                     checkPermissionOrDownload {
                         val intent = Intent(context, DownloadService::class.java).apply {
