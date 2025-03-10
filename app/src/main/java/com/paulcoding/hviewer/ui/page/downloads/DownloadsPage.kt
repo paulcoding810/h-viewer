@@ -60,7 +60,6 @@ fun DownloadsPage(
         }, actions = {
             if (selectedDir != null) HIcon(
                 Icons.Outlined.Close,
-                rounded = true,
             ) { selectedDir = null }
         })
     }) { paddings ->
