@@ -16,5 +16,4 @@ object Route {
     const val HISTORY = "history"
     const val WEBVIEW = "webview"
     const val TABS = "tabs"
-    const val DOWNLOADS = "downloads"
 }

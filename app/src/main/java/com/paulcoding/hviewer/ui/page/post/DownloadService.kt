@@ -6,11 +6,14 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.app.TaskStackBuilder
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.core.content.FileProvider
+import androidx.core.net.toUri
+import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.helper.ImageDownloader
 import com.paulcoding.hviewer.helper.SCRIPTS_DIR
 import com.paulcoding.hviewer.helper.downloadDir
@@ -132,7 +135,7 @@ class DownloadService : Service() {
                 updateNotification("${totalProgress}/${images.size} images")
             }
             println("✅ All images downloaded successfully!")
-            showDownloadCompleteNotification(downloadDir)
+            showDownloadCompleteNotification(outputDir)
             onFinish()
         }
     }
@@ -168,24 +171,26 @@ class DownloadService : Service() {
     }
 
     private fun showDownloadCompleteNotification(file: File) {
-        val uri = FileProvider.getUriForFile(
+        val deepLinkIntent = Intent(
+            Intent.ACTION_VIEW,
+            "hviewer://downloads/${Uri.encode(file.absolutePath)}".toUri(),
             this,
-            "${applicationContext.packageName}.fileprovider",
-            file
+            MainActivity::class.java
         )
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "*/*")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        val deepLinkPendingIntent: PendingIntent? = TaskStackBuilder.create(this).run {
+            addNextIntentWithParentStack(deepLinkIntent)
+            getPendingIntent(0, PendingIntent.FLAG_MUTABLE)
         }
-        val pendingIntent =
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
 
         val completedNotification =
             NotificationCompat.Builder(this, channelId).setContentTitle("Download Complete")
                 .setContentText("Tap to open")
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true).build()
+                .setContentIntent(deepLinkPendingIntent)
+                .setAutoCancel(true)
+                .build()
 
         notificationManager.notify(notificationId, completedNotification)
     }
