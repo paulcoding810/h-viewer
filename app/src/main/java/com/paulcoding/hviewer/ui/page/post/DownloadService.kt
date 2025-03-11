@@ -118,7 +118,7 @@ class DownloadService : Service() {
     }
 
     private suspend fun downloadImagesParallel(postName: String, onFinish: () -> Unit = {}) {
-        val outputName = postName.replace(Regex("[^a-zA-Z0-9._]"), "_")
+        val outputName = postName.trim().replace(Regex("[^\\p{L}0-9._]"), "_")
         coroutineScope {
             val outputDir = File(downloadDir, outputName).apply {
                 if (!exists()) {
