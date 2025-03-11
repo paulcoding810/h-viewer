@@ -22,7 +22,9 @@ import com.paulcoding.hviewer.model.PostData
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.js.JS
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -32,10 +34,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.coroutines.CoroutineContext
 
 class DownloadService : Service() {
     private lateinit var notificationManager: NotificationManager
     private lateinit var notificationBuilder: NotificationCompat.Builder
+
+    private val job = SupervisorJob()
+    private val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job
 
     private val channelId = "DownloadChannel"
     private val notificationId = 1
@@ -54,6 +61,13 @@ class DownloadService : Service() {
         _downloadStatusFlow.update { DownloadStatus.IDLE }
     }
 
+    private fun stopService() {
+        job.cancel()
+        reset()
+        stopForeground(STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
     override fun onCreate() {
         super.onCreate()
         notificationManager = getSystemService(NotificationManager::class.java)
@@ -61,6 +75,11 @@ class DownloadService : Service() {
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+        if (intent.action == ACTION_STOP_SERVICE) {
+            stopService()
+            return START_NOT_STICKY
+        }
+
         reset()
 
         val postUrl = intent.getStringExtra("postUrl")
@@ -77,6 +96,11 @@ class DownloadService : Service() {
 
     override fun onBind(intent: Intent?): IBinder? {
         return null
+    }
+
+    override fun onDestroy() {
+        job.cancel()
+        super.onDestroy()
     }
 
     private suspend fun getImages(js: JS, url: String, page: Int = 1) {
@@ -99,7 +123,7 @@ class DownloadService : Service() {
 
         try {
             // fetch image urls
-            CoroutineScope(Dispatchers.IO).launch {
+            CoroutineScope(coroutineContext).launch {
                 _downloadStatusFlow.update { DownloadStatus.DOWNLOADING }
                 while (postPage <= postTotalPage) {
                     delay(1000) // add some delay to avoid getting blocked by the server
@@ -128,13 +152,14 @@ class DownloadService : Service() {
             }
             val paddingLength = images.size.toString().length
             val downloadJobs = images.mapIndexed { index, url ->
-                async {
+                async(context = coroutineContext, start = CoroutineStart.LAZY) {
                     val file =
                         File(outputDir, "img_${index.toString().padStart(paddingLength, '0')}.jpg")
-
-                    val success = ImageDownloader.downloadImage(url, file)
-                    if (!success) {
-                        println("❌ Failed to download: $url")
+                    try {
+                        ImageDownloader.downloadImage(coroutineContext, url, file)
+                    } catch (e: Exception) {
+                        println("❌ Failed to download image: $url")
+                        e.printStackTrace()
                     }
                 }
             }
@@ -153,12 +178,18 @@ class DownloadService : Service() {
 
 
     private fun createNotification(title: String): Notification {
+        val stopIntent = Intent(this, DownloadService::class.java).apply {
+            action = ACTION_STOP_SERVICE
+        }
+        val stopPendingIntent =
+            PendingIntent.getService(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE)
         notificationBuilder =
             NotificationCompat.Builder(this, channelId)
                 .setContentTitle(title)
                 .setSmallIcon(android.R.drawable.stat_sys_download)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setProgress(0, 0, true)
+                .addAction(android.R.drawable.ic_delete, "Cancel", stopPendingIntent)
         val notification = notificationBuilder.build()
         notificationManager.notify(notificationId, notification)
         return notification
@@ -196,7 +227,8 @@ class DownloadService : Service() {
 
 
         val completedNotification =
-            NotificationCompat.Builder(this, channelId).setContentTitle(getString(R.string.download_complete))
+            NotificationCompat.Builder(this, channelId)
+                .setContentTitle(getString(R.string.download_complete))
                 .setContentText(getString(R.string.tap_to_open))
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setContentIntent(deepLinkPendingIntent)
@@ -209,6 +241,7 @@ class DownloadService : Service() {
     companion object {
         private val _downloadStatusFlow = MutableStateFlow(DownloadStatus.IDLE)
         val downloadStatusFlow = _downloadStatusFlow.asStateFlow()
+        const val ACTION_STOP_SERVICE = "STOP_FOREGROUND_SERVICE"
     }
 }
 
