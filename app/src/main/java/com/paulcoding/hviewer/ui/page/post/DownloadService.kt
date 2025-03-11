@@ -143,18 +143,17 @@ class DownloadService : Service() {
     }
 
     private suspend fun downloadImagesParallel(postName: String, onFinish: () -> Unit = {}) {
-        val outputName = postName.trim().replace(Regex("[^\\p{L}0-9._]"), "_")
+        val outputName = postName.replace(Regex("[^\\p{L}0-9._]+"), " ").trim()
         coroutineScope {
             val outputDir = File(downloadDir, outputName).apply {
                 if (!exists()) {
                     mkdirs()
                 }
             }
-            val paddingLength = images.size.toString().length
             val downloadJobs = images.mapIndexed { index, url ->
                 async(context = coroutineContext, start = CoroutineStart.LAZY) {
-                    val file =
-                        File(outputDir, "img_${index.toString().padStart(paddingLength, '0')}.jpg")
+
+                    val file = File(outputDir, getImgName(url, index))
                     try {
                         ImageDownloader.downloadImage(coroutineContext, url, file)
                     } catch (e: Exception) {
@@ -176,6 +175,20 @@ class DownloadService : Service() {
         }
     }
 
+    private fun getImgName(url: String, index: Int): String {
+        val paddingLength = images.size.toString().length
+
+        val extension = when {
+            url.contains(".webp", ignoreCase = true) -> "webp"
+            url.contains(".png", ignoreCase = true) -> "png"
+            url.contains(".gif", ignoreCase = true) -> "gif"
+            url.contains(".jpeg", ignoreCase = true) -> "jpeg"
+            url.contains(".jpg", ignoreCase = true) -> "jpg"
+            else -> "jpg"
+        }
+
+        return "img_${(index + 1).toString().padStart(paddingLength, '0')}.$extension"
+    }
 
     private fun createNotification(title: String): Notification {
         val stopIntent = Intent(this, DownloadService::class.java).apply {
