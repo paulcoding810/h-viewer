@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Downloading
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -33,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -45,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.openInBrowser
+import com.paulcoding.hviewer.helper.rememberDownloadState
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
@@ -158,6 +162,7 @@ fun InfoBottomSheet(
 ) {
     val bottomSheetState = rememberModalBottomSheetState()
     val activity = LocalActivity.current
+    val downloadState = rememberDownloadState(postItem)
 
     LaunchedEffect(visible) {
         if (visible) {
@@ -177,8 +182,24 @@ fun InfoBottomSheet(
                     .padding(16.dp),
             ) {
                 postItem.run {
-                    SelectionContainer {
-                        Text(text = name, fontSize = 20.sp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            SelectionContainer {
+                                Text(text = name, fontSize = 16.sp)
+                            }
+                        }
+                        HIcon(
+                            imageVector = if (downloadState.isDownloading) Icons.Outlined.Downloading else Icons.Outlined.Download,
+                            enabled = !downloadState.isDownloading,
+                            onClick = {
+                                onDismissRequest()
+                                downloadState.download()
+                            }
+                        )
                     }
                     TextButton(onClick = {
                         onDismissRequest()
