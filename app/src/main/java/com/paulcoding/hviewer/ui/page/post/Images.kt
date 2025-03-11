@@ -42,23 +42,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.helper.BasePaginationHelper
 import com.paulcoding.hviewer.helper.LoadMoreHandler
+import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.SystemBar
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun ImageList(
-    postUrl: String,
+    post: PostItem,
     siteConfig: SiteConfig,
     goBack: () -> Unit,
     bottomRowActions: @Composable (RowScope.() -> Unit) = {},
 ) {
     val viewModel: PostViewModel = viewModel(
-        key = postUrl,
-        factory = PostViewModelFactory(postUrl, siteConfig = siteConfig)
+        key = post.url,
+        factory = PostViewModelFactory(post.url, siteConfig = siteConfig)
     )
 
     val uiState by viewModel.stateFlow.collectAsState()
@@ -70,6 +70,7 @@ fun ImageList(
         targetValue = if (uiState.isSystemBarHidden) (-100).dp else 0.dp,
         animationSpec = tween(200)
     )
+
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {

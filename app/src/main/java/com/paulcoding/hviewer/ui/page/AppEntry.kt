@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -20,9 +21,12 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.PostItem
@@ -30,7 +34,9 @@ import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
+import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
+import com.paulcoding.hviewer.ui.page.downloads.DownloadsPage
 import com.paulcoding.hviewer.ui.page.editor.EditorPage
 import com.paulcoding.hviewer.ui.page.editor.ListScriptPage
 import com.paulcoding.hviewer.ui.page.history.HistoryPage
@@ -50,6 +56,7 @@ fun AppEntry(intent: Intent?) {
 
     val githubState by Github.stateFlow.collectAsState()
     val siteConfigs by remember { derivedStateOf { githubState.siteConfigs ?: SiteConfigs() } }
+    val hostsMap by remember { derivedStateOf { siteConfigs.toHostsMap() } }
     val appViewModel: AppViewModel = viewModel()
     val appState by appViewModel.stateFlow.collectAsState()
     val context = LocalContext.current
@@ -82,6 +89,7 @@ fun AppEntry(intent: Intent?) {
     }
 
     LaunchedEffect(updatedIntent) {
+
         updatedIntent?.apply {
             when (action) {
                 Intent.ACTION_SEND -> {
@@ -93,7 +101,13 @@ fun AppEntry(intent: Intent?) {
                 }
 
                 Intent.ACTION_VIEW -> {
-                    handleIntentUrl(data.toString())
+                    // TODO: why deeplink not working
+                    if (data.toString().startsWith("hviewer://")) {
+                        val route = data.toString().substringAfter("hviewer://")
+                        navController.navigate(route)
+                    } else {
+                        handleIntentUrl(data.toString())
+                    }
                 }
 
                 else -> {
@@ -101,154 +115,169 @@ fun AppEntry(intent: Intent?) {
             }
         }
     }
-
-    NavHost(navController, startDestination = startDestination) {
-        animatedComposable(Route.SITES) {
-            SitesPage(
-                isDevMode = appState.isDevMode,
-                siteConfigs = siteConfigs,
-                refresh = { Github.refreshLocalConfigs() },
-                navToTopics = { siteConfig ->
-                    appViewModel.setCurrentPost(PostItem(siteConfig.baseUrl))
-                    navController.navigate(Route.POSTS)
-                }, navToSettings = {
-                    navController.navigate(Route.SETTINGS)
-                },
-                navToFavorite = {
-                    navController.navigate(Route.FAVORITE)
-                },
-                navToHistory = {
-                    navController.navigate(Route.HISTORY)
-                },
-                goBack = { navController.popBackStack() })
-        }
-        animatedComposable(Route.SETTINGS) {
-            SettingsPage(appViewModel = appViewModel,
-                navToListScript = {
-                    navController.navigate(Route.LIST_SCRIPT + "/script")
-                },
-                navToListCrashLog = {
-                    navController.navigate(Route.LIST_SCRIPT + "/crash_log")
-                },
-                onLockEnabled = {
-                    navController.navigate(Route.LOCK) {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
-                        restoreState = false
-                    }
-                }, goBack = { navController.popBackStack() })
-        }
-        animatedComposable(Route.POSTS) {
-            PostsPage(
-                appViewModel,
-                navToImages = { post: PostItem ->
-                    navToImages(post)
-                },
-                navToSearch = { navController.navigate(Route.SEARCH) },
-                navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
-                navToTabs = { navController.navigate(Route.TABS) },
-                goBack = { navController.popBackStack() },
-            )
-        }
-        animatedComposable(Route.CUSTOM_TAG) {
-            CustomTagPage(
-                appViewModel,
-                navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
-                goBack = { navController.popBackStack() }
-            ) {
-                navToImages(it)
+    CompositionLocalProvider(LocalHostsMap provides hostsMap) {
+        NavHost(navController, startDestination = startDestination) {
+            animatedComposable(Route.SITES) {
+                SitesPage(
+                    isDevMode = appState.isDevMode,
+                    siteConfigs = siteConfigs,
+                    refresh = { Github.refreshLocalConfigs() },
+                    navToTopics = { siteConfig ->
+                        appViewModel.setCurrentPost(PostItem(siteConfig.baseUrl))
+                        navController.navigate(Route.POSTS)
+                    }, navToSettings = {
+                        navController.navigate(Route.SETTINGS)
+                    },
+                    navToFavorite = {
+                        navController.navigate(Route.FAVORITE)
+                    },
+                    navToHistory = {
+                        navController.navigate(Route.HISTORY)
+                    },
+                    navToDownloads = {
+                        navController.navigate("downloads/")
+                    },
+                    goBack = { navController.popBackStack() })
             }
-        }
-        animatedComposable(Route.POST) {
-            PostPage(
-                appViewModel,
-                navToWebView = {
-                    appViewModel.setWebViewUrl(it)
-                    navController.navigate(Route.WEBVIEW)
-                },
-                hostMap = siteConfigs.toHostsMap(),
-                goBack = {
-                    navController.popBackStack()
-                })
-        }
-        animatedComposable(Route.SEARCH) {
-            SearchPage(
-                appViewModel = appViewModel,
-                navToImages = { post: PostItem ->
-                    navToImages(post)
-                },
-                navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
-                goBack = { navController.popBackStack() },
-            )
-        }
-        animatedComposable(Route.FAVORITE) {
-            FavoritePage(
-                appViewModel = appViewModel,
-                navToImages = { post: PostItem ->
-                    navToImages(post)
-                },
-                navToCustomTag = { post, tag ->
-                    navToCustomTag(post, tag)
-                },
-                goBack = { navController.popBackStack() }
-            )
-        }
-        animatedComposable(Route.LIST_SCRIPT + "/{type}") { backStackEntry ->
-            val type = backStackEntry.arguments?.getString("type")!!
-
-            ListScriptPage(
-                appViewModel = appViewModel,
-                type = type,
-                goBack = { navController.popBackStack() },
-                navToEditor = {
-                    navController.navigate(Route.EDITOR + "/$type" + "/$it")
-                })
-        }
-        animatedComposable(Route.EDITOR + "/{type}" + "/{scriptFile}") { backStackEntry ->
-            val type = backStackEntry.arguments?.getString("type")!!
-            val scriptFile = backStackEntry.arguments?.getString("scriptFile")!!
-
-            EditorPage(
-                appViewModel = appViewModel,
-                type = type,
-                scriptFile = scriptFile,
-                goBack = { navController.popBackStack() })
-        }
-        animatedComposable(Route.LOCK) {
-            LockPage(onUnlocked = {
-                navController.navigate(Route.SITES)
-                {
-                    popUpTo(Route.LOCK) {
-                        inclusive = true
-                    }
+            animatedComposable(Route.SETTINGS) {
+                SettingsPage(appViewModel = appViewModel,
+                    navToListScript = {
+                        navController.navigate(Route.LIST_SCRIPT + "/script")
+                    },
+                    navToListCrashLog = {
+                        navController.navigate(Route.LIST_SCRIPT + "/crash_log")
+                    },
+                    onLockEnabled = {
+                        navController.navigate(Route.LOCK) {
+                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                            launchSingleTop = true
+                            restoreState = false
+                        }
+                    }, goBack = { navController.popBackStack() })
+            }
+            animatedComposable(Route.POSTS) {
+                PostsPage(
+                    appViewModel,
+                    navToImages = { post: PostItem ->
+                        navToImages(post)
+                    },
+                    navToSearch = { navController.navigate(Route.SEARCH) },
+                    navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
+                    navToTabs = { navController.navigate(Route.TABS) },
+                    goBack = { navController.popBackStack() },
+                )
+            }
+            animatedComposable(Route.CUSTOM_TAG) {
+                CustomTagPage(
+                    appViewModel,
+                    navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
+                    goBack = { navController.popBackStack() }
+                ) {
+                    navToImages(it)
                 }
-            })
-        }
-        animatedComposable(Route.HISTORY) {
-            HistoryPage(
-                goBack = { navController.popBackStack() }, appViewModel = appViewModel,
-                navToImages = { post: PostItem ->
-                    navToImages(post)
-                },
-                navToCustomTag = { post, tag ->
-                    navToCustomTag(post, tag)
-                },
-                deleteHistory = appViewModel::deleteHistory
-            )
-        }
-        animatedComposable(Route.WEBVIEW) {
-            val url = appViewModel.getWebViewUrl()
-            WebPage(goBack = { navController.popBackStack() }, url = url)
-        }
-        animatedComposable(Route.TABS) {
-            TabsPage(
-                goBack = {
-                    navController.popBackStack()
-                    appViewModel.clearTabs()
-                },
-                navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
-                appViewModel = appViewModel, siteConfigs = siteConfigs
-            )
+            }
+            animatedComposable(Route.POST) {
+                PostPage(
+                    appViewModel,
+                    navToWebView = {
+                        appViewModel.setWebViewUrl(it)
+                        navController.navigate(Route.WEBVIEW)
+                    },
+                    hostMap = siteConfigs.toHostsMap(),
+                    goBack = {
+                        navController.popBackStack()
+                    })
+            }
+            animatedComposable(Route.SEARCH) {
+                SearchPage(
+                    appViewModel = appViewModel,
+                    navToImages = { post: PostItem ->
+                        navToImages(post)
+                    },
+                    navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
+                    goBack = { navController.popBackStack() },
+                )
+            }
+            animatedComposable(Route.FAVORITE) {
+                FavoritePage(
+                    appViewModel = appViewModel,
+                    navToImages = { post: PostItem ->
+                        navToImages(post)
+                    },
+                    navToCustomTag = { post, tag ->
+                        navToCustomTag(post, tag)
+                    },
+                    goBack = { navController.popBackStack() }
+                )
+            }
+            animatedComposable(Route.LIST_SCRIPT + "/{type}") { backStackEntry ->
+                val type = backStackEntry.arguments?.getString("type")!!
+
+                ListScriptPage(
+                    appViewModel = appViewModel,
+                    type = type,
+                    goBack = { navController.popBackStack() },
+                    navToEditor = {
+                        navController.navigate(Route.EDITOR + "/$type" + "/$it")
+                    })
+            }
+            animatedComposable(Route.EDITOR + "/{type}" + "/{scriptFile}") { backStackEntry ->
+                val type = backStackEntry.arguments?.getString("type")!!
+                val scriptFile = backStackEntry.arguments?.getString("scriptFile")!!
+
+                EditorPage(
+                    appViewModel = appViewModel,
+                    type = type,
+                    scriptFile = scriptFile,
+                    goBack = { navController.popBackStack() })
+            }
+            animatedComposable(Route.LOCK) {
+                LockPage(onUnlocked = {
+                    navController.navigate(Route.SITES)
+                    {
+                        popUpTo(Route.LOCK) {
+                            inclusive = true
+                        }
+                    }
+                })
+            }
+            animatedComposable(Route.HISTORY) {
+                HistoryPage(
+                    goBack = { navController.popBackStack() }, appViewModel = appViewModel,
+                    navToImages = { post: PostItem ->
+                        navToImages(post)
+                    },
+                    navToCustomTag = { post, tag ->
+                        navToCustomTag(post, tag)
+                    },
+                    deleteHistory = appViewModel::deleteHistory
+                )
+            }
+            animatedComposable(Route.WEBVIEW) {
+                val url = appViewModel.getWebViewUrl()
+                WebPage(goBack = { navController.popBackStack() }, url = url)
+            }
+            animatedComposable(Route.TABS) {
+                TabsPage(
+                    goBack = {
+                        navController.popBackStack()
+                        appViewModel.clearTabs()
+                    },
+                    navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
+                    appViewModel = appViewModel, siteConfigs = siteConfigs
+                )
+            }
+            animatedComposable(
+                route = "downloads/{path}",
+                arguments = listOf(navArgument("path") { type = NavType.StringType }),
+                deepLinks = listOf(navDeepLink { uriPattern = "hviewer://downloads/{path}" })
+            ) { backStackEntry ->
+                val path = backStackEntry.arguments?.getString("path")
+                DownloadsPage(
+                    goBack = navController::popBackStack,
+                    initialDir = path
+                )
+            }
         }
     }
 }

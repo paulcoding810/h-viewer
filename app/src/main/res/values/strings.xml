@@ -31,4 +31,11 @@
     <string name="edit_local_scripts">Edit local scripts</string>
     <string name="invalid_url">Invalid URL %1$s</string>
     <string name="invalid_repo">Invalid Repo</string>
+    <string name="downloads">Downloads</string>
+    <string name="downloading_post">Downloading %1$s</string>
+    <string name="tap_to_open">Tap to open</string>
+    <string name="download_complete">Download Complete</string>
+    <string name="confirm">Confirm</string>
+    <string name="confirm_delete">Confirm Delete</string>
+    <string name="are_you_sure_you_want_to_delete_folder">Are you sure you want to delete %1$s?\nThis process cannot be undone.</string>
 </resources>

@@ -18,7 +18,7 @@ fun PostPage(
 
     post.getSiteConfig(hostMap)?.let {
         ImageList(
-            postUrl = post.url, siteConfig = it,
+            post = post, siteConfig = it,
             goBack = goBack
         )
     }
