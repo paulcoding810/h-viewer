@@ -98,8 +98,8 @@ class DownloadService : Service() {
 
         try {
             // fetch image urls
-            _downloadStatusFlow.update { DownloadStatus.DOWNLOADING }
             CoroutineScope(Dispatchers.IO).launch {
+                _downloadStatusFlow.update { DownloadStatus.DOWNLOADING }
                 while (postPage <= postTotalPage) {
                     delay(1000) // add some delay to avoid getting blocked by the server
                     nextPage?.let { getImages(js, it, postPage) }
@@ -107,6 +107,7 @@ class DownloadService : Service() {
                     postPage++
                 }
                 downloadImagesParallel(postName)
+                _downloadStatusFlow.update { DownloadStatus.IDLE }
             }
         } catch (e: Exception) {
             e.printStackTrace()
