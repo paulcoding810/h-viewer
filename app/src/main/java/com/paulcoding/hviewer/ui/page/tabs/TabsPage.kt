@@ -28,8 +28,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.database.DatabaseProvider
 import com.paulcoding.hviewer.model.PostItem
-import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.model.Tag
+import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
@@ -44,14 +44,13 @@ fun TabsPage(
     goBack: () -> Unit,
     navToCustomTag: (PostItem, Tag) -> Unit,
     appViewModel: AppViewModel,
-    siteConfigs: SiteConfigs
 ) {
+    val hostsMap = LocalHostsMap.current
     val tabs by appViewModel.tabs.collectAsState(initial = listOf())
     val reversedTabs by remember { derivedStateOf { tabs.reversed() } }
     val pagerState = rememberPagerState { reversedTabs.size }
     val currentPost by remember { derivedStateOf { reversedTabs[pagerState.currentPage] } }
     val scope = rememberCoroutineScope()
-    val hostsMap by remember { derivedStateOf { siteConfigs.toHostsMap() } }
     var infoSheetVisible by remember { mutableStateOf(false) }
 
     BackHandler {

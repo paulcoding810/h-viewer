@@ -32,7 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.SiteConfig
-import com.paulcoding.hviewer.model.SiteConfigs
+import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
@@ -45,13 +45,14 @@ fun SitesPage(
     isDevMode: Boolean,
     navToTopics: (siteConfig: SiteConfig) -> Unit,
     goBack: () -> Unit,
-    siteConfigs: SiteConfigs,
     navToSettings: () -> Unit,
     navToHistory: () -> Unit,
     navToDownloads: () -> Unit,
     refresh: () -> Unit,
     navToFavorite: () -> Unit,
 ) {
+    val hostsMap = LocalHostsMap.current
+
     val state = rememberPullToRefreshState()
 
 //  TODO: check refreshing status
@@ -96,11 +97,11 @@ fun SitesPage(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                if (siteConfigs.sites.keys.isEmpty()) {
+                if (hostsMap.isEmpty()) {
                     HEmpty(title = "No sites found", message = "Add repo?") { navToSettings() }
                 } else
-                    siteConfigs.sites.keys.map { site ->
-                        siteConfigs.sites[site]?.let { siteConfig ->
+                    hostsMap.keys.map { site ->
+                        hostsMap[site]?.let { siteConfig ->
                             Site(
                                 key = site,
                                 site = siteConfig
@@ -127,7 +128,7 @@ fun Site(site: SiteConfig, key: String, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             site.SiteIcon()
-            Text(key)
+            Text(site.name)
         }
     }
 }
