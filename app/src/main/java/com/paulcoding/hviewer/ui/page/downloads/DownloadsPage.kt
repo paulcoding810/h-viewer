@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +31,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.downloadDir
+import com.paulcoding.hviewer.helper.makeToast
+import com.paulcoding.hviewer.ui.component.ConfirmDialog
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HIcon
@@ -45,11 +48,16 @@ fun DownloadsPage(
 ) {
     var dirs by remember { mutableStateOf(emptyList<File>()) }
     var selectedDir by remember { mutableStateOf<File?>(null) }
+    var dirWillBeDeleted by remember { mutableStateOf<File?>(null) }
 
-    LaunchedEffect(Unit) {
+    fun fetchDirs() {
         downloadDir.listFiles()?.filter { it.isDirectory }?.toList()?.let {
             dirs = it
         }
+    }
+
+    LaunchedEffect(Unit) {
+        fetchDirs()
         initialDir?.let {
             if (File(it).exists()) selectedDir = File(it)
         }
@@ -79,8 +87,13 @@ fun DownloadsPage(
                     ) {
                         Icon(Icons.Outlined.Folder, it.name)
                         Text(
-                            it.name, modifier = Modifier.padding(12.dp)
+                            it.name, modifier = Modifier
+                                .padding(12.dp)
+                                .weight(1f)
                         )
+                        HIcon(Icons.Outlined.Delete) {
+                            dirWillBeDeleted = it
+                        }
                     }
                 }
                 if (dirs.isEmpty()) item {
@@ -91,6 +104,19 @@ fun DownloadsPage(
                 ImageList(selectedDir!!)
             }
         }
+        ConfirmDialog(
+            showDialog = dirWillBeDeleted != null,
+            title = "Confirm Delete",
+            text = "Are you sure you want to delete ${dirWillBeDeleted?.name}?\nThis process cannot be undone.",
+            onDismiss = {
+                dirWillBeDeleted = null
+            }, onConfirm = {
+                if (dirWillBeDeleted?.deleteRecursively() == true) {
+                    makeToast("Deleted ${dirWillBeDeleted?.name}")
+                    fetchDirs()
+                    dirWillBeDeleted = null
+                }
+            })
     }
 }
 
