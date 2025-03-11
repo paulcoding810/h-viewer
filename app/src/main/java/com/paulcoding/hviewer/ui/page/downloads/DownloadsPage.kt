@@ -106,8 +106,11 @@ fun DownloadsPage(
         }
         ConfirmDialog(
             showDialog = dirWillBeDeleted != null,
-            title = "Confirm Delete",
-            text = "Are you sure you want to delete ${dirWillBeDeleted?.name}?\nThis process cannot be undone.",
+            title = stringResource(R.string.confirm_delete),
+            text = stringResource(
+                R.string.are_you_sure_you_want_to_delete_folder,
+                dirWillBeDeleted?.name ?: ""
+            ),
             onDismiss = {
                 dirWillBeDeleted = null
             }, onConfirm = {
