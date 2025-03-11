@@ -14,6 +14,7 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import com.paulcoding.hviewer.MainActivity
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.ImageDownloader
 import com.paulcoding.hviewer.helper.SCRIPTS_DIR
 import com.paulcoding.hviewer.helper.downloadDir
@@ -195,8 +196,8 @@ class DownloadService : Service() {
 
 
         val completedNotification =
-            NotificationCompat.Builder(this, channelId).setContentTitle("Download Complete")
-                .setContentText("Tap to open")
+            NotificationCompat.Builder(this, channelId).setContentTitle(getString(R.string.download_complete))
+                .setContentText(getString(R.string.tap_to_open))
                 .setSmallIcon(android.R.drawable.stat_sys_download_done)
                 .setContentIntent(deepLinkPendingIntent)
                 .setAutoCancel(true)

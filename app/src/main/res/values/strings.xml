@@ -33,4 +33,6 @@
     <string name="invalid_repo">Invalid Repo</string>
     <string name="downloads">Downloads</string>
     <string name="downloading_post">Downloading %1$s</string>
+    <string name="tap_to_open">Tap to open</string>
+    <string name="download_complete">Download Complete</string>
 </resources>
