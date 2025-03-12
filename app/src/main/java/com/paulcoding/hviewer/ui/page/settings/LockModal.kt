@@ -35,6 +35,7 @@ fun LockModal(onDismiss: () -> Unit, onPinConfirmed: (String) -> Unit = {}) {
         Surface {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(stringResource(R.string.enter_new_pin))
+                Spacer(modifier = Modifier.height(12.dp))
                 HOTP {
                     pin = it
                 }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,7 +19,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,11 @@ fun HOTP(
 ) {
     var text by remember { mutableStateOf("") }
     val localKeyboardController = LocalSoftwareKeyboardController.current
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
 
     LaunchedEffect(text) {
         if (text.length == Preferences.pinCount) {
@@ -42,7 +49,7 @@ fun HOTP(
 
     BasicTextField(
         text,
-        modifier = modifier,
+        modifier = modifier.focusRequester(focusRequester),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         onValueChange = { if (it.length <= pinCount) text = it },
         decorationBox = {
@@ -54,7 +61,11 @@ fun HOTP(
                     Box(
                         modifier = Modifier
                             .size(64.dp)
-                            .border(1.dp, Color.Black, shape = RoundedCornerShape(4.dp))
+                            .border(
+                                1.dp,
+                                MaterialTheme.colorScheme.onBackground,
+                                shape = RoundedCornerShape(4.dp)
+                            )
                     ) {
                         Text(
                             modifier = Modifier.align(Alignment.Center),
