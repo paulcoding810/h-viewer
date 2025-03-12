@@ -29,7 +29,7 @@ class PostViewModel(private val postUrl: String, siteConfig: SiteConfig) : ViewM
         val isLoading: Boolean = false,
         val error: Throwable? = null,
         val currentPostUrl: String = "",
-        val isSystemBarHidden: Boolean = true,
+        val isSystemBarHidden: Boolean = false,
     )
 
     private fun setError(th: Throwable) {

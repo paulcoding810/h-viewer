@@ -1,6 +1,7 @@
 package com.paulcoding.hviewer.ui.page.post
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -80,6 +81,12 @@ fun ImageList(
 
     LaunchedEffect(Unit) {
         viewModel.getImages()
+    }
+
+    LaunchedEffect(uiState.images) {
+        if (uiState.images.isNotEmpty()) {
+            viewModel.toggleSystemBarHidden()
+        }
     }
 
     val paginationHelper = remember {
@@ -171,21 +178,24 @@ fun ImageList(
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Gray.copy(alpha = 0.4f))
-                .align(Alignment.BottomEnd)
-                .padding(horizontal = 28.dp),
+        AnimatedVisibility(
+            uiState.images.isNotEmpty(),
+            modifier = Modifier.align(Alignment.BottomEnd)
         ) {
-            Text(
-                "${uiState.postPage}/${uiState.postTotalPage}",
-                modifier = Modifier.align(Alignment.BottomEnd),
-                fontSize = 10.sp,
-                maxLines = 1,
-                color = Color.White,
-            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color.Gray.copy(alpha = 0.4f))
+                    .padding(horizontal = 28.dp),
+            ) {
+                Text(
+                    "${uiState.postPage}/${uiState.postTotalPage}",
+                    modifier = Modifier.align(Alignment.BottomEnd),
+                    fontSize = 10.sp,
+                    maxLines = 1,
+                    color = Color.White,
+                )
+            }
         }
-
     }
 }
