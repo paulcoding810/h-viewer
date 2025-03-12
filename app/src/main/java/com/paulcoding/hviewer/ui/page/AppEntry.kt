@@ -170,6 +170,7 @@ fun AppEntry(intent: Intent?) {
                 CustomTagPage(
                     appViewModel,
                     navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
+                    navToTabs = { navController.navigate(Route.TABS) },
                     goBack = { navController.popBackStack() }
                 ) {
                     navToImages(it)
@@ -193,6 +194,7 @@ fun AppEntry(intent: Intent?) {
                         navToImages(post)
                     },
                     navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
+                    navToTabs = { navController.navigate(Route.TABS) },
                     goBack = { navController.popBackStack() },
                 )
             }

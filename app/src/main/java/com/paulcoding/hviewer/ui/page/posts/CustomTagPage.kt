@@ -27,11 +27,13 @@ fun CustomTagPage(
     appViewModel: AppViewModel,
     goBack: () -> Unit,
     navToCustomTag: (PostItem, Tag) -> Unit,
+    navToTabs: () -> Unit,
     navToImages: (PostItem) -> Unit
 ) {
-    val appState by appViewModel.stateFlow.collectAsState()
     val tag = appViewModel.getCurrentTag()
     var pageProgress by remember { mutableStateOf(1 to 1) }
+    var tabsIconPosition by remember { mutableStateOf(Offset.Zero) }
+    val tabs by appViewModel.tabs.collectAsState(initial = listOf())
 
     Scaffold(
         topBar = {
@@ -42,16 +44,19 @@ fun CustomTagPage(
                 },
                 actions = {
                     HPageProgress(pageProgress.first, pageProgress.second)
+                    TabsIcon(
+                        onClick = navToTabs,
+                        size = tabs.size,
+                        onGloballyPositioned = { tabsIconPosition = it })
                 }
             )
         }
     ) { paddings ->
         Box(modifier = Modifier.padding(paddings)) {
-
             PageContent(
                 appViewModel,
                 tag = tag,
-                endPos = Offset.Zero,
+                endPos = tabsIconPosition,
                 onPageChange = { currentPage, total ->
                     pageProgress = currentPage to total
                 },

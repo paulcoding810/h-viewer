@@ -1,17 +1,14 @@
 package com.paulcoding.hviewer.ui.page.posts
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Tab
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,15 +24,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.toCapital
@@ -71,9 +62,7 @@ fun PostsPage(
     val currentTag = listTag[selectedTabIndex]
     val scope = rememberCoroutineScope()
     var pageProgress by remember { mutableStateOf(1 to 1) }
-
-    var endPos by remember { mutableStateOf(Offset.Zero) }
-
+    var tabsIconPosition by remember { mutableStateOf(Offset.Zero) }
 
     Scaffold(topBar = {
         TopAppBar(title = { Text(currentTag.name.toCapital()) }, navigationIcon = {
@@ -81,25 +70,11 @@ fun PostsPage(
         }, actions = {
             HPageProgress(pageProgress.first, pageProgress.second)
             HIcon(imageVector = Icons.Outlined.Search) { navToSearch() }
-            Box(modifier = Modifier
-                .onGloballyPositioned {
-                    endPos = it.positionInRoot()
-                }) {
-                if (tabs.isNotEmpty()) {
-                    HIcon(
-                        imageVector = Icons.Outlined.Tab,
-                    ) { navToTabs() }
-                    Text(
-                        tabs.size.toString(),
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .clip(CircleShape),
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                }
-            }
+            TabsIcon(
+                size = tabs.size,
+                onGloballyPositioned = { tabsIconPosition = it },
+                onClick = navToTabs
+            )
         })
     }) { paddings ->
         Column(modifier = Modifier.padding(paddings)) {
@@ -132,7 +107,7 @@ fun PostsPage(
                 PageContent(
                     appViewModel,
                     tag = tag,
-                    endPos = endPos,
+                    endPos = tabsIconPosition,
                     navToCustomTag = navToCustomTag,
                     onPageChange = { currentPage, total ->
                         pageProgress = currentPage to total

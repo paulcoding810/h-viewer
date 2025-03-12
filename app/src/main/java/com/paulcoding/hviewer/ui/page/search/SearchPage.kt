@@ -44,6 +44,7 @@ import com.paulcoding.hviewer.ui.page.AppViewModel
 import com.paulcoding.hviewer.ui.page.posts.PostList
 import com.paulcoding.hviewer.ui.page.posts.PostsViewModel
 import com.paulcoding.hviewer.ui.page.posts.PostsViewModelFactory
+import com.paulcoding.hviewer.ui.page.posts.TabsIcon
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,6 +53,7 @@ fun SearchPage(
     appViewModel: AppViewModel,
     navToImages: (post: PostItem) -> Unit,
     navToCustomTag: (PostItem, Tag) -> Unit,
+    navToTabs: () -> Unit,
     goBack: () -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
@@ -64,8 +66,10 @@ fun SearchPage(
         ),
     )
     val uiState by viewModel.stateFlow.collectAsState()
+    val tabs by appViewModel.tabs.collectAsState(initial = listOf())
     val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
     val focusManager = LocalFocusManager.current
+    var tabsIconPosition by remember { mutableStateOf(Offset.Zero) }
 
     fun submit() {
         viewModel.setQueryAndSearch(query)
@@ -84,6 +88,11 @@ fun SearchPage(
             actions = {
                 if (uiState.postItems.isNotEmpty())
                     HPageProgress(uiState.postsPage, uiState.postsTotalPage)
+                TabsIcon(
+                    size = tabs.size,
+                    onGloballyPositioned = { tabsIconPosition = it },
+                    onClick = navToTabs
+                )
             })
     }) { paddings ->
         Column(modifier = Modifier.padding(paddings)) {
@@ -114,8 +123,9 @@ fun SearchPage(
                 )
                 HIcon(Icons.Outlined.Search) { submit() }
             }
-            PageContent(
+            SearchPageContent(
                 appViewModel = appViewModel,
+                endPos = tabsIconPosition,
                 navToCustomTag = navToCustomTag,
                 viewModel = viewModel
             ) { post ->
@@ -126,9 +136,10 @@ fun SearchPage(
 }
 
 @Composable
-fun PageContent(
+internal fun SearchPageContent(
     appViewModel: AppViewModel,
     viewModel: PostsViewModel,
+    endPos: Offset = Offset.Zero,
     navToCustomTag: (PostItem, Tag) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
@@ -154,7 +165,7 @@ fun PageContent(
     PostList(
         paginationHelper = paginationHelper,
         favoriteSet = favoriteSet,
-        endPos = Offset.Zero,
+        endPos = endPos,
         hidesEmpty = true, // TODO: hide empty on queried & empty
         onAddToTabs = appViewModel::addTab,
         setFavorite = { post, isFavorite ->
