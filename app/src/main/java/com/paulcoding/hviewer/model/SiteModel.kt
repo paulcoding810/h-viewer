@@ -15,6 +15,7 @@ import com.paulcoding.hviewer.R
 
 @kotlinx.parcelize.Parcelize
 data class SiteConfig(
+    val name: String = "",
     val baseUrl: String = "",
     val scriptFile: String = "",
     val tags: Map<String, String> = mapOf(),
@@ -37,11 +38,9 @@ data class SiteConfig(
 
 data class SiteConfigs(
     val version: Int = 1,
-    val sites: Map<String, SiteConfig> = mapOf()
+    val sites: List<SiteConfig> = listOf()
 ) {
     fun toHostsMap(): Map<String, SiteConfig> {
-        return sites.map {
-            it.value.baseUrl.split('/')[2] to it.value
-        }.toMap()
+        return sites.associateBy { it.baseUrl.split('/')[2] }
     }
 }

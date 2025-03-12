@@ -81,7 +81,7 @@ fun AppEntry(intent: Intent?) {
 
     fun handleIntentUrl(url: String) {
         val postItem = PostItem(url = url)
-        if (postItem.getSiteConfig(siteConfigs.toHostsMap()) != null) {
+        if (postItem.getSiteConfig(hostsMap) != null) {
             navToImages(postItem)
         } else {
             makeToast(context.getString(R.string.invalid_url, url))
@@ -120,7 +120,6 @@ fun AppEntry(intent: Intent?) {
             animatedComposable(Route.SITES) {
                 SitesPage(
                     isDevMode = appState.isDevMode,
-                    siteConfigs = siteConfigs,
                     refresh = { Github.refreshLocalConfigs() },
                     navToTopics = { siteConfig ->
                         appViewModel.setCurrentPost(PostItem(siteConfig.baseUrl))
@@ -183,7 +182,6 @@ fun AppEntry(intent: Intent?) {
                         appViewModel.setWebViewUrl(it)
                         navController.navigate(Route.WEBVIEW)
                     },
-                    hostMap = siteConfigs.toHostsMap(),
                     goBack = {
                         navController.popBackStack()
                     })
@@ -264,7 +262,7 @@ fun AppEntry(intent: Intent?) {
                         appViewModel.clearTabs()
                     },
                     navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
-                    appViewModel = appViewModel, siteConfigs = siteConfigs
+                    appViewModel = appViewModel,
                 )
             }
             animatedComposable(
