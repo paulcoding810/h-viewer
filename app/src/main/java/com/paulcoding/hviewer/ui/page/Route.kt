@@ -12,7 +12,6 @@ object Route {
     const val FAVORITE = "favorite"
     const val EDITOR = "editor"
     const val LIST_SCRIPT = "list_script"
-    const val LOCK = "lock"
     const val HISTORY = "history"
     const val WEBVIEW = "webview"
     const val TABS = "tabs"

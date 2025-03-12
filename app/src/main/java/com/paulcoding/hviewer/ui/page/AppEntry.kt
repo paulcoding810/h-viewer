@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
@@ -33,14 +32,12 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
-import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
 import com.paulcoding.hviewer.ui.page.downloads.DownloadsPage
 import com.paulcoding.hviewer.ui.page.editor.EditorPage
 import com.paulcoding.hviewer.ui.page.editor.ListScriptPage
 import com.paulcoding.hviewer.ui.page.history.HistoryPage
-import com.paulcoding.hviewer.ui.page.lock.LockPage
 import com.paulcoding.hviewer.ui.page.post.PostPage
 import com.paulcoding.hviewer.ui.page.posts.CustomTagPage
 import com.paulcoding.hviewer.ui.page.posts.PostsPage
@@ -51,13 +48,12 @@ import com.paulcoding.hviewer.ui.page.tabs.TabsPage
 import com.paulcoding.hviewer.ui.page.web.WebPage
 
 @Composable
-fun AppEntry(intent: Intent?) {
+fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
     val navController = rememberNavController()
 
     val githubState by Github.stateFlow.collectAsState()
     val siteConfigs by remember { derivedStateOf { githubState.siteConfigs ?: SiteConfigs() } }
     val hostsMap by remember { derivedStateOf { siteConfigs.toHostsMap() } }
-    val appViewModel: AppViewModel = viewModel()
     val appState by appViewModel.stateFlow.collectAsState()
     val context = LocalContext.current
 
@@ -72,9 +68,6 @@ fun AppEntry(intent: Intent?) {
         appViewModel.setCurrentTag(tag)
         navController.navigate(Route.CUSTOM_TAG)
     }
-
-    val startDestination =
-        remember { if (Preferences.pin.isNotEmpty()) Route.LOCK else Route.SITES }
 
     // handle intent
     val updatedIntent by rememberUpdatedState(intent)
@@ -116,7 +109,7 @@ fun AppEntry(intent: Intent?) {
         }
     }
     CompositionLocalProvider(LocalHostsMap provides hostsMap) {
-        NavHost(navController, startDestination = startDestination) {
+        NavHost(navController, startDestination = Route.SITES) {
             animatedComposable(Route.SITES) {
                 SitesPage(
                     isDevMode = appState.isDevMode,
@@ -146,13 +139,7 @@ fun AppEntry(intent: Intent?) {
                     navToListCrashLog = {
                         navController.navigate(Route.LIST_SCRIPT + "/crash_log")
                     },
-                    onLockEnabled = {
-                        navController.navigate(Route.LOCK) {
-                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                            launchSingleTop = true
-                            restoreState = false
-                        }
-                    }, goBack = { navController.popBackStack() })
+                    goBack = { navController.popBackStack() })
             }
             animatedComposable(Route.POSTS) {
                 PostsPage(
@@ -230,16 +217,6 @@ fun AppEntry(intent: Intent?) {
                     type = type,
                     scriptFile = scriptFile,
                     goBack = { navController.popBackStack() })
-            }
-            animatedComposable(Route.LOCK) {
-                LockPage(onUnlocked = {
-                    navController.navigate(Route.SITES)
-                    {
-                        popUpTo(Route.LOCK) {
-                            inclusive = true
-                        }
-                    }
-                })
             }
             animatedComposable(Route.HISTORY) {
                 HistoryPage(

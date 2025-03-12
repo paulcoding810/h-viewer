@@ -11,6 +11,7 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
+import com.paulcoding.hviewer.preference.Preferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +34,9 @@ class AppViewModel : ViewModel() {
 
     private var _tabs = MutableStateFlow(listOf<PostItem>())
     val tabs = _tabs.asStateFlow()
+
+    private var _isLocked = MutableStateFlow(Preferences.pin.isNotEmpty())
+    val isLocked = _isLocked.asStateFlow()
 
     val favoritePosts = DatabaseProvider.getInstance().postItemDao().getFavoritePosts()
     val favoriteSet = favoritePosts.map { it.map { post -> post.url }.toSet() }
@@ -130,5 +134,13 @@ class AppViewModel : ViewModel() {
                 ?: throw Exception("Host map is null: ${Github.stateFlow.value.siteConfigs}")
         return hostMap[_stateFlow.value.post.getHost()]
             ?: throw (Exception("No site config found for ${stateFlow.value.post.url}"))
+    }
+
+    fun unlock() {
+        _isLocked.update { false }
+    }
+
+    fun lock() {
+        _isLocked.update { true }
     }
 }

@@ -57,8 +57,7 @@ fun SettingsPage(
     appViewModel: AppViewModel,
     goBack: () -> Boolean,
     navToListScript: () -> Unit,
-    navToListCrashLog: () -> Unit,
-    onLockEnabled: () -> Unit
+    navToListCrashLog: () -> Unit
 ) {
     val githubState by Github.stateFlow.collectAsState()
     val appState by appViewModel.stateFlow.collectAsState()
@@ -81,7 +80,7 @@ fun SettingsPage(
     fun onAppLockEnabled(pin: String) {
         Preferences.pin = pin
         appLockEnabled = true
-        onLockEnabled()
+        appViewModel.lock()
     }
 
     fun onAppLockDisabled() {

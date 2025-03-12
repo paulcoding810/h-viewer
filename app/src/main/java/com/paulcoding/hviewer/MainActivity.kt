@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.helper.setupTextmate
@@ -27,6 +28,8 @@ import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.ToastExit
 import com.paulcoding.hviewer.ui.page.AppEntry
+import com.paulcoding.hviewer.ui.page.AppViewModel
+import com.paulcoding.hviewer.ui.page.lock.LockPage
 import com.paulcoding.hviewer.ui.theme.HViewerTheme
 
 class MainActivity : ComponentActivity() {
@@ -55,6 +58,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Content(intent: Intent?) {
     val githubState by Github.stateFlow.collectAsState()
+    val appViewModel: AppViewModel = viewModel()
+    val isLocked by appViewModel.isLocked.collectAsState()
 
     ToastExit()
 
@@ -72,7 +77,13 @@ fun Content(intent: Intent?) {
     HViewerTheme {
         if (githubState.isLoading)
             UpdateDialog()
-        AppEntry(intent)
+        if (isLocked) {
+            LockPage(
+                onUnlocked = appViewModel::unlock
+            )
+        } else {
+            AppEntry(appViewModel = appViewModel, intent = intent)
+        }
     }
 }
 
