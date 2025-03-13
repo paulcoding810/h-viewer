@@ -26,12 +26,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.PostItem
-import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.model.Tag
-import com.paulcoding.hviewer.network.Github
+import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
 import com.paulcoding.hviewer.ui.page.downloads.DownloadsPage
@@ -50,11 +50,8 @@ import com.paulcoding.hviewer.ui.page.web.WebPage
 @Composable
 fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
     val navController = rememberNavController()
-
-    val githubState by Github.stateFlow.collectAsState()
-    val siteConfigs by remember { derivedStateOf { githubState.siteConfigs ?: SiteConfigs() } }
-    val hostsMap by remember { derivedStateOf { siteConfigs.toHostsMap() } }
     val appState by appViewModel.stateFlow.collectAsState()
+    val hostsMap by remember { derivedStateOf { appState.siteConfigs?.toHostsMap() ?: mapOf() } }
     val context = LocalContext.current
 
     fun navToImages(post: PostItem) {
@@ -113,7 +110,16 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
             animatedComposable(Route.SITES) {
                 SitesPage(
                     isDevMode = appState.isDevMode,
-                    refresh = { Github.refreshLocalConfigs() },
+                    refresh = {
+                        if (BuildConfig.DEBUG)
+                            appViewModel.refreshLocalConfigs()
+                        else
+                            appViewModel.checkVersionOrUpdate(
+                                Preferences.getRemote(),
+                                onUpdate = { state ->
+                                    makeToast(state.getToastMessage())
+                                })
+                    },
                     navToTopics = { siteConfig ->
                         appViewModel.setCurrentPost(PostItem(siteConfig.baseUrl))
                         navController.navigate(Route.POSTS)
