@@ -26,10 +26,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
+import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.favorite.FavoritePage
 import com.paulcoding.hviewer.ui.page.downloads.DownloadsPage
@@ -108,7 +110,16 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
             animatedComposable(Route.SITES) {
                 SitesPage(
                     isDevMode = appState.isDevMode,
-                    refresh = { appViewModel.refreshLocalConfigs() },
+                    refresh = {
+                        if (BuildConfig.DEBUG)
+                            appViewModel.refreshLocalConfigs()
+                        else
+                            appViewModel.checkVersionOrUpdate(
+                                Preferences.getRemote(),
+                                onUpdate = { state ->
+                                    makeToast(state.getToastMessage())
+                                })
+                    },
                     navToTopics = { siteConfig ->
                         appViewModel.setCurrentPost(PostItem(siteConfig.baseUrl))
                         navController.navigate(Route.POSTS)

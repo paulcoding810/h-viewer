@@ -2,6 +2,7 @@ package com.paulcoding.hviewer.network
 
 import com.google.gson.Gson
 import com.paulcoding.hviewer.MainApp.Companion.appContext
+import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.alsoLog
 import com.paulcoding.hviewer.helper.extractTarGzFromResponseBody
 import com.paulcoding.hviewer.helper.log
@@ -112,4 +113,10 @@ sealed class SiteConfigsState {
     class NewConfigsInstall(val repoUrl: String) : SiteConfigsState()
     class UpToDate(val currentVersion: Int) : SiteConfigsState()
     class Updated(val newVersion: Int) : SiteConfigsState()
+
+    fun getToastMessage() = when (this) {
+        is NewConfigsInstall -> R.string.scripts_installed
+        is UpToDate -> R.string.up_to_Date
+        is Updated -> R.string.scripts_updated
+    }
 }

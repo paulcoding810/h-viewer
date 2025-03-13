@@ -32,7 +32,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +43,6 @@ import androidx.compose.ui.unit.sp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.helper.makeToast
-import com.paulcoding.hviewer.network.SiteConfigsState
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.H7Tap
 import com.paulcoding.hviewer.ui.component.HBackIcon
@@ -59,7 +57,6 @@ fun SettingsPage(
     navToListCrashLog: () -> Unit
 ) {
     val appState by appViewModel.stateFlow.collectAsState()
-//    val prevSiteConfigs = remember { githubState.siteConfigs }
     var modalVisible by remember { mutableStateOf(false) }
     var secureScreen by remember { mutableStateOf(Preferences.secureScreen) }
     val context = LocalContext.current
@@ -67,13 +64,6 @@ fun SettingsPage(
     var lockModalVisible by remember { mutableStateOf(false) }
     var appLockEnabled by remember { mutableStateOf(Preferences.pin.isNotEmpty()) }
     val scrollState = rememberScrollState()
-    val scope = rememberCoroutineScope()
-
-//    LaunchedEffect(githubState.siteConfigs) {
-//        if (prevSiteConfigs != githubState.siteConfigs) {
-//            goBack()
-//        }
-//    }
 
     fun onAppLockEnabled(pin: String) {
         Preferences.pin = pin
@@ -167,12 +157,7 @@ fun SettingsPage(
         modalVisible = it
     }) {
         appViewModel.checkVersionOrUpdate(it, onUpdate = { state ->
-            val message = when (state) {
-                is SiteConfigsState.NewConfigsInstall -> R.string.scripts_installed
-                is SiteConfigsState.UpToDate -> R.string.up_to_Date
-                is SiteConfigsState.Updated -> R.string.scripts_updated
-            }
-            makeToast(message)
+            makeToast(state.getToastMessage())
             goBack()
         })
     }
