@@ -39,4 +39,9 @@
     <string name="confirm">Confirm</string>
     <string name="confirm_delete">Confirm Delete</string>
     <string name="are_you_sure_you_want_to_delete_folder">Are you sure you want to delete %1$s?\nThis process cannot be undone.</string>
+    <string name="scripts_updated">Scripts Updated</string>
+    <string name="version_">Version %1$s</string>
+    <string name="scripts_installed">Scripts Installed</string>
+    <string name="from_repo_">From repo %1$s</string>
+    <string name="up_to_Date">Up to date</string>
 </resources>
