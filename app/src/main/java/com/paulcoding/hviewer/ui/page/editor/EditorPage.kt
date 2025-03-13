@@ -21,7 +21,6 @@ import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.helper.readFile
 import com.paulcoding.hviewer.helper.scriptsDir
 import com.paulcoding.hviewer.helper.writeFile
-import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.page.AppViewModel
@@ -60,7 +59,7 @@ fun EditorPage(
             }, actions = {
                 HIcon(imageVector = Icons.Outlined.Save) {
                     context.writeFile(state.content.toString(), scriptFile)
-                    Github.refreshLocalConfigs()
+                    appViewModel.refreshLocalConfigs()
                     localSoftwareKeyboardController?.hide()
                     goBack()
                     makeToast(R.string.saved)

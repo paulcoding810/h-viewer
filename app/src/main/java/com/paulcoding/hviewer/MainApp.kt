@@ -1,9 +1,12 @@
 package com.paulcoding.hviewer
 
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import com.paulcoding.hviewer.helper.CrashHandler
 import com.paulcoding.hviewer.helper.setupPaths
+import com.paulcoding.hviewer.worker.scheduleScriptsUpdate
 import com.paulcoding.js.JS
 import com.tencent.mmkv.MMKV
 
@@ -16,6 +19,22 @@ class MainApp : Application() {
         JS.initialize(this)
 
         setupPaths()
+        setupNotificationChannels()
+        setupWorkers()
+    }
+
+    private fun setupWorkers() {
+        scheduleScriptsUpdate(this)
+    }
+
+    private fun setupNotificationChannels() {
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        val checkForUpdateChannel = NotificationChannel(
+            CHECK_FOR_UPDATE_CHANNEL,
+            "Check for update",
+            NotificationManager.IMPORTANCE_LOW
+        )
+        notificationManager.createNotificationChannel(checkForUpdateChannel)
     }
 
     companion object {

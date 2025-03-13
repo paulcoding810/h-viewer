@@ -19,11 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.helper.setupTextmate
-import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.ToastExit
@@ -57,26 +57,20 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Content(intent: Intent?) {
-    val githubState by Github.stateFlow.collectAsState()
     val appViewModel: AppViewModel = viewModel()
+    val appState by appViewModel.stateFlow.collectAsStateWithLifecycle()
     val isLocked by appViewModel.isLocked.collectAsState()
 
     ToastExit()
 
-    LaunchedEffect(Unit) {
-        if (!BuildConfig.DEBUG)
-            Github.checkVersionOrUpdate()
-    }
-
-    LaunchedEffect(githubState.error) {
-        if (githubState.error != null) {
-            makeToast(githubState.error?.message ?: "")
+    LaunchedEffect(appState.error) {
+        if (appState.error != null) {
+            makeToast(appState.error?.message ?: "")
         }
     }
 
     HViewerTheme {
-        if (githubState.isLoading)
-            UpdateDialog()
+        if (appState.checkingForUpdateScripts) UpdateDialog()
         if (isLocked) {
             LockPage(
                 onUnlocked = appViewModel::unlock

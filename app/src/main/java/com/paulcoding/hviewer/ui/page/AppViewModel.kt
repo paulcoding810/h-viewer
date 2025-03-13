@@ -6,11 +6,14 @@ import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.database.DatabaseProvider
 import com.paulcoding.hviewer.helper.crashLogDir
+import com.paulcoding.hviewer.helper.readConfigFile
 import com.paulcoding.hviewer.helper.scriptsDir
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
+import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
+import com.paulcoding.hviewer.network.SiteConfigsState
 import com.paulcoding.hviewer.preference.Preferences
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -58,7 +61,15 @@ class AppViewModel : ViewModel() {
         val url: String = "",
         val tag: Tag = Tag(),
         val isDevMode: Boolean = BuildConfig.DEBUG,
+        val siteConfigs: SiteConfigs? = appContext.readConfigFile<SiteConfigs>().getOrNull(),
+        val error: Throwable? = null,
+        val checkingForUpdateScripts: Boolean = false,
     )
+
+    private fun setError(throwable: Throwable) {
+        throwable.printStackTrace()
+        _stateFlow.update { it.copy(error = throwable) }
+    }
 
     fun setWebViewUrl(url: String) {
         _stateFlow.update { it.copy(url = url) }
@@ -129,9 +140,8 @@ class AppViewModel : ViewModel() {
     }
 
     fun getCurrentSiteConfig(): SiteConfig {
-        val hostMap =
-            Github.stateFlow.value.siteConfigs?.toHostsMap()
-                ?: throw Exception("Host map is null: ${Github.stateFlow.value.siteConfigs}")
+        val hostMap = _stateFlow.value.siteConfigs?.toHostsMap()
+            ?: throw Exception("Host map is null: ${_stateFlow.value.siteConfigs}")
         return hostMap[_stateFlow.value.post.getHost()]
             ?: throw (Exception("No site config found for ${stateFlow.value.post.url}"))
     }
@@ -142,5 +152,31 @@ class AppViewModel : ViewModel() {
 
     fun lock() {
         _isLocked.update { true }
+    }
+
+    fun refreshLocalConfigs() {
+        appContext.readConfigFile<SiteConfigs>()
+            .onSuccess { configs ->
+                _stateFlow.update { it.copy(siteConfigs = configs) }
+            }
+            .onFailure { setError(it) }
+    }
+
+    fun checkVersionOrUpdate(remoteUrl: String, onUpdate: (SiteConfigsState) -> Unit = {}) {
+        viewModelScope.launch {
+            _stateFlow.update { it.copy(checkingForUpdateScripts = true) }
+            try {
+                val result = Github.checkVersionOrUpdate(remoteUrl)
+                if (result is SiteConfigsState.NewConfigsInstall || result is SiteConfigsState.Updated) {
+                    refreshLocalConfigs()
+                }
+                onUpdate(result)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                setError(e)
+            } finally {
+                _stateFlow.update { it.copy(checkingForUpdateScripts = false) }
+            }
+        }
     }
 }

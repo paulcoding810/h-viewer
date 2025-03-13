@@ -5,6 +5,7 @@ import android.os.Environment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 
 const val SCRIPTS_DIR = "scripts"
@@ -62,6 +63,8 @@ inline fun <reified T> Context.readJsonFile(fileName: String): Result<T> {
 
 inline fun <reified T> Context.readConfigFile(): Result<T> {
     return runCatching {
+        if (!configFile.exists())
+            throw (FileNotFoundException(configFile.absolutePath))
         val content = readFile(CONFIG_FILE)
         val type = object : TypeToken<T>() {}.type
         Gson().fromJson(content, type) as T
