@@ -25,7 +25,11 @@ import java.io.File
 
 class AppViewModel : ViewModel() {
     val listScriptFiles: List<File>
-        get() = appContext.scriptsDir.listFiles()?.toList() ?: listOf()
+        get() = appContext.scriptsDir.listFiles()
+            ?.toList()
+            ?.filter { it.extension == "json" || it.extension == "js" }
+            ?.sortedBy { it.name }
+            ?: listOf()
 
     val listCrashLogFiles: List<File>
         get() = appContext.crashLogDir.listFiles()?.filter { it.isFile }
