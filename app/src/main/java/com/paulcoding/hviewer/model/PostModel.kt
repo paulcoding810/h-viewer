@@ -1,7 +1,9 @@
 package com.paulcoding.hviewer.model
 
+import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import kotlinx.parcelize.Parcelize
 
 data class PostData(
     val images: List<String>,
@@ -36,10 +38,11 @@ data class PostItem(
     }
 }
 
+@Parcelize
 data class Tag(
     val name: String = "",
     val url: String = "",
-)
+) : Parcelable
 
 data class Posts(
     val posts: List<PostItem> = listOf(),

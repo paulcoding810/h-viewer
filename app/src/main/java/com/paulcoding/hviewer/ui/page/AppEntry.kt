@@ -61,7 +61,7 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
 
     fun navToCustomTag(post: PostItem, tag: Tag) {
         appViewModel.setCurrentPost(post)
-        appViewModel.setCurrentTag(tag)
+        navController.currentBackStackEntry?.savedStateHandle?.set("tag", tag)
         navController.navigate(Route.CUSTOM_TAG)
     }
 
@@ -159,14 +159,17 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
                 )
             }
             animatedComposable(Route.CUSTOM_TAG) {
-                CustomTagPage(
-                    appViewModel,
-                    navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
-                    navToTabs = { navController.navigate(Route.TABS) },
-                    goBack = { navController.popBackStack() }
-                ) {
-                    navToImages(it)
-                }
+                val tag = navController.previousBackStackEntry?.savedStateHandle?.get<Tag>("tag")
+                if (tag != null)
+                    CustomTagPage(
+                        appViewModel,
+                        tag = tag,
+                        navToCustomTag = { postItem, newTag -> navToCustomTag(postItem, newTag) },
+                        navToTabs = { navController.navigate(Route.TABS) },
+                        goBack = { navController.popBackStack() }
+                    ) {
+                        navToImages(it)
+                    }
             }
             animatedComposable(Route.POST) {
                 PostPage(

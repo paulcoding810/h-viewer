@@ -11,7 +11,6 @@ import com.paulcoding.hviewer.helper.scriptsDir
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
-import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.network.SiteConfigsState
 import com.paulcoding.hviewer.preference.Preferences
@@ -53,16 +52,9 @@ class AppViewModel : ViewModel() {
         _stateFlow.update { it.copy(post = post) }
     }
 
-    fun setCurrentTag(tag: Tag) {
-        _stateFlow.update { it.copy(tag = tag) }
-    }
-
-    fun getCurrentTag() = _stateFlow.value.tag
-
     data class UiState(
         val post: PostItem = PostItem(),
         val url: String = "",
-        val tag: Tag = Tag(),
         val isDevMode: Boolean = BuildConfig.DEBUG,
         val siteConfigs: SiteConfigs? = appContext.readConfigFile<SiteConfigs>().getOrNull(),
         val error: Throwable? = null,

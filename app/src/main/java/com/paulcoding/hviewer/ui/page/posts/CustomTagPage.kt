@@ -25,12 +25,12 @@ import com.paulcoding.hviewer.ui.page.AppViewModel
 @Composable
 fun CustomTagPage(
     appViewModel: AppViewModel,
+    tag: Tag,
     goBack: () -> Unit,
     navToCustomTag: (PostItem, Tag) -> Unit,
     navToTabs: () -> Unit,
     navToImages: (PostItem) -> Unit
 ) {
-    val tag = appViewModel.getCurrentTag()
     var pageProgress by remember { mutableStateOf(1 to 1) }
     var tabsIconPosition by remember { mutableStateOf(Offset.Zero) }
     val tabs by appViewModel.tabs.collectAsState(initial = listOf())
@@ -62,7 +62,7 @@ fun CustomTagPage(
                 },
                 navToCustomTag = { post, newTag ->
                     if (newTag.name != tag.name)
-                        navToCustomTag(post, tag)
+                        navToCustomTag(post, newTag)
                 }) { post ->
                 navToImages(post)
             }
