@@ -11,9 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NamedNavArgument
@@ -51,7 +49,8 @@ import com.paulcoding.hviewer.ui.page.web.WebPage
 fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
     val navController = rememberNavController()
     val appState by appViewModel.stateFlow.collectAsState()
-    val hostsMap by remember { derivedStateOf { appState.siteConfigs?.toHostsMap() ?: mapOf() } }
+    val hostsMap by appViewModel.hostsMap.collectAsState()
+
     val context = LocalContext.current
 
     fun navToImages(post: PostItem) {

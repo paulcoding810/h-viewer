@@ -35,6 +35,9 @@ class AppViewModel : ViewModel() {
     private var _stateFlow = MutableStateFlow(UiState())
     val stateFlow = _stateFlow.asStateFlow()
 
+    val hostsMap = _stateFlow.map { it.siteConfigs?.toHostsMap() ?: mapOf() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, mapOf())
+
     private var _tabs = MutableStateFlow(listOf<PostItem>())
     val tabs = _tabs.asStateFlow()
 
@@ -140,9 +143,7 @@ class AppViewModel : ViewModel() {
     }
 
     fun getCurrentSiteConfig(): SiteConfig {
-        val hostMap = _stateFlow.value.siteConfigs?.toHostsMap()
-            ?: throw Exception("Host map is null: ${_stateFlow.value.siteConfigs}")
-        return hostMap[_stateFlow.value.post.getHost()]
+        return hostsMap.value[_stateFlow.value.post.getHost()]
             ?: throw (Exception("No site config found for ${stateFlow.value.post.url}"))
     }
 
