@@ -23,8 +23,7 @@ object Github {
         }
         return withContext(Dispatchers.IO) {
             if (remoteUrl != Preferences.getRemote()) {
-                Preferences.setRemote(remoteUrl)
-                downloadAndGetConfig()
+                downloadAndGetConfig(remoteUrl)
                 return@withContext SiteConfigsState.NewConfigsInstall(remoteUrl)
             }
 
@@ -71,18 +70,23 @@ object Github {
         }
     }
 
-    private suspend fun downloadAndGetConfig() {
-        val repoUrl = Preferences.getRemote()
+    private suspend fun downloadAndGetConfig(remoteUrl: String = Preferences.getRemote()) {
         val branch = Preferences.branch
 
-        val (owner, repo) = parseRepo(repoUrl)
+        val (owner, repo) = parseRepo(remoteUrl)
 
         val tarUrl =
             "https://api.github.com/repos/$owner/$repo/tarball/$branch"
 
         ktorClient.use { client ->
-            val inputStream = client.get(tarUrl).readRawBytes().inputStream()
-            extractTarGzFromResponseBody(inputStream, appContext.filesDir)
+            val response = client.get(tarUrl)
+            if (response.status == HttpStatusCode.OK) {
+                Preferences.setRemote(remoteUrl)
+                val inputStream = client.get(tarUrl).readRawBytes().inputStream()
+                extractTarGzFromResponseBody(inputStream, appContext.filesDir)
+            } else {
+                throw Exception("Invalid repo")
+            }
         }
     }
 
