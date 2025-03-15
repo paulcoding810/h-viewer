@@ -50,6 +50,7 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
     val navController = rememberNavController()
     val appState by appViewModel.stateFlow.collectAsState()
     val hostsMap by appViewModel.hostsMap.collectAsState()
+    val tabs by appViewModel.tabs.collectAsState(initial = listOf())
 
     val context = LocalContext.current
 
@@ -200,6 +201,8 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
                     navToImages = { post: PostItem ->
                         navToImages(post)
                     },
+                    tabs = tabs,
+                    navToTabs = { navController.navigate(Route.TABS) },
                     navToCustomTag = { post, tag ->
                         navToCustomTag(post, tag)
                     },
