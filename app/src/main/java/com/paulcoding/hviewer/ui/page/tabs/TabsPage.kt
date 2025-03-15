@@ -15,7 +15,6 @@ import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -26,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.paulcoding.hviewer.database.DatabaseProvider
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.LocalHostsMap
@@ -126,13 +124,7 @@ internal fun BottomRowActions(
     pagerState: PagerState,
     toggleBottomSheet: () -> Unit,
 ) {
-    var favorite by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        scope.launch {
-            favorite = DatabaseProvider.getInstance().postItemDao().isFavorite(postItem.url)
-        }
-    }
+    val favorite by appViewModel.postFavorite(postItem.url).collectAsState(false)
 
     HIcon(
         Icons.Outlined.ChevronLeft,
@@ -178,7 +170,6 @@ internal fun BottomRowActions(
                 appViewModel.addFavorite(postItem = postItem)
             else
                 appViewModel.deleteFavorite(postItem)
-            favorite = !favorite
         }
     }
 }

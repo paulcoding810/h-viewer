@@ -178,6 +178,7 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
                         appViewModel.setWebViewUrl(it)
                         navController.navigate(Route.WEBVIEW)
                     },
+                    navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
                     goBack = {
                         navController.popBackStack()
                     })

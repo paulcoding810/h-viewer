@@ -52,6 +52,9 @@ class AppViewModel : ViewModel() {
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
     val historyPosts = DatabaseProvider.getInstance().postItemDao().getViewedPosts()
 
+    val postFavorite =
+        { url: String -> DatabaseProvider.getInstance().postItemDao().isFavorite(url) }
+
     fun setCurrentPost(post: PostItem) {
         _stateFlow.update { it.copy(post = post) }
     }

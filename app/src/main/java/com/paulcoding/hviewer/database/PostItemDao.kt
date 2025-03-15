@@ -43,7 +43,7 @@ interface PostItemDao {
     )
 
     @Query("SELECT favorite FROM post_items WHERE url = :url")
-    suspend fun isFavorite(url: String): Boolean
+    fun isFavorite(url: String): Flow<Boolean>
 
     @Query("UPDATE post_items SET viewed = 0, viewedAt = 0 WHERE viewed = 1")
     suspend fun clearHistory()
