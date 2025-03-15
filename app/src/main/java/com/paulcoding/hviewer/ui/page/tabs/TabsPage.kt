@@ -7,11 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ChevronLeft
-import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.LocalHostsMap
-import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.page.AppViewModel
@@ -47,7 +44,7 @@ fun TabsPage(
     val tabs by appViewModel.tabs.collectAsState(initial = listOf())
     val reversedTabs by remember { derivedStateOf { tabs.reversed() } }
     val pagerState = rememberPagerState { reversedTabs.size }
-    val currentPost by remember { derivedStateOf { reversedTabs[pagerState.currentPage] } }
+
     val scope = rememberCoroutineScope()
     var infoSheetVisible by remember { mutableStateOf(false) }
 
@@ -64,42 +61,45 @@ fun TabsPage(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (reversedTabs.isEmpty()) {
-            HEmpty()
-        } else {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-                beyondViewportPageCount = 2,
-                key = { reversedTabs[it].url }
-            ) { pageIndex ->
-                val tab = reversedTabs[pageIndex]
-                val siteConfig = tab.getSiteConfig(hostsMap)
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            beyondViewportPageCount = 2,
+            key = { reversedTabs[it].url }
+        ) { pageIndex ->
+            val tab = reversedTabs[pageIndex]
+            val siteConfig = tab.getSiteConfig(hostsMap)
 
-                if (siteConfig != null) {
-                    ImageList(
-                        tab,
-                        siteConfig = siteConfig,
-                        goBack = goBack,
-                        bottomRowActions = {
-                            BottomRowActions(
-                                tab,
-                                appViewModel,
-                                pageIndex,
-                                scope,
-                                pagerState,
-                                toggleBottomSheet = {
-                                    infoSheetVisible = !infoSheetVisible
-                                })
-                        }
-                    )
-                } else
-                    Text(
-                        "Site config not found for ${tab.url}",
-                        modifier = Modifier.padding(16.dp),
-                        color = Color.Red
-                    )
-            }
+            if (siteConfig != null) {
+                ImageList(
+                    tab,
+                    siteConfig = siteConfig,
+                    goBack = goBack,
+                    bottomRowActions = {
+                        BottomRowActions(
+                            tab,
+                            appViewModel,
+                            pageIndex,
+                            scope,
+                            removeTab = {
+                                appViewModel.removeTab(tab)
+                                if (pagerState.pageCount == 1) {
+                                    goBack()
+                                }
+                            },
+                            toggleBottomSheet = {
+                                infoSheetVisible = !infoSheetVisible
+                            })
+                    }
+                )
+            } else
+                Text(
+                    "Site config not found for ${tab.url}",
+                    modifier = Modifier.padding(16.dp),
+                    color = Color.Red
+                )
+        }
+        reversedTabs.getOrNull(pagerState.currentPage)?.let { currentPost ->
             InfoBottomSheet(
                 visible = infoSheetVisible,
                 postItem = currentPost,
@@ -119,40 +119,12 @@ fun TabsPage(
 internal fun BottomRowActions(
     postItem: PostItem,
     appViewModel: AppViewModel,
-    pageIndex: Int,
+    totalPage: Int,
     scope: CoroutineScope,
-    pagerState: PagerState,
+    removeTab: () -> Unit,
     toggleBottomSheet: () -> Unit,
 ) {
     val favorite by appViewModel.postFavorite(postItem.url).collectAsState(false)
-
-    HIcon(
-        Icons.Outlined.ChevronLeft,
-        size = 32,
-        rounded = true,
-        enabled = pageIndex > 0
-    ) {
-        scope.launch {
-            pagerState.animateScrollToPage(
-                pageIndex.dec()
-            )
-        }
-    }
-    Spacer(modifier = Modifier.width(16.dp))
-    HIcon(
-        Icons.Outlined.ChevronRight,
-        size = 32,
-        rounded = true,
-        enabled = pageIndex < pagerState.pageCount - 1
-    ) {
-        scope.launch {
-            pagerState.animateScrollToPage(
-                pageIndex.inc()
-            )
-        }
-    }
-
-    Spacer(modifier = Modifier.width(16.dp))
 
     HIcon(
         Icons.Outlined.Info,
@@ -172,5 +144,14 @@ internal fun BottomRowActions(
                 appViewModel.deleteFavorite(postItem)
         }
     }
+
+    Spacer(modifier = Modifier.width(16.dp))
+
+    HIcon(
+        Icons.Outlined.Close,
+        size = 32,
+        rounded = true,
+        onClick = removeTab
+    )
 }
 

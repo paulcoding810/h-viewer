@@ -251,7 +251,6 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
                 TabsPage(
                     goBack = {
                         navController.popBackStack()
-                        appViewModel.clearTabs()
                     },
                     navToCustomTag = { postItem, tag -> navToCustomTag(postItem, tag) },
                     appViewModel = appViewModel,
