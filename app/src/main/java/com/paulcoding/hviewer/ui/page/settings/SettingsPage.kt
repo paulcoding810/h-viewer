@@ -153,10 +153,14 @@ fun SettingsPage(
         }
     }
 
-    if (modalVisible) InputRemoteModal(initialText = Preferences.getRemote(), setVisible = {
-        modalVisible = it
-    }) {
-        appViewModel.checkVersionOrUpdate(it, onUpdate = { state ->
+    if (modalVisible) InputRemoteModal(
+        initialText = Preferences.getRemote(),
+        initialBranch = Preferences.branch,
+        setVisible = {
+            modalVisible = it
+        }) { repo, branch ->
+        Preferences.branch = branch
+        appViewModel.checkVersionOrUpdate(repo, onUpdate = { state ->
             makeToast(state.getToastMessage())
             goBack()
         })

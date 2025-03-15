@@ -44,10 +44,12 @@ import com.paulcoding.hviewer.network.Github
 @Composable
 fun InputRemoteModal(
     initialText: String = "",
+    initialBranch: String = "main",
     setVisible: (Boolean) -> Unit,
-    onSubmit: (url: String) -> Unit
+    onSubmit: (String, String) -> Unit
 ) {
     var textFieldValue by remember { mutableStateOf(TextFieldValue(initialText)) }
+    var branch by remember { mutableStateOf(initialBranch) }
     val focusRequester = remember { FocusRequester() }
 
     fun submit() {
@@ -56,7 +58,7 @@ fun InputRemoteModal(
             return makeToast(R.string.invalid_repo)
         } else {
             setVisible(false)
-            onSubmit(textFieldValue.text)
+            onSubmit(textFieldValue.text, branch)
         }
     }
 
@@ -102,20 +104,28 @@ fun InputRemoteModal(
                     label = { Text(stringResource(R.string.remote_url)) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Send
+                        imeAction = ImeAction.Go
                     ),
                     keyboardActions = KeyboardActions(
-                        onSend = { submit() }
+                        onGo = { submit() }
                     ),
-                    placeholder = { Text("https://github.com/paulcoding810/h-viewer-scripts") }
+                    placeholder = { Text(stringResource(R.string.h_viewer_scripts_url)) }
                 )
+                OutlinedTextField(value = branch, onValueChange = { branch = it }, label = {
+                    Text(
+                        stringResource(R.string.branch)
+                    )
+                })
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = { dismiss() }) {
-                        Text("Cancel", color = MaterialTheme.colorScheme.error)
+                        Text(
+                            stringResource(R.string.cancel),
+                            color = MaterialTheme.colorScheme.error
+                        )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     TextButton(onClick = { submit() }) {

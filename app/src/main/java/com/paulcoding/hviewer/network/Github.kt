@@ -3,7 +3,6 @@ package com.paulcoding.hviewer.network
 import com.google.gson.Gson
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.R
-import com.paulcoding.hviewer.helper.alsoLog
 import com.paulcoding.hviewer.helper.extractTarGzFromResponseBody
 import com.paulcoding.hviewer.helper.log
 import com.paulcoding.hviewer.helper.readConfigFile
@@ -55,11 +54,12 @@ object Github {
 
     private suspend fun getRemoteVersion(): Int {
         val repoUrl = Preferences.getRemote()
+        val branch = Preferences.branch
 
         val (owner, repo) = parseRepo(repoUrl)
 
         val configUrl =
-            "https://raw.githubusercontent.com/$owner/$repo/refs/heads/main/config.json?v=1"
+            "https://raw.githubusercontent.com/$owner/$repo/refs/heads/$branch/config.json?v=1"
 
         ktorClient.use { client ->
             val response = client.get(configUrl)
@@ -73,11 +73,12 @@ object Github {
 
     private suspend fun downloadAndGetConfig() {
         val repoUrl = Preferences.getRemote()
+        val branch = Preferences.branch
 
         val (owner, repo) = parseRepo(repoUrl)
 
         val tarUrl =
-            "https://api.github.com/repos/$owner/$repo/tarball".alsoLog("tarUrl")
+            "https://api.github.com/repos/$owner/$repo/tarball/$branch"
 
         ktorClient.use { client ->
             val inputStream = client.get(tarUrl).readRawBytes().inputStream()

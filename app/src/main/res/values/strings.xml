@@ -43,4 +43,6 @@
     <string name="scripts_installed">Scripts Installed</string>
     <string name="from_repo_">From repo %1$s</string>
     <string name="up_to_Date">Up to date</string>
+    <string name="h_viewer_scripts_url">https://github.com/paulcoding810/h-viewer-scripts</string>
+    <string name="branch">Branch</string>
 </resources>
