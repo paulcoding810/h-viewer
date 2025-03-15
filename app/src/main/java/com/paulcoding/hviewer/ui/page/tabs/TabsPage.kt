@@ -7,11 +7,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ChevronLeft
-import androidx.compose.material.icons.outlined.ChevronRight
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Text
@@ -64,7 +61,6 @@ fun TabsPage(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
@@ -84,9 +80,7 @@ fun TabsPage(
                             tab,
                             appViewModel,
                             pageIndex,
-                            totalPage = reversedTabs.size,
                             scope,
-                            pagerState,
                             toggleBottomSheet = {
                                 infoSheetVisible = !infoSheetVisible
                             })
@@ -119,41 +113,11 @@ fun TabsPage(
 internal fun BottomRowActions(
     postItem: PostItem,
     appViewModel: AppViewModel,
-    pageIndex: Int,
     totalPage: Int,
     scope: CoroutineScope,
-    pagerState: PagerState,
     toggleBottomSheet: () -> Unit,
 ) {
     val favorite by appViewModel.postFavorite(postItem.url).collectAsState(false)
-
-    HIcon(
-        Icons.Outlined.ChevronLeft,
-        size = 32,
-        rounded = true,
-        enabled = pageIndex > 0
-    ) {
-        scope.launch {
-            pagerState.animateScrollToPage(
-                pageIndex.dec()
-            )
-        }
-    }
-    Spacer(modifier = Modifier.width(16.dp))
-    HIcon(
-        Icons.Outlined.ChevronRight,
-        size = 32,
-        rounded = true,
-        enabled = pageIndex < pagerState.pageCount - 1
-    ) {
-        scope.launch {
-            pagerState.animateScrollToPage(
-                pageIndex.inc()
-            )
-        }
-    }
-
-    Spacer(modifier = Modifier.width(16.dp))
 
     HIcon(
         Icons.Outlined.Info,
