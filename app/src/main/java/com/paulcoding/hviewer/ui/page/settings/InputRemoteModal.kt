@@ -124,7 +124,7 @@ fun InputRemoteModal(
                     TextButton(onClick = { dismiss() }) {
                         Text(
                             stringResource(R.string.cancel),
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))

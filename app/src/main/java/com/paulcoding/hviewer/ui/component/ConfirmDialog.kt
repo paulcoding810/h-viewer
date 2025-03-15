@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.paulcoding.hviewer.R
 
@@ -14,6 +15,8 @@ fun ConfirmDialog(
     showDialog: Boolean,
     title: String = "",
     text: String = "",
+    confirmColor: Color? = null,
+    dismissColor: Color? = null,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -26,13 +29,16 @@ fun ConfirmDialog(
                 TextButton(onClick = { onConfirm() }) {
                     Text(
                         stringResource(R.string.confirm),
-                        color = MaterialTheme.colorScheme.primary
+                        color = confirmColor ?: MaterialTheme.colorScheme.error
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { onDismiss() }) {
-                    Text(stringResource(R.string.cancel), color = MaterialTheme.colorScheme.error)
+                    Text(
+                        stringResource(R.string.cancel),
+                        color = dismissColor ?: MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
         )
