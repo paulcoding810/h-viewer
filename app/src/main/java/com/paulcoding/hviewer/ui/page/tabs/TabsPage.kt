@@ -81,6 +81,12 @@ fun TabsPage(
                             appViewModel,
                             pageIndex,
                             scope,
+                            removeTab = {
+                                appViewModel.removeTab(tab)
+                                if (pagerState.pageCount == 1) {
+                                    goBack()
+                                }
+                            },
                             toggleBottomSheet = {
                                 infoSheetVisible = !infoSheetVisible
                             })
@@ -115,6 +121,7 @@ internal fun BottomRowActions(
     appViewModel: AppViewModel,
     totalPage: Int,
     scope: CoroutineScope,
+    removeTab: () -> Unit,
     toggleBottomSheet: () -> Unit,
 ) {
     val favorite by appViewModel.postFavorite(postItem.url).collectAsState(false)
@@ -140,14 +147,11 @@ internal fun BottomRowActions(
 
     Spacer(modifier = Modifier.width(16.dp))
 
-    if (totalPage > 1) {
-        HIcon(
-            Icons.Outlined.Close,
-            size = 32,
-            rounded = true
-        ) {
-            appViewModel.removeTab(postItem)
-        }
-    }
+    HIcon(
+        Icons.Outlined.Close,
+        size = 32,
+        rounded = true,
+        onClick = removeTab
+    )
 }
 
