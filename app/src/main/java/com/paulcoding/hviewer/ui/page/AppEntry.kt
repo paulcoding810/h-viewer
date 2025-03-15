@@ -235,7 +235,8 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
                     navToCustomTag = { post, tag ->
                         navToCustomTag(post, tag)
                     },
-                    deleteHistory = appViewModel::deleteHistory
+                    clearHistory = appViewModel::clearHistory,
+                    deleteHistory = appViewModel::deleteHistory,
                 )
             }
             animatedComposable(Route.WEBVIEW) {

@@ -109,7 +109,13 @@ class AppViewModel : ViewModel() {
         viewModelScope.launch {
             DatabaseProvider.getInstance().postItemDao()
                 .setViewed(postItem.url, false)
+        }
+    }
 
+    fun clearHistory() {
+        viewModelScope.launch {
+            DatabaseProvider.getInstance().postItemDao()
+                .clearHistory()
         }
     }
 

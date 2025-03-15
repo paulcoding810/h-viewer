@@ -10,19 +10,25 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.DeleteForever
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
+import com.paulcoding.hviewer.ui.component.ConfirmDialog
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HIcon
@@ -35,9 +41,11 @@ fun HistoryPage(
     goBack: () -> Unit, appViewModel: AppViewModel,
     navToImages: (PostItem) -> Unit,
     navToCustomTag: (PostItem, Tag) -> Unit,
+    clearHistory: () -> Unit,
     deleteHistory: (post: PostItem) -> Unit
 ) {
     val historyPosts by appViewModel.historyPosts.collectAsState(initial = listOf())
+    var showsConfirmClearHistory by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -47,6 +55,15 @@ fun HistoryPage(
                 navigationIcon = {
                     HBackIcon { goBack() }
                 },
+                actions = {
+                    HIcon(
+                        Icons.Outlined.DeleteForever,
+                        "Delete",
+                        tint = MaterialTheme.colorScheme.error
+                    ) {
+                        showsConfirmClearHistory = true
+                    }
+                }
             )
         }
     ) { paddings ->
@@ -82,5 +99,14 @@ fun HistoryPage(
                     message = "Such empty"
                 )
         }
+
+        ConfirmDialog(showDialog = showsConfirmClearHistory,
+            onDismiss = { showsConfirmClearHistory = false },
+            title = stringResource(R.string.clear_history),
+            text = stringResource(R.string.clear_history_confirm),
+            onConfirm = {
+                clearHistory()
+                showsConfirmClearHistory = true
+            })
     }
 }

@@ -45,4 +45,6 @@
     <string name="up_to_Date">Up to date</string>
     <string name="h_viewer_scripts_url">https://github.com/paulcoding810/h-viewer-scripts</string>
     <string name="branch">Branch</string>
+    <string name="clear_history">Clear history</string>
+    <string name="clear_history_confirm">Are you sure you want to clear history?</string>
 </resources>
