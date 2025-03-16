@@ -16,7 +16,7 @@ fun scheduleScriptsUpdate(context: Context) {
     val updateScriptsWorkRequest =
         PeriodicWorkRequestBuilder<UpdateScriptsWorker>(1, TimeUnit.DAYS)
             .setConstraints(constraints)
-            .setInitialDelay(calculateDelayUntilMidnight(), TimeUnit.SECONDS)
+            .setInitialDelay(calculateDelayUntilMidnight(), TimeUnit.MILLISECONDS)
             .build()
     WorkManager.getInstance(context).enqueueUniquePeriodicWork(
         "updateScripts",
