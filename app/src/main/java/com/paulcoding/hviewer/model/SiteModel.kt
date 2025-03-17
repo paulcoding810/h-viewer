@@ -31,7 +31,7 @@ data class SiteConfig(
                 .size(size)
                 .clip(RoundedCornerShape(clip)),
             contentScale = ContentScale.Crop,
-            placeholder = painterResource(R.drawable.ic_launcher_foreground)
+            placeholder = painterResource(R.mipmap.ic_launcher_foreground)
         )
     }
 }

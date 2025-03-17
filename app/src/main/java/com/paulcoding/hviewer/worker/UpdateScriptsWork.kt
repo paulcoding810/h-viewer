@@ -36,7 +36,7 @@ class UpdateScriptsWorker(
             PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         val notificationBuilder = NotificationCompat.Builder(context, CHECK_FOR_UPDATE_CHANNEL)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
