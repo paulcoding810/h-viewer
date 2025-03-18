@@ -1,5 +1,8 @@
 package com.paulcoding.hviewer.ui.page
 
+import android.content.Context
+import android.content.Intent
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.BuildConfig
@@ -66,6 +69,7 @@ class AppViewModel : ViewModel() {
         val siteConfigs: SiteConfigs? = appContext.readConfigFile<SiteConfigs>().getOrNull(),
         val error: Throwable? = null,
         val checkingForUpdateScripts: Boolean = false,
+        val updatingApk: Boolean = false,
     )
 
     private fun setError(throwable: Throwable) {
@@ -183,6 +187,33 @@ class AppViewModel : ViewModel() {
             } finally {
                 _stateFlow.update { it.copy(checkingForUpdateScripts = false) }
             }
+        }
+    }
+
+    fun checkForUpdate(currentVersion: String, onUpdateAvailable: (String, String) -> Unit) {
+        viewModelScope.launch {
+            _stateFlow.update { it.copy(updatingApk = true) }
+            Github.checkForUpdate(currentVersion, onUpdateAvailable)
+            _stateFlow.update { it.copy(updatingApk = false) }
+        }
+    }
+
+    fun downloadAndInstallApk(context: Context, downloadUrl: String) {
+        viewModelScope.launch {
+            _stateFlow.update { it.copy(updatingApk = true) }
+            Github.downloadApk(context, downloadUrl) { file ->
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(uri, "application/vnd.android.package-archive")
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                }
+                context.startActivity(intent)
+            }
+            _stateFlow.update { it.copy(updatingApk = false) }
         }
     }
 }

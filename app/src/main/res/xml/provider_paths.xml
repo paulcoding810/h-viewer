@@ -3,4 +3,7 @@
     <external-path
         name="download_path"
         path="." />
+    <cache-path
+        name="cache"
+        path="." />
 </paths>
