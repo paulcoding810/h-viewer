@@ -13,6 +13,8 @@ import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.network.Github
 import com.paulcoding.hviewer.network.SiteConfigsState
+import java.time.LocalDateTime
+import kotlin.random.Random
 
 class UpdateScriptsWorker(
     val context: Context,
@@ -60,7 +62,12 @@ class UpdateScriptsWorker(
                 notificationManager.notify(1, notificationBuilder.build())
             }
 
-            else -> {}
+            else -> {
+                notificationBuilder
+                    .setContentTitle("Up to date")
+                    .setContentText(LocalDateTime.now().toString())
+                notificationManager.notify(Random.nextInt(2, 100), notificationBuilder.build())
+            }
         }
     }
 }

@@ -25,6 +25,22 @@ fun scheduleScriptsUpdate(context: Context) {
     )
 }
 
+fun scheduleApkUpdate(context: Context) {
+    val constraints = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
+    val updateScriptsWorkRequest =
+        PeriodicWorkRequestBuilder<UpdateApkWorker>(1, TimeUnit.DAYS)
+            .setConstraints(constraints)
+            .setInitialDelay(calculateDelayUntilMidnight(), TimeUnit.MILLISECONDS)
+            .build()
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        "updateApk",
+        ExistingPeriodicWorkPolicy.KEEP,
+        updateScriptsWorkRequest
+    )
+}
+
 fun calculateDelayUntilMidnight(): Long {
     val now = Calendar.getInstance()
     val midnight = Calendar.getInstance().apply {

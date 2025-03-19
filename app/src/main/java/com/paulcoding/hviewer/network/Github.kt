@@ -8,6 +8,7 @@ import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.extractTarGzFromResponseBody
 import com.paulcoding.hviewer.helper.log
 import com.paulcoding.hviewer.helper.readConfigFile
+import com.paulcoding.hviewer.model.HRelease
 import com.paulcoding.hviewer.model.Release
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.preference.Preferences
@@ -118,8 +119,8 @@ object Github {
 
     suspend fun checkForUpdate(
         currentVersion: String,
-        onUpdateAvailable: (String, String) -> Unit
-    ) {
+        onUpdateAvailable: ((String, String) -> Unit)? = null
+    ): HRelease? {
         val (owner, repo) = parseRepo(BuildConfig.REPO_URL)
         val url = "https://api.github.com/repos/${owner}/${repo}/releases/latest"
         ktorClient.use { client ->
@@ -127,8 +128,10 @@ object Github {
             val latestVersion = jsonObject.tag_name.substring(1)
             val downloadUrl = jsonObject.assets[0].browser_download_url
             if (latestVersion != currentVersion) {
-                onUpdateAvailable(latestVersion, downloadUrl)
+                onUpdateAvailable?.invoke(latestVersion, downloadUrl)
+                return HRelease(latestVersion, downloadUrl)
             }
+            return null
         }
     }
 

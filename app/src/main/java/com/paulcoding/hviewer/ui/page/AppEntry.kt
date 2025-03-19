@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDeepLink
@@ -24,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.paulcoding.hviewer.ACTION_INSTALL_APK
 import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
@@ -98,6 +100,10 @@ fun AppEntry(intent: Intent?, appViewModel: AppViewModel) {
                     } else {
                         handleIntentUrl(data.toString())
                     }
+                }
+
+                ACTION_INSTALL_APK -> {
+                    appViewModel.installApk(context, data.toString().toUri())
                 }
 
                 else -> {
