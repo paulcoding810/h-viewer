@@ -43,9 +43,15 @@
     <string name="version_">Version %1$s</string>
     <string name="scripts_installed">Scripts Installed</string>
     <string name="from_repo_">From repo %1$s</string>
-    <string name="up_to_Date">Up to date</string>
+    <string name="up_to_date">Up to date</string>
     <string name="h_viewer_scripts_url">https://github.com/paulcoding810/h-viewer-scripts</string>
     <string name="branch">Branch</string>
     <string name="clear_history">Clear history</string>
     <string name="clear_history_confirm">Are you sure you want to clear history?</string>
+    <string name="new_version_available">New version available</string>
+    <string name="downloading_apk">Downloading APK</string>
+    <string name="install_now">Install now</string>
+    <string name="error">Error</string>
+    <string name="install">Install</string>
+    <string name="update_available">Update Available</string>
 </resources>
