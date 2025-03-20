@@ -1,11 +1,15 @@
 package com.paulcoding.hviewer.network
 
+import android.content.Context
 import com.google.gson.Gson
+import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.extractTarGzFromResponseBody
 import com.paulcoding.hviewer.helper.log
 import com.paulcoding.hviewer.helper.readConfigFile
+import com.paulcoding.hviewer.model.HRelease
+import com.paulcoding.hviewer.model.Release
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.preference.Preferences
 import io.ktor.client.call.body
@@ -14,6 +18,7 @@ import io.ktor.client.statement.readRawBytes
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
 
 object Github {
     @Throws(Exception::class)
@@ -111,6 +116,39 @@ object Github {
             return null
         }
     }
+
+    suspend fun checkForUpdate(
+        currentVersion: String,
+        onUpdateAvailable: ((String, String) -> Unit)? = null
+    ): HRelease? {
+        val (owner, repo) = parseRepo(BuildConfig.REPO_URL)
+        val url = "https://api.github.com/repos/${owner}/${repo}/releases/latest"
+        ktorClient.use { client ->
+            val jsonObject: Release = client.get(url).body()
+            val latestVersion = jsonObject.tag_name.substring(1)
+            val downloadUrl = jsonObject.assets[0].browser_download_url
+            if (latestVersion != currentVersion) {
+                onUpdateAvailable?.invoke(latestVersion, downloadUrl)
+                return HRelease(latestVersion, downloadUrl)
+            }
+            return null
+        }
+    }
+
+    suspend fun downloadApk(
+        context: Context,
+        downloadUrl: String,
+        onDownloadComplete: (File) -> Unit
+    ) {
+        val file = File(context.cacheDir, "latest.apk")
+        ktorClient.use { client ->
+            val input = client.get(downloadUrl).readRawBytes().inputStream()
+            file.outputStream().use { output ->
+                input.copyTo(output)
+            }
+        }
+        onDownloadComplete(file)
+    }
 }
 
 
@@ -121,7 +159,7 @@ sealed class SiteConfigsState {
 
     fun getToastMessage() = when (this) {
         is NewConfigsInstall -> R.string.scripts_installed
-        is UpToDate -> R.string.up_to_Date
+        is UpToDate -> R.string.up_to_date
         is Updated -> R.string.scripts_updated
     }
 }

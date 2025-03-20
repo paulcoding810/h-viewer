@@ -1,9 +1,11 @@
 package com.paulcoding.hviewer.ui.page.settings
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -16,10 +18,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
@@ -35,17 +39,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.preference.Preferences
+import com.paulcoding.hviewer.ui.component.ConfirmDialog
 import com.paulcoding.hviewer.ui.component.H7Tap
 import com.paulcoding.hviewer.ui.component.HBackIcon
+import com.paulcoding.hviewer.ui.component.HIcon
+import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.page.AppViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,6 +72,8 @@ fun SettingsPage(
     val window = (context as ComponentActivity).window
     var lockModalVisible by remember { mutableStateOf(false) }
     var appLockEnabled by remember { mutableStateOf(Preferences.pin.isNotEmpty()) }
+    var newVersion by remember { mutableStateOf("") }
+    var downloadUrl by remember { mutableStateOf("") }
     val scrollState = rememberScrollState()
 
     fun onAppLockEnabled(pin: String) {
@@ -147,8 +158,23 @@ fun SettingsPage(
                 }
             }
 
-            H7Tap(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                appViewModel.setDevMode(it)
+            Row(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                H7Tap() {
+                    appViewModel.setDevMode(it)
+                }
+                HIcon(Icons.Outlined.Update, tint = MaterialTheme.colorScheme.primary) {
+                    appViewModel.checkForUpdate(BuildConfig.VERSION_NAME,
+                        onUpToDate = {
+                            makeToast(R.string.up_to_date)
+                        },
+                        onUpdateAvailable = { version, url ->
+                            newVersion = version
+                            downloadUrl = url
+                        })
+                }
             }
         }
     }
@@ -168,6 +194,34 @@ fun SettingsPage(
 
     if (lockModalVisible) LockModal(onDismiss = { lockModalVisible = false }) {
         onAppLockEnabled(it)
+    }
+
+    ConfirmDialog(
+        showDialog = newVersion.isNotEmpty(),
+        title = stringResource(R.string.update_available),
+        text = newVersion,
+        confirmColor = MaterialTheme.colorScheme.primary,
+        confirmText = stringResource(R.string.install_now),
+        dismissColor = MaterialTheme.colorScheme.onBackground,
+        onDismiss = {
+            newVersion = ""
+        },
+        onConfirm = {
+            appViewModel.downloadAndInstallApk(context, downloadUrl)
+            newVersion = ""
+        }
+    )
+
+    if (appState.updatingApk) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+        ) {
+            Box(modifier = Modifier.align(Alignment.Center)) {
+                HLoading()
+            }
+        }
     }
 }
 
