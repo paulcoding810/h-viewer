@@ -159,7 +159,7 @@ sealed class SiteConfigsState {
 
     fun getToastMessage() = when (this) {
         is NewConfigsInstall -> R.string.scripts_installed
-        is UpToDate -> R.string.up_to_Date
+        is UpToDate -> R.string.up_to_date
         is Updated -> R.string.scripts_updated
     }
 }

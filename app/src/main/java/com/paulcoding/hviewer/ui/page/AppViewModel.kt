@@ -2,6 +2,7 @@ package com.paulcoding.hviewer.ui.page
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -190,10 +191,18 @@ class AppViewModel : ViewModel() {
         }
     }
 
-    fun checkForUpdate(currentVersion: String, onUpdateAvailable: (String, String) -> Unit) {
+    fun checkForUpdate(
+        currentVersion: String,
+        onUpToDate: () -> Unit,
+        onUpdateAvailable: (String, String) -> Unit
+    ) {
         viewModelScope.launch {
             _stateFlow.update { it.copy(updatingApk = true) }
-            Github.checkForUpdate(currentVersion, onUpdateAvailable)
+            val release = Github.checkForUpdate(currentVersion)
+            if (release != null)
+                onUpdateAvailable(release.version, release.downloadUrl)
+            else
+                onUpToDate()
             _stateFlow.update { it.copy(updatingApk = false) }
         }
     }
@@ -207,13 +216,17 @@ class AppViewModel : ViewModel() {
                     "${context.packageName}.fileprovider",
                     file
                 )
-                val intent = Intent(Intent.ACTION_VIEW).apply {
-                    setDataAndType(uri, "application/vnd.android.package-archive")
-                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
-                }
-                context.startActivity(intent)
+                installApk(context, uri)
             }
             _stateFlow.update { it.copy(updatingApk = false) }
         }
+    }
+
+    fun installApk(context: Context, uri: Uri) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/vnd.android.package-archive")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        context.startActivity(intent)
     }
 }

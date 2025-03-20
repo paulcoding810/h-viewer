@@ -166,10 +166,14 @@ fun SettingsPage(
                     appViewModel.setDevMode(it)
                 }
                 HIcon(Icons.Outlined.Update, tint = MaterialTheme.colorScheme.primary) {
-                    appViewModel.checkForUpdate(BuildConfig.VERSION_NAME) { version, url ->
-                        newVersion = version
-                        downloadUrl = url
-                    }
+                    appViewModel.checkForUpdate(BuildConfig.VERSION_NAME,
+                        onUpToDate = {
+                            makeToast(R.string.up_to_date)
+                        },
+                        onUpdateAvailable = { version, url ->
+                            newVersion = version
+                            downloadUrl = url
+                        })
                 }
             }
         }
@@ -194,9 +198,10 @@ fun SettingsPage(
 
     ConfirmDialog(
         showDialog = newVersion.isNotEmpty(),
-        title = "Update Available",
+        title = stringResource(R.string.update_available),
         text = newVersion,
         confirmColor = MaterialTheme.colorScheme.primary,
+        confirmText = stringResource(R.string.install_now),
         dismissColor = MaterialTheme.colorScheme.onBackground,
         onDismiss = {
             newVersion = ""

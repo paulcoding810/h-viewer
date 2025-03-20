@@ -17,6 +17,8 @@ fun ConfirmDialog(
     text: String = "",
     confirmColor: Color? = null,
     dismissColor: Color? = null,
+    confirmText: String? = null,
+    dismissText: String? = null,
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
@@ -28,7 +30,7 @@ fun ConfirmDialog(
             confirmButton = {
                 TextButton(onClick = { onConfirm() }) {
                     Text(
-                        stringResource(R.string.confirm),
+                        confirmText ?: stringResource(R.string.confirm),
                         color = confirmColor ?: MaterialTheme.colorScheme.error
                     )
                 }
@@ -36,7 +38,7 @@ fun ConfirmDialog(
             dismissButton = {
                 TextButton(onClick = { onDismiss() }) {
                     Text(
-                        stringResource(R.string.cancel),
+                        dismissText ?: stringResource(R.string.cancel),
                         color = dismissColor ?: MaterialTheme.colorScheme.onBackground
                     )
                 }
