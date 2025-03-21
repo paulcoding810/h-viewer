@@ -8,6 +8,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
+import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.CHECK_FOR_UPDATE_CHANNEL
 import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.R
@@ -63,10 +64,12 @@ class UpdateScriptsWorker(
             }
 
             else -> {
-                notificationBuilder
-                    .setContentTitle("Up to date")
-                    .setContentText(LocalDateTime.now().toString())
-                notificationManager.notify(Random.nextInt(2, 100), notificationBuilder.build())
+                if (BuildConfig.DEBUG) {
+                    notificationBuilder
+                        .setContentTitle("Up to date")
+                        .setContentText(LocalDateTime.now().toString())
+                    notificationManager.notify(Random.nextInt(2, 100), notificationBuilder.build())
+                }
             }
         }
     }
