@@ -4,6 +4,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -11,10 +12,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,14 +27,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.MainApp.Companion.appContext
-import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.BasePaginationHelper
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
@@ -70,6 +72,7 @@ fun SearchPage(
     val focusRequester = remember { androidx.compose.ui.focus.FocusRequester() }
     val focusManager = LocalFocusManager.current
     var tabsIconPosition by remember { mutableStateOf(Offset.Zero) }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     fun submit() {
         viewModel.setQueryAndSearch(query)
@@ -81,48 +84,57 @@ fun SearchPage(
             focusRequester.requestFocus()
     }
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text(stringResource(R.string.search)) }, navigationIcon = {
-            HBackIcon { goBack() }
-        },
-            actions = {
-                if (uiState.postItems.isNotEmpty())
-                    HPageProgress(uiState.postsPage, uiState.postsTotalPage)
-                TabsIcon(
-                    size = tabs.size,
-                    onGloballyPositioned = { tabsIconPosition = it },
-                    onClick = navToTabs
-                )
-            })
-    }) { paddings ->
-        Column(modifier = Modifier.padding(paddings)) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                OutlinedTextField(
-                    query,
-                    onValueChange = { query = it },
-                    label = { Text("Search") },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Go
-                    ),
-                    keyboardActions = KeyboardActions(onGo = { submit() }),
-                    modifier = Modifier
-                        .focusRequester(focusRequester)
-                        .weight(1f),
-                    trailingIcon = {
-                        if (query.isNotEmpty())
-                            HIcon(Icons.Outlined.Clear) {
-                                query = ""
-                                focusRequester.requestFocus()
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                navigationIcon = {
+                    HBackIcon { goBack() }
+                },
+                actions = {
+                    if (uiState.postItems.isNotEmpty())
+                        HPageProgress(uiState.postsPage, uiState.postsTotalPage)
+                    TabsIcon(
+                        size = tabs.size,
+                        onGloballyPositioned = { tabsIconPosition = it },
+                        onClick = navToTabs
+                    )
+                },
+                title = {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        OutlinedTextField(
+                            query,
+                            textStyle = TextStyle(fontSize = 14.sp),
+                            onValueChange = { query = it },
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                imeAction = ImeAction.Go
+                            ),
+                            keyboardActions = KeyboardActions(onGo = { submit() }),
+                            modifier = Modifier
+                                .focusRequester(focusRequester)
+                                .weight(1f)
+                                .height(52.dp),
+                            trailingIcon = {
+                                if (query.isNotEmpty())
+                                    HIcon(Icons.Outlined.Clear) {
+                                        query = ""
+                                        focusRequester.requestFocus()
+                                    }
                             }
+                        )
+                        HIcon(Icons.Outlined.Search) { submit() }
                     }
-                )
-                HIcon(Icons.Outlined.Search) { submit() }
-            }
+                },
+                scrollBehavior = scrollBehavior
+            )
+        }) { paddings ->
+        Column(modifier = Modifier.padding(paddings)) {
+
             SearchPageContent(
                 appViewModel = appViewModel,
                 endPos = tabsIconPosition,
