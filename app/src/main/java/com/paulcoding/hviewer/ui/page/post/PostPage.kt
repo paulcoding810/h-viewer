@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
-import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.page.AppViewModel
@@ -33,7 +32,6 @@ fun PostPage(
     val post = remember { appState.post }
     val siteConfig = appViewModel.getCurrentSiteConfig()
     val favorite by appViewModel.postFavorite(post.url).collectAsState(false)
-    val hostsMap = LocalHostsMap.current
     var infoSheetVisible by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 

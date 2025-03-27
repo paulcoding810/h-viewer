@@ -48,7 +48,6 @@ import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.SystemBar
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -91,12 +90,12 @@ fun ImageList(
     }
 
     // auto hide system bar after 5 seconds
-    LaunchedEffect(uiState.isSystemBarHidden) {
-        if (!uiState.isSystemBarHidden) {
-            delay(5000)
-            viewModel.toggleSystemBarHidden()
-        }
-    }
+//    LaunchedEffect(uiState.isSystemBarHidden) {
+//        if (!uiState.isSystemBarHidden) {
+//            delay(5000)
+//            viewModel.toggleSystemBarHidden()
+//        }
+//    }
 
     val paginationHelper = remember {
         BasePaginationHelper(
