@@ -16,7 +16,6 @@ import com.paulcoding.hviewer.repository.HistoryRepository
 import com.paulcoding.hviewer.repository.SiteConfigsRepository
 import com.paulcoding.hviewer.repository.TabsRepository
 import com.paulcoding.hviewer.repository.UpdateAppRepository
-import com.paulcoding.hviewer.ui.page.AppViewModel
 import com.paulcoding.hviewer.ui.page.favorite.FavoriteViewModel
 import com.paulcoding.hviewer.ui.page.history.HistoryViewModel
 import com.paulcoding.hviewer.ui.page.lock.LockViewModel
@@ -41,7 +40,6 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val viewModelModule = module {
-    viewModelOf(::AppViewModel)
     viewModelOf(::SitesViewModel)
     viewModelOf(::SiteViewModel)
     viewModelOf(::PostViewModel)
