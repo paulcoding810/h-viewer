@@ -9,6 +9,7 @@ data class SiteConfig(
     val baseUrl: String = "",
     val scriptFile: String = "",
     val tags: Map<String, String> = mapOf(),
+    val ads: Set<String> = setOf()
 )
 
 data class SiteConfigs(

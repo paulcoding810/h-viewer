@@ -1,9 +1,7 @@
 package com.paulcoding.hviewer
 
-import androidx.core.net.toUri
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -13,8 +11,6 @@ import org.junit.Assert.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        val url = "https://chatgpt.com/?temporary-chat=true"
-        println("${url.toUri().host}")
         assertEquals(4, 2 + 2)
     }
 }

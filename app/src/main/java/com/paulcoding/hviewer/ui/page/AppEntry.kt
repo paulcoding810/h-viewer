@@ -16,7 +16,6 @@ import com.paulcoding.hviewer.ui.page.settings.settingsNavigation
 import com.paulcoding.hviewer.ui.page.sites.sitesNavigation
 import com.paulcoding.hviewer.ui.page.tabs.TabsViewModel
 import com.paulcoding.hviewer.ui.page.tabs.tabsNavigation
-import com.paulcoding.hviewer.ui.page.web.webNavigation
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -75,7 +74,6 @@ fun AppEntry(intent: Intent?) {
         settingsNavigation(navController)
         listScriptNavigation(navController)
         editorNavigation(navController)
-        webNavigation(navController)
         downloadsNavigation(navController)
     }
 }

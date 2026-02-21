@@ -59,6 +59,12 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".WebActivity"
+            android:exported="true"
+            android:theme="@style/Theme.HViewer">
+        </activity>
+
         <service
             android:name=".ui.page.sites.post.DownloadService"
             android:foregroundServiceType="dataSync" />
