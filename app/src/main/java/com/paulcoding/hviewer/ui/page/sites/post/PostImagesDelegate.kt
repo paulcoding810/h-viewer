@@ -6,6 +6,7 @@ import com.paulcoding.hviewer.helper.host
 import com.paulcoding.hviewer.model.PostData
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.repository.FavoriteRepository
+import com.paulcoding.hviewer.repository.HistoryRepository
 import com.paulcoding.js.JS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,33 +17,25 @@ import kotlinx.coroutines.launch
 class PostImagesDelegate(
     private val viewModelScope: CoroutineScope,
     private val postItem: PostItem,
+    private val historyRepository: HistoryRepository,
     private val favoriteRepository: FavoriteRepository,
 ) {
     private var _stateFlow = MutableStateFlow(UiState(postItem = postItem))
     val stateFlow = _stateFlow.asStateFlow()
 
-
     private val postUrl = postItem.url
+
     private val siteConfig = GlobalData.siteConfigMap[postUrl.host]!!
     private var js = JS(
         fileRelativePath = SCRIPTS_DIR + "/${siteConfig.scriptFile}",
         properties = mapOf("baseUrl" to siteConfig.baseUrl)
     )
 
-    data class UiState(
-        val postItem: PostItem,
-        val images: Set<String> = setOf(),
-        val postPage: Int = 1,
-        val postTotalPage: Int = 1,
-        val nextPage: String? = null,
-        val isFavorite: Boolean = false,
-        val isLoading: Boolean = false,
-        val error: Throwable? = null,
-        val currentPostUrl: String = "",
-        val isSystemBarHidden: Boolean = false,
-        val scrollIndex: Int = 0,
-        val scrollOffset: Int = 0,
-    )
+    init {
+        viewModelScope.launch {
+            historyRepository.insert(postItem)
+        }
+    }
 
     fun updateScrollIndex(scrollIndex: Int, scrollOffset: Int) {
         _stateFlow.update { it.copy(scrollIndex = scrollIndex, scrollOffset = scrollOffset) }
@@ -94,7 +87,6 @@ class PostImagesDelegate(
         }
     }
 
-
     fun getNextImages() {
         val newPage = _stateFlow.value.postPage + 1
         _stateFlow.update { it.copy(postPage = newPage) }
@@ -108,4 +100,19 @@ class PostImagesDelegate(
     fun toggleSystemBarHidden() {
         _stateFlow.update { it.copy(isSystemBarHidden = !it.isSystemBarHidden) }
     }
+
+    data class UiState(
+        val postItem: PostItem,
+        val images: Set<String> = setOf(),
+        val postPage: Int = 1,
+        val postTotalPage: Int = 1,
+        val nextPage: String? = null,
+        val isFavorite: Boolean = false,
+        val isLoading: Boolean = false,
+        val error: Throwable? = null,
+        val currentPostUrl: String = "",
+        val isSystemBarHidden: Boolean = false,
+        val scrollIndex: Int = 0,
+        val scrollOffset: Int = 0,
+    )
 }

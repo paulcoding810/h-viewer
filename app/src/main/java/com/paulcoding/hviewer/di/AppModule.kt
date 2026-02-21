@@ -2,11 +2,7 @@ package com.paulcoding.hviewer.di
 
 import androidx.room.Room
 import com.paulcoding.hviewer.database.AppDatabase
-import com.paulcoding.hviewer.database.MIGRATION_1_2
-import com.paulcoding.hviewer.database.MIGRATION_2_3
-import com.paulcoding.hviewer.database.MIGRATION_3_4
-import com.paulcoding.hviewer.database.MIGRATION_4_5
-import com.paulcoding.hviewer.database.MIGRATION_5_6
+import com.paulcoding.hviewer.database.migrations
 import com.paulcoding.hviewer.helper.Downloader
 import com.paulcoding.hviewer.helper.TabsManager
 import com.paulcoding.hviewer.network.GithubRemoteDatasource
@@ -55,7 +51,6 @@ val viewModelModule = module {
             isSearch = params.get(),
             favoriteRepository = get(),
             tabsManager = get(),
-            postItemDao = get(),
         )
     }
 }
@@ -79,16 +74,20 @@ val appModule = module {
     }
 
     single {
-        //DatabaseProvider.getInstance()
         Room.databaseBuilder(
             get(),
             AppDatabase::class.java, "hviewer_db"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+            .addMigrations(*migrations)
             .build()
     }
+
     single {
-        get<AppDatabase>().postItemDao()
+        get<AppDatabase>().historyDao()
+    }
+
+    single {
+        get<AppDatabase>().favoriteItemDao()
     }
 
     single {

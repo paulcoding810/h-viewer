@@ -104,7 +104,7 @@ fun HistoryPage(
                 title = stringResource(R.string.clear_history),
                 text = stringResource(R.string.clear_history_confirm),
                 onConfirm = {
-                    viewModel.clearHistory()
+                    viewModel.deleteAllHistory()
                     showsConfirmClearHistory = true
                 }
             )

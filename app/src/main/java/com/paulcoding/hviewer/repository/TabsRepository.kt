@@ -12,12 +12,6 @@ class TabsRepository {
             tabs.update {
                 it + postItem
             }
-        //
-        //// mark as viewed
-        //viewModelScope.launch {
-        //    DatabaseProvider.getInstance().postItemDao()
-        //        .setViewed(postItem.url)
-        //}
     }
 
     fun removeTab(postItem: PostItem) {

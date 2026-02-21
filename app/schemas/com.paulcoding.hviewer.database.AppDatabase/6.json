@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "9a533ec4d7da1d93de96fb8ff43d17b9",
+    "identityHash": "d6a4ff6e532191f65ce7dc9e59b19c18",
     "entities": [
       {
-        "tableName": "post_items",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`url` TEXT NOT NULL, `name` TEXT NOT NULL, `thumbnail` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `tags` TEXT, `size` INTEGER, `views` INTEGER, `quantity` INTEGER, `favorite` INTEGER NOT NULL, `favoriteAt` INTEGER NOT NULL, `viewed` INTEGER NOT NULL, `viewedAt` INTEGER NOT NULL, PRIMARY KEY(`url`))",
+        "tableName": "PostItem",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`url` TEXT NOT NULL, `name` TEXT NOT NULL, `thumbnail` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `tags` TEXT, `size` INTEGER, `views` INTEGER, `quantity` INTEGER)",
         "fields": [
           {
             "fieldPath": "url",
@@ -55,37 +55,11 @@
             "columnName": "quantity",
             "affinity": "INTEGER",
             "notNull": false
-          },
-          {
-            "fieldPath": "favorite",
-            "columnName": "favorite",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "favoriteAt",
-            "columnName": "favoriteAt",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "viewed",
-            "columnName": "viewed",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "viewedAt",
-            "columnName": "viewedAt",
-            "affinity": "INTEGER",
-            "notNull": true
           }
         ],
         "primaryKey": {
           "autoGenerate": false,
-          "columnNames": [
-            "url"
-          ]
+          "columnNames": []
         },
         "indices": [],
         "foreignKeys": []
@@ -94,7 +68,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9a533ec4d7da1d93de96fb8ff43d17b9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd6a4ff6e532191f65ce7dc9e59b19c18')"
     ]
   }
 }

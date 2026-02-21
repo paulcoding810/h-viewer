@@ -1,7 +1,5 @@
 package com.paulcoding.hviewer.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import kotlinx.serialization.Serializable
 
 data class PostData(
@@ -10,15 +8,22 @@ data class PostData(
     val next: String? = null
 )
 
-
 @Serializable
-@Entity(tableName = "post_items")
-data class PostItem(
-    @PrimaryKey
+data class PostItemEntity(
     val url: String = "",
     val name: String = "",
     val thumbnail: String = "",
-    val createdAt: Long = 0,
+    val tags: List<Tag>? = null,
+    val size: Int? = null,
+    val views: Int? = null,
+    val quantity: Int? = null,
+)
+
+@Serializable
+data class PostItem(
+    val url: String = "",
+    val name: String = "",
+    val thumbnail: String = "",
     val tags: List<Tag>? = null,
     val size: Int? = null,
     val views: Int? = null,
@@ -29,10 +34,30 @@ data class PostItem(
     val viewedAt: Long = 0,
 )
 
+fun PostItemEntity.toPostItem(): PostItem {
+    return PostItem(
+        url = url,
+        name = name,
+        thumbnail = thumbnail,
+        tags = tags,
+        size = size,
+        views = views,
+        quantity = quantity,
+        favorite = false,
+        viewed = false
+    )
+}
+
 @Serializable
 data class Tag(
     val name: String = "",
     val url: String = "",
+)
+
+data class PostsEntity(
+    val posts: List<PostItemEntity> = listOf(),
+    val total: Int = 1,
+    val next: String? = null
 )
 
 data class Posts(
@@ -40,3 +65,11 @@ data class Posts(
     val total: Int = 1,
     val next: String? = null
 )
+
+fun PostsEntity.toPosts(): Posts {
+    return Posts(
+        posts = posts.map { it.toPostItem() },
+        total = total,
+        next = next
+    )
+}

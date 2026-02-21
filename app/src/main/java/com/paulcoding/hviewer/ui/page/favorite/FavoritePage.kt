@@ -69,7 +69,7 @@ fun FavoritePage(
             )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    viewModel.addFavorite(post, true)
+                    viewModel.undoDelete()
                 }
 
                 SnackbarResult.Dismissed -> {

@@ -61,11 +61,6 @@ fun TabsPage(
         ) { pageIndex ->
             val (tab, delegate) = reversedTabs[pageIndex]
 
-            //val tabViewModel = koinViewModel<TabViewModel>(
-            //    key = tab.url,
-            //    parameters = { parametersOf(tab) }
-            //)
-
             ImageList(
                 delegate,
                 goBack = goBack,
@@ -85,11 +80,6 @@ fun TabsPage(
                 }
             )
         }
-        //Text(
-        //    "Site config not found for ${tab.url}",
-        //    modifier = Modifier.padding(16.dp),
-        //    color = Color.Red
-        //)
     }
     showInfoSheet?.let { currentPost ->
         InfoBottomSheet(

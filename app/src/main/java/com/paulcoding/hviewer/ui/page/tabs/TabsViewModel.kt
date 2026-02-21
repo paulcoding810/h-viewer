@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.repository.FavoriteRepository
+import com.paulcoding.hviewer.repository.HistoryRepository
 import com.paulcoding.hviewer.repository.TabsRepository
 import com.paulcoding.hviewer.ui.page.sites.post.PostImagesDelegate
 import kotlinx.coroutines.flow.SharingStarted
@@ -12,7 +13,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class TabsViewModel(private val tabsRepository: TabsRepository, private val favoriteRepository: FavoriteRepository) :
+class TabsViewModel(
+    private val tabsRepository: TabsRepository,
+    private val favoriteRepository: FavoriteRepository,
+    private val historyRepository: HistoryRepository,
+) :
     ViewModel() {
 
     val tabsWithFavorite: StateFlow<List<Pair<PostItem, PostImagesDelegate>>> =
@@ -23,6 +28,7 @@ class TabsViewModel(private val tabsRepository: TabsRepository, private val favo
                     viewModelScope = viewModelScope,
                     postItem = tab,
                     favoriteRepository = favoriteRepository,
+                    historyRepository = historyRepository,
                 )
                 Pair(tab.copy(favorite = isFavorite), delegate)
             }.reversed()

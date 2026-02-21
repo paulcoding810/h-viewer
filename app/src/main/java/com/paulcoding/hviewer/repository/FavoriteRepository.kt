@@ -1,31 +1,22 @@
 package com.paulcoding.hviewer.repository
 
-import com.paulcoding.hviewer.database.PostItemDao
+import com.paulcoding.hviewer.database.FavoriteDao
 import com.paulcoding.hviewer.model.PostItem
+import com.paulcoding.hviewer.model.toFavoriteEntity
 
-class FavoriteRepository(private val postItemDao: PostItemDao) {
-    val favoritePosts = postItemDao.getFavoritePosts()
-    val favoritePostUrls = postItemDao.getFavoriteUrls()
+class FavoriteRepository(private val favoriteDao: FavoriteDao) {
+    val favoritePosts = favoriteDao.getFavoritePosts()
+    val favoritePostUrls = favoriteDao.getFavoriteUrls()
 
-    val isFavorite =
-        { url: String -> postItemDao.isFavorite(url) }
-
-    suspend fun addFavorite(postItem: PostItem, reAdded: Boolean = false) {
-        postItemDao.setFavorite(
-            postItem.url,
-            favorite = true,
-            favoriteAt = if (!reAdded) System.currentTimeMillis() else postItem.favoriteAt,
-        )
+    suspend fun addFavorite(postItem: PostItem, keepTimestamp: Boolean = false) {
+        favoriteDao.insert(postItem.toFavoriteEntity(keepTimestamp))
     }
 
     suspend fun deleteFavorite(postItem: PostItem) {
-        postItemDao.setFavorite(
-            postItem.url, false
-        )
+        favoriteDao.delete(postItem.url)
     }
 
     suspend fun toggleFavorite(postItem: PostItem) {
-        println("🚀 ~ postItem: ${postItem.favorite}")
         if (postItem.favorite) {
             deleteFavorite(postItem)
         } else {

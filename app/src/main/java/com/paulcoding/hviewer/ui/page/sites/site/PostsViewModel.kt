@@ -4,13 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.H_JS_FUNCTIONS
 import com.paulcoding.hviewer.H_JS_PROPERTIES
-import com.paulcoding.hviewer.database.PostItemDao
 import com.paulcoding.hviewer.helper.GlobalData
 import com.paulcoding.hviewer.helper.SCRIPTS_DIR
 import com.paulcoding.hviewer.helper.TabsManager
 import com.paulcoding.hviewer.helper.host
 import com.paulcoding.hviewer.model.PostItem
-import com.paulcoding.hviewer.model.Posts
+import com.paulcoding.hviewer.model.PostsEntity
+import com.paulcoding.hviewer.model.toPosts
 import com.paulcoding.hviewer.repository.FavoriteRepository
 import com.paulcoding.js.JS
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +23,6 @@ class PostsViewModel(
     postUrl: String,
     private val isSearch: Boolean,
     val tabsManager: TabsManager,
-    private val postItemDao: PostItemDao,
     private val favoriteRepository: FavoriteRepository,
 ) : ViewModel() {
     private var currentPage: String = postUrl
@@ -80,8 +79,9 @@ class PostsViewModel(
             )
         launchAndLoad {
             val functionName = if (isSearch) H_JS_FUNCTIONS.SEARCH else H_JS_FUNCTIONS.GET_POSTS
-            js.callFunction<Posts>(functionName, arrayOf(url, page))
-                .onSuccess { postsData ->
+            js.callFunction<PostsEntity>(functionName, arrayOf(url, page))
+                .onSuccess { postsEntity ->
+                    val postsData = postsEntity.toPosts()
                     nextPage = postsData.next
                     _stateFlow.update {
                         it.copy(
@@ -89,10 +89,6 @@ class PostsViewModel(
                         )
                     }
                     _postItem.update { it + postsData.posts }
-
-                    // TODO: consider remove this
-                    // store all posts to database.
-                    postItemDao.addPosts(postsData.posts)
                 }
                 .onFailure {
                     setError(it)
