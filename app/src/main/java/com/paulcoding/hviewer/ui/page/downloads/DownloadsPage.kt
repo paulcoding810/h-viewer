@@ -36,8 +36,8 @@ import com.paulcoding.hviewer.ui.component.ConfirmDialog
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.page.post.ImageModal
-import com.paulcoding.hviewer.ui.page.post.PostImage
+import com.paulcoding.hviewer.ui.page.sites.post.ImageModal
+import com.paulcoding.hviewer.ui.page.sites.post.PostImage
 import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -104,22 +104,24 @@ fun DownloadsPage(
                 ImageList(selectedDir!!)
             }
         }
-        ConfirmDialog(
-            showDialog = dirWillBeDeleted != null,
-            title = stringResource(R.string.confirm_delete),
-            text = stringResource(
-                R.string.are_you_sure_you_want_to_delete_folder,
-                dirWillBeDeleted?.name ?: ""
-            ),
-            onDismiss = {
-                dirWillBeDeleted = null
-            }, onConfirm = {
-                if (dirWillBeDeleted?.deleteRecursively() == true) {
-                    makeToast("Deleted ${dirWillBeDeleted?.name}")
-                    fetchDirs()
+        if (dirWillBeDeleted != null) {
+            ConfirmDialog(
+                title = stringResource(R.string.confirm_delete),
+                text = stringResource(
+                    R.string.are_you_sure_you_want_to_delete_folder,
+                    dirWillBeDeleted?.name ?: ""
+                ),
+                onDismiss = {
                     dirWillBeDeleted = null
+                }, onConfirm = {
+                    if (dirWillBeDeleted?.deleteRecursively() == true) {
+                        makeToast("Deleted ${dirWillBeDeleted?.name}")
+                        fetchDirs()
+                        dirWillBeDeleted = null
+                    }
                 }
-            })
+            )
+        }
     }
 }
 

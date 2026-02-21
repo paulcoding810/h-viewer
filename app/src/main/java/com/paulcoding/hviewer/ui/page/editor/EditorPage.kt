@@ -11,41 +11,29 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import com.paulcoding.hviewer.R
-import com.paulcoding.hviewer.helper.crashLogDir
 import com.paulcoding.hviewer.helper.makeToast
-import com.paulcoding.hviewer.helper.readFile
-import com.paulcoding.hviewer.helper.scriptsDir
-import com.paulcoding.hviewer.helper.writeFile
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.page.AppViewModel
 import io.github.rosemoe.sora.text.Content
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditorPage(
-    appViewModel: AppViewModel,
-    type: String,
+    viewModel: EditorViewModel = koinViewModel(),
     goBack: () -> Boolean,
-    scriptFile: String
 ) {
-    val context = LocalContext.current
-    val dir = when (type) {
-        "script" -> context.scriptsDir
-        "crash_log" -> context.crashLogDir
-        else -> return makeToast("Unknown type $type")
-    }
-    val editable = type == "script"
-    val language = if (type == "script") "js" else null
-    val script = context.readFile(scriptFile, dir)
+    val uiState by viewModel.uiState.collectAsState()
+
     val state = rememberCodeEditorState(
-        initialContent = Content(script), editable = editable,
-        language = language
+        initialContent = Content(uiState.content), editable = uiState.editable,
+        language = uiState.language
     )
     val localSoftwareKeyboardController = LocalSoftwareKeyboardController.current
 
@@ -58,8 +46,7 @@ fun EditorPage(
                 }
             }, actions = {
                 HIcon(imageVector = Icons.Outlined.Save) {
-                    context.writeFile(state.content.toString(), scriptFile)
-                    appViewModel.refreshLocalConfigs()
+                    viewModel.saveScript(state.content.toString())
                     localSoftwareKeyboardController?.hide()
                     goBack()
                     makeToast(R.string.saved)

@@ -2,13 +2,14 @@ package com.paulcoding.hviewer.ui.page.sites
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
@@ -22,42 +23,37 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.SiteConfig
-import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SitesPage(
-    isDevMode: Boolean,
-    navToTopics: (siteConfig: SiteConfig) -> Unit,
-    goBack: () -> Unit,
+    viewModel: SitesViewModel = koinViewModel(),
+    navToSite: (url: String, isSearch: Boolean) -> Unit,
     navToSettings: () -> Unit,
     navToHistory: () -> Unit,
     navToDownloads: () -> Unit,
-    refresh: () -> Unit,
     navToFavorite: () -> Unit,
 ) {
-    val hostsMap = LocalHostsMap.current
-
-    val state = rememberPullToRefreshState()
-
-//  TODO: check refreshing status
-//   https://stackoverflow.com/questions/75293735/pullrefreshindicator-does-not-disappear-after-refreshing
-    var refreshing by remember { mutableStateOf(false) }
+    val pullToRefreshState = rememberPullToRefreshState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
 
@@ -81,14 +77,11 @@ fun SitesPage(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it),
-            state = state,
-            isRefreshing = refreshing,
+            state = pullToRefreshState,
+            isRefreshing = uiState.isLoading,
             onRefresh = {
                 scope.launch {
-                    refreshing = true
-                    refresh()
-                    delay(100)
-                    refreshing = false
+                    viewModel.dispatch(SitesViewModel.Actions.LoadSites)
                 }
             }
         ) {
@@ -97,39 +90,51 @@ fun SitesPage(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                if (hostsMap.isEmpty()) {
+                if (uiState.siteConfigs == null) {
                     HEmpty(title = "No sites found", message = "Add repo?") { navToSettings() }
-                } else
+                } else {
+                    val hostsMap = uiState.siteConfigs!!.toHostsMap()
                     hostsMap.keys.map { site ->
                         hostsMap[site]?.let { siteConfig ->
-                            Site(
-                                key = site,
-                                site = siteConfig
-                            ) {
-                                navToTopics(siteConfig)
+                            Site(site = siteConfig) {
+                                navToSite(
+                                    siteConfig.baseUrl,
+                                    false
+                                )
                             }
                         }
                     }
+                }
             }
         }
     }
 }
 
 @Composable
-fun Site(site: SiteConfig, key: String, onClick: () -> Unit) {
-    Box(modifier = Modifier.clickable {
-        onClick()
-    }) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            site.SiteIcon()
-            Text(site.name)
-        }
+private fun Site(site: SiteConfig, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .fillMaxWidth()
+            .clickable {
+                onClick()
+            },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        site.SiteIcon()
+        Text(site.name)
     }
 }
 
+@Composable
+private fun SiteConfig.SiteIcon(size: Dp = 20.dp, clip: Dp = 4.dp) {
+    AsyncImage(
+        "https://www.google.com/s2/favicons?sz=64&domain=$baseUrl", baseUrl,
+        modifier = Modifier
+            .size(size)
+            .clip(RoundedCornerShape(clip)),
+        contentScale = ContentScale.Crop,
+        placeholder = painterResource(R.mipmap.ic_launcher_foreground)
+    )
+}

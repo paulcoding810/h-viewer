@@ -16,21 +16,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.paulcoding.hviewer.extensions.setSecureScreen
-import com.paulcoding.hviewer.helper.makeToast
 import com.paulcoding.hviewer.helper.setupTextmate
-import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HLoading
 import com.paulcoding.hviewer.ui.component.ToastExit
 import com.paulcoding.hviewer.ui.page.AppEntry
-import com.paulcoding.hviewer.ui.page.AppViewModel
 import com.paulcoding.hviewer.ui.page.lock.LockPage
+import com.paulcoding.hviewer.ui.page.settings.SettingsViewModel
 import com.paulcoding.hviewer.ui.theme.HViewerTheme
+import org.koin.androidx.compose.koinViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -39,45 +37,55 @@ class MainActivity : ComponentActivity() {
 
         setupTextmate()
 
-        window.setSecureScreen(Preferences.secureScreen)
-
         enableEdgeToEdge()
+
         setContent {
-            Content(intent)
+            Content(intent = intent)
         }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setContent {
-            Content(intent)
+            Content(intent = intent)
         }
     }
 }
 
 @Composable
 fun Content(intent: Intent?) {
-    val appViewModel: AppViewModel = viewModel()
-    val appState by appViewModel.stateFlow.collectAsStateWithLifecycle()
-    val isLocked by appViewModel.isLocked.collectAsState()
+    val viewModel: SettingsViewModel = koinViewModel()
+    val uiState by viewModel.uiState.collectAsState()
+
+    val context = LocalContext.current
+    val window = (context as ComponentActivity).window
+
+    LaunchedEffect(Unit) {
+        viewModel.dispatch(SettingsViewModel.Action.CheckForAppUpdate())
+    }
+
+    LaunchedEffect(uiState.isSecureScreenEnabled) {
+        window.setSecureScreen(uiState.isSecureScreenEnabled)
+    }
 
     ToastExit()
 
-    LaunchedEffect(appState.error) {
-        if (appState.error != null) {
-            makeToast(appState.error?.message ?: "")
-        }
-    }
-
     HViewerTheme {
-        if (appState.checkingForUpdateScripts) UpdateDialog()
-        if (isLocked) {
+        if (uiState.newRelease != null) UpdateDialog()
+        //if (isLocked) {
+        //    LockPage(
+        //        onUnlocked = appViewModel::unlock
+        //    )
+        //} else {
+        //    AppEntry(appViewModel = appViewModel, intent = intent)
+        //}
+
+        AppEntry(intent = intent)
+
+        if (uiState.isLockScreenEnabled)
             LockPage(
-                onUnlocked = appViewModel::unlock
+                onUnlocked = { viewModel.dispatch(SettingsViewModel.Action.Unlock) }
             )
-        } else {
-            AppEntry(appViewModel = appViewModel, intent = intent)
-        }
     }
 }
 

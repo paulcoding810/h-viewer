@@ -24,12 +24,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.paulcoding.hviewer.preference.Preferences
+import com.paulcoding.hviewer.PIN_COUNT
 
 @Composable
 fun HOTP(
     modifier: Modifier = Modifier,
-    pinCount: Int = Preferences.pinCount,
+    pinCount: Int = PIN_COUNT,
     onCompleted: (String) -> Unit = {}
 ) {
     var text by remember { mutableStateOf("") }
@@ -41,7 +41,7 @@ fun HOTP(
     }
 
     LaunchedEffect(text) {
-        if (text.length == Preferences.pinCount) {
+        if (text.length == pinCount) {
             localKeyboardController?.hide()
             onCompleted(text)
         }
@@ -51,7 +51,7 @@ fun HOTP(
         text,
         modifier = modifier.focusRequester(focusRequester),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        onValueChange = { if (it.length <= pinCount) text = it },
+        onValueChange = { if (it.length <= PIN_COUNT) text = it },
         decorationBox = {
             Row(
                 modifier = Modifier.fillMaxWidth(),

@@ -12,18 +12,19 @@ import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.CHECK_FOR_UPDATE_APK_CHANNEL
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.HRelease
-import com.paulcoding.hviewer.network.Github
+import com.paulcoding.hviewer.repository.UpdateAppRepository
 
 class UpdateApkWorker(
     val context: Context,
+    val updateAppRepository: UpdateAppRepository,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
     private val notificationId = 2
 
     override suspend fun doWork(): Result {
         try {
-            val hRelease = Github.checkForUpdate(BuildConfig.VERSION_NAME)
-            if (hRelease != null) {
+            val hRelease = updateAppRepository.getLatestAppRelease().getOrThrow()
+            if (hRelease.version != BuildConfig.VERSION_NAME) {
                 notify(context, hRelease)
             }
             return Result.success()

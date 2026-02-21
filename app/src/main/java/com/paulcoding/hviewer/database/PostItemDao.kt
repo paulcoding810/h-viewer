@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import androidx.room.Upsert
 import com.paulcoding.hviewer.model.PostItem
 import kotlinx.coroutines.flow.Flow
 
@@ -15,6 +16,9 @@ interface PostItemDao {
 
     @Query("SELECT * FROM post_items WHERE favorite = 1 ORDER BY favoriteAt DESC")
     fun getFavoritePosts(): Flow<List<PostItem>>
+
+    @Query("SELECT url FROM post_items WHERE favorite = 1 ORDER BY favoriteAt DESC")
+    fun getFavoriteUrls(): Flow<List<String>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addPost(postItem: PostItem)

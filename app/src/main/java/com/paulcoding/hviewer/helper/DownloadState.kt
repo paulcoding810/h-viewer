@@ -13,16 +13,13 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostItem
-import com.paulcoding.hviewer.ui.LocalHostsMap
-import com.paulcoding.hviewer.ui.page.post.DownloadService
-import com.paulcoding.hviewer.ui.page.post.DownloadStatus
+import com.paulcoding.hviewer.ui.page.sites.post.DownloadService
+import com.paulcoding.hviewer.ui.page.sites.post.DownloadStatus
 
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun rememberDownloadState(post: PostItem): DownloadState {
-    val hostsMap = LocalHostsMap.current
-
     val downloadState by DownloadService.downloadStatusFlow.collectAsState()
     val context = LocalContext.current
 
@@ -54,15 +51,12 @@ fun rememberDownloadState(post: PostItem): DownloadState {
     }
 
     fun download() {
-        val siteConfig =
-            post.getSiteConfig(hostsMap) ?: throw Exception("Site config not found: ${post.url}")
-
         checkPermissionOrDownload {
             makeToast(context.getString(R.string.downloading_post, post.name))
             val intent = Intent(context, DownloadService::class.java).apply {
                 putExtra("postUrl", post.url)
                 putExtra("postName", post.name)
-                putExtra("siteConfig", siteConfig)
+                //putExtra("siteConfig", siteConfig)
             }
             context.startForegroundService(intent)
         }

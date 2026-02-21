@@ -1,9 +1,8 @@
 package com.paulcoding.hviewer.model
 
-import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 data class PostData(
     val images: List<String>,
@@ -12,6 +11,7 @@ data class PostData(
 )
 
 
+@Serializable
 @Entity(tableName = "post_items")
 data class PostItem(
     @PrimaryKey
@@ -27,22 +27,13 @@ data class PostItem(
     val favoriteAt: Long = 0,
     val viewed: Boolean = false,
     val viewedAt: Long = 0,
-) {
-    fun getHost(): String {
-        return url.split("/").getOrNull(2) ?: ""
-    }
+)
 
-    fun getSiteConfig(hostsMap: Map<String, SiteConfig>): SiteConfig? {
-        val host = getHost()
-        return hostsMap[host]
-    }
-}
-
-@Parcelize
+@Serializable
 data class Tag(
     val name: String = "",
     val url: String = "",
-) : Parcelable
+)
 
 data class Posts(
     val posts: List<PostItem> = listOf(),

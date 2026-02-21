@@ -4,49 +4,41 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
-import com.paulcoding.hviewer.ui.LocalHostsMap
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.post.ImageList
 import com.paulcoding.hviewer.ui.page.posts.InfoBottomSheet
-import kotlinx.coroutines.CoroutineScope
+import com.paulcoding.hviewer.ui.page.sites.post.ImageList
 import kotlinx.coroutines.launch
 
 @Composable
 fun TabsPage(
+    viewModel: TabsViewModel,
     goBack: () -> Unit,
-    navToCustomTag: (PostItem, Tag) -> Unit,
-    appViewModel: AppViewModel,
+    navToCustomTag: (Tag) -> Unit,
 ) {
-    val hostsMap = LocalHostsMap.current
-    val tabs by appViewModel.tabs.collectAsState(initial = listOf())
-    val reversedTabs by remember { derivedStateOf { tabs.reversed() } }
+    val reversedTabs by viewModel.tabsWithFavorite.collectAsState(initial = listOf())
+
     val pagerState = rememberPagerState { reversedTabs.size }
 
     val scope = rememberCoroutineScope()
-    var infoSheetVisible by remember { mutableStateOf(false) }
+    var showInfoSheet by remember { mutableStateOf<PostItem?>(null) }
 
     BackHandler {
         if (pagerState.currentPage > 0) {
@@ -65,66 +57,62 @@ fun TabsPage(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
             beyondViewportPageCount = 2,
-            key = { reversedTabs[it].url }
+            key = { reversedTabs[it].first.url }
         ) { pageIndex ->
-            val tab = reversedTabs[pageIndex]
-            val siteConfig = tab.getSiteConfig(hostsMap)
+            val (tab, delegate) = reversedTabs[pageIndex]
 
-            if (siteConfig != null) {
-                ImageList(
-                    tab,
-                    siteConfig = siteConfig,
-                    goBack = goBack,
-                    bottomRowActions = {
-                        BottomRowActions(
-                            tab,
-                            appViewModel,
-                            pageIndex,
-                            scope,
-                            removeTab = {
-                                appViewModel.removeTab(tab)
-                                if (pagerState.pageCount == 1) {
-                                    goBack()
-                                }
-                            },
-                            toggleBottomSheet = {
-                                infoSheetVisible = !infoSheetVisible
-                            })
-                    }
-                )
-            } else
-                Text(
-                    "Site config not found for ${tab.url}",
-                    modifier = Modifier.padding(16.dp),
-                    color = Color.Red
-                )
-        }
-        reversedTabs.getOrNull(pagerState.currentPage)?.let { currentPost ->
-            InfoBottomSheet(
-                visible = infoSheetVisible,
-                postItem = currentPost,
-                onDismissRequest = {
-                    infoSheetVisible = false
-                },
-                onTagClick = {
-                    infoSheetVisible = false
-                    navToCustomTag(currentPost, it)
-                },
+            //val tabViewModel = koinViewModel<TabViewModel>(
+            //    key = tab.url,
+            //    parameters = { parametersOf(tab) }
+            //)
+
+            ImageList(
+                delegate,
+                goBack = goBack,
+                bottomRowActions = {
+                    BottomRowActions(
+                        postItem = tab,
+                        removeTab = {
+                            viewModel.removeTab(tab)
+                            if (pagerState.pageCount == 1) {
+                                goBack()
+                            }
+                        },
+                        toggleFavorite = viewModel::toggleFavorite,
+                        toggleBottomSheet = {
+                            showInfoSheet = tab
+                        })
+                }
             )
         }
+        //Text(
+        //    "Site config not found for ${tab.url}",
+        //    modifier = Modifier.padding(16.dp),
+        //    color = Color.Red
+        //)
+    }
+    showInfoSheet?.let { currentPost ->
+        InfoBottomSheet(
+            visible = true,
+            postItem = currentPost,
+            onDismissRequest = {
+                showInfoSheet = null
+            },
+            onTagClick = {
+                showInfoSheet = null
+                navToCustomTag(it)
+            },
+        )
     }
 }
 
 @Composable
 internal fun BottomRowActions(
     postItem: PostItem,
-    appViewModel: AppViewModel,
-    totalPage: Int,
-    scope: CoroutineScope,
     removeTab: () -> Unit,
+    toggleFavorite: (PostItem) -> Unit,
     toggleBottomSheet: () -> Unit,
 ) {
-    val favorite by appViewModel.postFavorite(postItem.url).collectAsState(false)
 
     HIcon(
         Icons.Outlined.Info,
@@ -136,13 +124,8 @@ internal fun BottomRowActions(
 
     Spacer(modifier = Modifier.width(16.dp))
 
-    HFavoriteIcon(isFavorite = favorite, rounded = true) {
-        scope.launch {
-            if (!favorite)
-                appViewModel.addFavorite(postItem = postItem)
-            else
-                appViewModel.deleteFavorite(postItem)
-        }
+    HFavoriteIcon(isFavorite = postItem.favorite, rounded = true) {
+        toggleFavorite(postItem)
     }
 
     Spacer(modifier = Modifier.width(16.dp))

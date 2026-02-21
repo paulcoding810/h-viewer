@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.paulcoding.hviewer.PIN_COUNT
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.ui.component.HOTP
 
@@ -36,7 +37,7 @@ fun LockModal(onDismiss: () -> Unit, onPinConfirmed: (String) -> Unit = {}) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(stringResource(R.string.enter_new_pin))
                 Spacer(modifier = Modifier.height(12.dp))
-                HOTP {
+                HOTP(pinCount = PIN_COUNT) {
                     pin = it
                 }
                 Spacer(modifier = Modifier.height(12.dp))

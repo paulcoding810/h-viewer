@@ -11,20 +11,24 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import com.paulcoding.hviewer.ACTION_INSTALL_APK
+import com.paulcoding.hviewer.APK_NAME
 import com.paulcoding.hviewer.CHECK_FOR_UPDATE_APK_CHANNEL
 import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.helper.Downloader
 import com.paulcoding.hviewer.model.HRelease
-import com.paulcoding.hviewer.network.Github
-import com.paulcoding.hviewer.ui.page.post.DownloadService
-import com.paulcoding.hviewer.ui.page.post.DownloadService.Companion.ACTION_STOP_SERVICE
+import com.paulcoding.hviewer.ui.page.sites.post.DownloadService
+import com.paulcoding.hviewer.ui.page.sites.post.DownloadService.Companion.ACTION_STOP_SERVICE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.coroutines.CoroutineContext
 
-class DownloadApkService : Service() {
+class DownloadApkService(
+    private val downloader: Downloader
+) : Service() {
     private lateinit var notificationManager: NotificationManager
     private lateinit var notificationBuilder: NotificationCompat.Builder
 
@@ -77,14 +81,16 @@ class DownloadApkService : Service() {
     private fun downloadAndInstall(context: Context, release: HRelease) {
         try {
             CoroutineScope(coroutineContext).launch {
-                Github.downloadApk(context, release.downloadUrl) { file ->
-                    val uri = FileProvider.getUriForFile(
-                        context,
-                        "${context.packageName}.fileprovider",
-                        file
-                    )
-                    showDownloadCompleteNotification(release, uri)
-                }
+                val file = downloader.download(
+                    downloadUrl = release.downloadUrl,
+                    destination = File(context.cacheDir, APK_NAME)
+                )
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+                showDownloadCompleteNotification(release, uri)
             }
         } catch (e: Exception) {
             e.printStackTrace()

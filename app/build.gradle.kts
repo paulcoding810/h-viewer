@@ -1,9 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.util.prefixIfNot
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    //alias(libs.plugins.koin.compiler)
+    id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.devtools.ksp")
     id("kotlin-parcelize")
 }
@@ -20,19 +23,20 @@ android {
     namespace = "com.paulcoding.hviewer"
     compileSdk = 35
 
-    val repoUrl = providers.exec {
-        commandLine = "git remote get-url origin".split(' ')
-    }.standardOutput.asText.get().trim().removePrefix("https://github.com/")
-        .removePrefix("git@github.com:")
-        .removeSuffix(".git")
-        .prefixIfNot("https://github.com/")
+    //val repoUrl = providers.exec {
+    //    commandLine = "git remote get-url origin".split(' ')
+    //}.standardOutput.asText.get().trim().removePrefix("https://github.com/")
+    //    .removePrefix("git@github.com:")
+    //    .removeSuffix(".git")
+    //    .prefixIfNot("https://github.com/")
+    val repoUrl = "https://github.com/paulcoding810/h-viewer"
 
     defaultConfig {
         applicationId = "com.paulcoding.hviewer"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "1.5.0"
+        versionName = "1.6.0"
 
         buildConfigField("String", "REPO_URL", "\"$repoUrl\"")
 
@@ -68,12 +72,16 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+
     buildFeatures {
         compose = true
         buildConfig = true
+    }
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 }
 
@@ -123,6 +131,15 @@ dependencies {
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     implementation(libs.androidx.work.runtime.ktx)
+
+    implementation(libs.koin.core)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logger.slf4j)
+    implementation(libs.koin.annotations)
+    implementation(libs.koin.androidx.workmanager)
+
+    implementation(libs.kotlinx.serialization.json)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
