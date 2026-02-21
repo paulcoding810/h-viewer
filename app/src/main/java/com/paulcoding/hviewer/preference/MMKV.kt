@@ -1,6 +1,5 @@
 package com.paulcoding.hviewer.preference
 
-import com.paulcoding.hviewer.PIN_COUNT
 import com.tencent.mmkv.MMKV
 
 

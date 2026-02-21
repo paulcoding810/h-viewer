@@ -49,10 +49,6 @@ object Routes {
 
     @Serializable
     @Immutable
-    data class Script(val scriptId: String)
-
-    @Serializable
-    @Immutable
     object Settings
 
     @Serializable

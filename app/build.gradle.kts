@@ -21,7 +21,7 @@ android {
         }
     }
     namespace = "com.paulcoding.hviewer"
-    compileSdk = 35
+    compileSdk = 36
 
     //val repoUrl = providers.exec {
     //    commandLine = "git remote get-url origin".split(' ')

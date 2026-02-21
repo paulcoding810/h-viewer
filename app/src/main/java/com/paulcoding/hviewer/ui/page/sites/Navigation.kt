@@ -104,5 +104,3 @@ fun NavController.navToPost(postItem: PostItem) {
 fun NavController.navToPosts(url: String, isSearch: Boolean) = navigate(Routes.Site(url, isSearch))
 
 fun NavController.navToCustomTag(tag: Tag) = navigate(Routes.CustomTag(tag.url, tag.name))
-
-fun NavController.navToSites() = navigate(Routes.Sites)

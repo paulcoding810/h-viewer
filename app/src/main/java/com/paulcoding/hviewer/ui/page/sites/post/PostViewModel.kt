@@ -3,7 +3,6 @@ package com.paulcoding.hviewer.ui.page.sites.post
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.paulcoding.hviewer.database.PostItemDao
 import com.paulcoding.hviewer.repository.FavoriteRepository
 import com.paulcoding.hviewer.repository.HistoryRepository
 import com.paulcoding.hviewer.ui.page.Routes

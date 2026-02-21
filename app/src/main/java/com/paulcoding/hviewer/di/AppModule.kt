@@ -25,7 +25,6 @@ import com.paulcoding.hviewer.ui.page.sites.SitesViewModel
 import com.paulcoding.hviewer.ui.page.sites.post.PostViewModel
 import com.paulcoding.hviewer.ui.page.sites.site.PostsViewModel
 import com.paulcoding.hviewer.ui.page.sites.site.SiteViewModel
-import com.paulcoding.hviewer.ui.page.tabs.TabViewModel
 import com.paulcoding.hviewer.ui.page.tabs.TabsViewModel
 import com.paulcoding.hviewer.worker.UpdateApkWorker
 import com.paulcoding.hviewer.worker.UpdateScriptsWorker
@@ -44,20 +43,12 @@ val viewModelModule = module {
     viewModelOf(::SiteViewModel)
     viewModelOf(::PostViewModel)
     viewModelOf(::TabsViewModel)
-    viewModelOf(::TabViewModel)
     viewModelOf(::FavoriteViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::HistoryViewModel)
     viewModelOf(::CustomTagViewModel)
     viewModelOf(::LockViewModel)
 
-    // use params as TabsPage contains lots of Pages using TabViewModel
-    viewModel { params ->
-        TabViewModel(
-            postItem = params.get(),
-            favoriteRepository = get()
-        )
-    }
     viewModel { params ->
         PostsViewModel(
             postUrl = params.get(),

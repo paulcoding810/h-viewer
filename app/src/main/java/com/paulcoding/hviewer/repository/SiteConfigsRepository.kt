@@ -5,7 +5,6 @@ import com.paulcoding.hviewer.helper.Downloader
 import com.paulcoding.hviewer.helper.GithubParser
 import com.paulcoding.hviewer.helper.GlobalData
 import com.paulcoding.hviewer.helper.readConfigFile
-import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.model.SiteConfigs
 import com.paulcoding.hviewer.network.GithubRemoteDatasource
 import com.paulcoding.hviewer.preference.Preferences
@@ -13,10 +12,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.koin.core.annotation.Named
 
 class SiteConfigsRepository(
     private val context: Context,
