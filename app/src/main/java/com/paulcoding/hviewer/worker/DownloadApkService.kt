@@ -17,8 +17,8 @@ import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.Downloader
 import com.paulcoding.hviewer.model.HRelease
-import com.paulcoding.hviewer.ui.page.sites.post.DownloadService
-import com.paulcoding.hviewer.ui.page.sites.post.DownloadService.Companion.ACTION_STOP_SERVICE
+import com.paulcoding.hviewer.helper.DownloadImageService
+import com.paulcoding.hviewer.helper.DownloadImageService.Companion.ACTION_STOP_SERVICE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -110,7 +110,7 @@ class DownloadApkService(
     }
 
     private fun createNotification(): Notification {
-        val stopIntent = Intent(this, DownloadService::class.java).apply {
+        val stopIntent = Intent(this, DownloadImageService::class.java).apply {
             action = ACTION_STOP_SERVICE
         }
         val stopPendingIntent =

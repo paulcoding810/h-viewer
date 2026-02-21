@@ -53,4 +53,17 @@
     <string name="error">Error</string>
     <string name="install">Install</string>
     <string name="update_available">Update Available</string>
+    
+    <!-- Download Service -->
+    <string name="downloading_images">Downloading images…</string>
+    <string name="fetching_pages">Fetching (%1$d/%2$d) pages</string>
+    <string name="downloading_progress">%1$d/%2$d images</string>
+    <string name="download_failed">Download failed</string>
+    <string name="download_failed_error">Download failed: %1$s</string>
+    <string name="download_complete_with_errors">Download complete with errors</string>
+    <string name="download_summary">%1$d succeeded, %2$d failed</string>
+    <string name="download_channel_name">Image Downloads</string>
+    <string name="download_channel_description">Notifications for image download progress</string>
+    <string name="permission_denied">Permission denied!</string>
+    <string name="notification_permission_denied">Notification permission denied!</string>
 </resources>

@@ -66,7 +66,7 @@
         </activity>
 
         <service
-            android:name=".ui.page.sites.post.DownloadService"
+            android:name=".helper.DownloadImageService"
             android:foregroundServiceType="dataSync" />
         <service
             android:name=".worker.DownloadApkService"
