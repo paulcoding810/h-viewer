@@ -1,4 +1,4 @@
-package com.paulcoding.hviewer.ui.page.posts
+package com.paulcoding.hviewer.ui.page.sites.composable
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.LocalActivity

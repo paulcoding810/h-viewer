@@ -1,4 +1,4 @@
-package com.paulcoding.hviewer.ui.page.posts
+package com.paulcoding.hviewer.ui.page.sites.composable
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

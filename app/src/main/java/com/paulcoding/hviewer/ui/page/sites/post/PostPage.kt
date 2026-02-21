@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.page.posts.InfoBottomSheet
+import com.paulcoding.hviewer.ui.page.sites.composable.InfoBottomSheet
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

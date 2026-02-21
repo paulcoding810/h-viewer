@@ -12,6 +12,8 @@ import com.paulcoding.hviewer.repository.HistoryRepository
 import com.paulcoding.hviewer.repository.SiteConfigsRepository
 import com.paulcoding.hviewer.repository.TabsRepository
 import com.paulcoding.hviewer.repository.UpdateAppRepository
+import com.paulcoding.hviewer.ui.page.editor.EditorViewModel
+import com.paulcoding.hviewer.ui.page.editor.ListScriptViewModel
 import com.paulcoding.hviewer.ui.page.favorite.FavoriteViewModel
 import com.paulcoding.hviewer.ui.page.history.HistoryViewModel
 import com.paulcoding.hviewer.ui.page.lock.LockViewModel
@@ -44,6 +46,8 @@ val viewModelModule = module {
     viewModelOf(::HistoryViewModel)
     viewModelOf(::CustomTagViewModel)
     viewModelOf(::LockViewModel)
+    viewModelOf(::ListScriptViewModel)
+    viewModelOf(::EditorViewModel)
 
     viewModel { params ->
         PostsViewModel(

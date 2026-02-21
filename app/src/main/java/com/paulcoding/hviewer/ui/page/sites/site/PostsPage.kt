@@ -35,7 +35,7 @@ import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HPageProgress
-import com.paulcoding.hviewer.ui.page.posts.PostList
+import com.paulcoding.hviewer.ui.page.sites.composable.PostList
 import com.paulcoding.hviewer.ui.page.sites.composable.TabsIcon
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel

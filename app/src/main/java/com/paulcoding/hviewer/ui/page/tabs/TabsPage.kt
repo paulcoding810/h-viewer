@@ -23,7 +23,7 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.page.posts.InfoBottomSheet
+import com.paulcoding.hviewer.ui.page.sites.composable.InfoBottomSheet
 import com.paulcoding.hviewer.ui.page.sites.post.ImageList
 import kotlinx.coroutines.launch
 

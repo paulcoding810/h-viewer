@@ -32,7 +32,7 @@ import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
-import com.paulcoding.hviewer.ui.page.posts.FavoriteCard
+import com.paulcoding.hviewer.ui.page.sites.composable.FavoriteCard
 import com.paulcoding.hviewer.ui.page.sites.composable.TabsIcon
 import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
 import kotlinx.coroutines.launch
