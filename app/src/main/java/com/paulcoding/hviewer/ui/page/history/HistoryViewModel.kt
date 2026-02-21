@@ -16,12 +16,6 @@ class HistoryViewModel(private val historyRepository: HistoryRepository) : ViewM
         initialValue = emptyList()
     )
 
-    fun addHistory(postItem: PostItem) {
-        viewModelScope.launch {
-            historyRepository.setViewed(postItem, true)
-        }
-    }
-
     fun deleteHistory(postItem: PostItem) {
         viewModelScope.launch {
             historyRepository.setViewed(postItem, false)

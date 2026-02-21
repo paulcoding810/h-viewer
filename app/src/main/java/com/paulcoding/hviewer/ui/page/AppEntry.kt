@@ -23,18 +23,6 @@ import org.koin.androidx.compose.koinViewModel
 fun AppEntry(intent: Intent?) {
     val navController = rememberNavController()
 
-    //fun navToImages(post: PostItem) {
-    //    appViewModel.setCurrentPost(post)
-    //    appViewModel.addHistory(post)
-    //    navController.navigate(Routes.Post)
-    //}
-    //
-    //fun navToCustomTag(post: PostItem, tag: Tag) {
-    //    appViewModel.setCurrentPost(post)
-    //    navController.currentBackStackEntry?.savedStateHandle?.set("tag", tag)
-    //    navController.navigate(Routes.CustomTag(tag))
-    //}
-
     // handle intent
     val updatedIntent by rememberUpdatedState(intent)
 

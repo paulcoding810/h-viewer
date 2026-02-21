@@ -67,11 +67,9 @@ fun PostList(
                     },
                     setFavorite = { isFavorite ->
                         setFavorite(post, isFavorite)
-                    }
-                ) {
-                    onClick(post)
-                    println("🚀 ~ post: $post")
-                }
+                    },
+                    onClick = { onClick(post) }
+                )
             }
             if (isLoading)
                 item {
