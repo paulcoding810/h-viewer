@@ -73,6 +73,11 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
 val MIGRATION_6_7 = object : Migration(6, 7) {
     override fun migrate(db: SupportSQLiteDatabase) {
         // Step 1: Create a new tables favorite, history
+        db.execSQL("DROP TABLE IF EXISTS favorite")
+        db.execSQL("DROP TABLE IF EXISTS history")
+        db.execSQL("DROP TABLE IF EXISTS favorite_posts")
+        db.execSQL("DROP TABLE IF EXISTS tags")
+
         db.execSQL(
             """
                 CREATE TABLE IF NOT EXISTS favorite (

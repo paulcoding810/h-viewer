@@ -9,6 +9,8 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.serialization.gson.gson
 import org.koin.dsl.module
 
@@ -22,7 +24,16 @@ val networkModule = module {
             }
             install(Logging) {
                 logger = Logger.SIMPLE
-                level = if (BuildConfig.DEBUG) LogLevel.BODY else LogLevel.NONE
+                level = if (BuildConfig.DEBUG) {
+                    LogLevel.BODY
+                } else {
+                    LogLevel.NONE
+                }
+
+                filter { request ->
+                    val contentType = request.headers[HttpHeaders.ContentType]
+                    contentType != ContentType.Application.OctetStream.toString()
+                }
             }
         }
     }

@@ -3,7 +3,7 @@ package com.paulcoding.hviewer.ui.page.settings
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import androidx.core.net.toUri
+import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.APK_NAME
@@ -23,8 +23,8 @@ class SettingsViewModel(
     private val preferences: Preferences,
     private val configsRepository: SiteConfigsRepository,
     private val updateAppRepository: UpdateAppRepository
-) :
-    ViewModel() {
+) : ViewModel() {
+    var checkedForUpdateAtLaunch = false
 
     private var _uiState = MutableStateFlow(
         UiState(
@@ -77,8 +77,9 @@ class SettingsViewModel(
             updateAppRepository.downloadApk(
                 newRelease.downloadUrl,
                 destination = File(context.cacheDir, APK_NAME)
-            ).onSuccess {
-                installApk(context, it.toUri())
+            ).onSuccess { file ->
+                val fileUri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
+                installApk(context, fileUri)
                 _uiState.update { it.copy(isUpdating = false) }
             }.onFailure { exception ->
                 exception.printStackTrace()
@@ -101,11 +102,13 @@ class SettingsViewModel(
     }
 
     private fun checkForAppUpdate() {
+        checkedForUpdateAtLaunch = true
+
         viewModelScope.launch {
             updateAppRepository.getLatestAppRelease()
-                .onSuccess { (version, downloadUrl) ->
-                    if (version != BuildConfig.VERSION_NAME) {
-                        // TODO: Show download dialog
+                .onSuccess { release ->
+                    if (release.version != BuildConfig.VERSION_NAME) {
+                        _uiState.update { it.copy(newRelease = release) }
                     } else {
                         _effect.value = Effect.Toast("App is up to date")
                     }

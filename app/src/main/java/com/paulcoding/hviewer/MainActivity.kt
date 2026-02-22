@@ -5,24 +5,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.helper.setupTextmate
-import com.paulcoding.hviewer.ui.component.HLoading
+import com.paulcoding.hviewer.ui.component.NewAppReleaseDialog
 import com.paulcoding.hviewer.ui.component.ToastExit
 import com.paulcoding.hviewer.ui.page.AppEntry
 import com.paulcoding.hviewer.ui.page.lock.LockPage
@@ -61,7 +51,9 @@ fun Content(intent: Intent?) {
     val window = (context as ComponentActivity).window
 
     LaunchedEffect(Unit) {
-        viewModel.dispatch(SettingsViewModel.Action.CheckForAppUpdate())
+        if (!viewModel.checkedForUpdateAtLaunch) {
+            viewModel.dispatch(SettingsViewModel.Action.CheckForAppUpdate())
+        }
     }
 
     LaunchedEffect(uiState.isSecureScreenEnabled) {
@@ -71,14 +63,12 @@ fun Content(intent: Intent?) {
     ToastExit()
 
     HViewerTheme {
-        if (uiState.newRelease != null) UpdateDialog()
-        //if (isLocked) {
-        //    LockPage(
-        //        onUnlocked = appViewModel::unlock
-        //    )
-        //} else {
-        //    AppEntry(appViewModel = appViewModel, intent = intent)
-        //}
+        uiState.newRelease?.let {
+            NewAppReleaseDialog(
+                release = it,
+                onAction = viewModel::dispatch
+            )
+        }
 
         AppEntry(intent = intent)
 
@@ -86,22 +76,6 @@ fun Content(intent: Intent?) {
             LockPage(
                 onUnlocked = { viewModel.dispatch(SettingsViewModel.Action.Unlock) }
             )
-    }
-}
-
-@Composable
-fun UpdateDialog() {
-    Dialog(onDismissRequest = {}) {
-        Surface {
-            Column(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(stringResource(R.string.checking_for_update))
-                HLoading()
-            }
-        }
     }
 }
 

@@ -47,11 +47,11 @@ import androidx.compose.ui.unit.sp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.model.ListScriptType
-import com.paulcoding.hviewer.ui.component.ConfirmDialog
 import com.paulcoding.hviewer.ui.component.H7Tap
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HLoading
+import com.paulcoding.hviewer.ui.component.NewAppReleaseDialog
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -190,18 +190,9 @@ fun SettingsPage(
     }
 
     uiState.newRelease?.let {
-        ConfirmDialog(
-            title = stringResource(R.string.update_available),
-            text = it.version,
-            confirmColor = MaterialTheme.colorScheme.primary,
-            confirmText = stringResource(R.string.install_now),
-            dismissColor = MaterialTheme.colorScheme.onBackground,
-            onDismiss = {
-                viewModel.dispatch(SettingsViewModel.Action.DismissAppUpdate)
-            },
-            onConfirm = {
-                viewModel.dispatch(SettingsViewModel.Action.DownloadAndInstallApk)
-            }
+        NewAppReleaseDialog(
+            release = it,
+            onAction = viewModel::dispatch
         )
     }
 

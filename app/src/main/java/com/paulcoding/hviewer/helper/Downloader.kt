@@ -3,7 +3,10 @@ package com.paulcoding.hviewer.helper
 import com.paulcoding.hviewer.exception.AppException
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.statement.readRawBytes
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import java.io.File
 
 class Downloader(
@@ -13,7 +16,11 @@ class Downloader(
         downloadUrl: String,
         destination: File,
     ): File {
-        val input = httpClient.get(downloadUrl).readRawBytes().inputStream()
+        val input = httpClient
+            .get(downloadUrl){
+                header(HttpHeaders.ContentType, ContentType.Application.OctetStream)
+            }
+            .readRawBytes().inputStream()
         destination.outputStream().use { output ->
             input.copyTo(output)
         }
