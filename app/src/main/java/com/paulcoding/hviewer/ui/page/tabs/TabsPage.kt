@@ -69,7 +69,7 @@ fun TabsPage(
             val postViewModel = koinViewModel<PostViewModel>(
                 viewModelStoreOwner = viewModelStoreOwner,
                 key = tab.url,
-                parameters = { parametersOf(tab) }
+                parameters = { parametersOf(tab, false) }
             )
 
             ImageList(

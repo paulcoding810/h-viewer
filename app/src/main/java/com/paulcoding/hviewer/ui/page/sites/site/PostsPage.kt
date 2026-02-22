@@ -109,7 +109,6 @@ fun PostsPage(
                     key = tag.url,
                     parameters = { parametersOf(tag.url, false) }
                 )
-
                 PageContent(
                     viewModel = viewModel,
                     endPos = tabsIconPosition,
