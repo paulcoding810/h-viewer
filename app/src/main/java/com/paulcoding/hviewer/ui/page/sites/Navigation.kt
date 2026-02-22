@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page.sites
 
+import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -42,7 +43,11 @@ fun NavGraphBuilder.sitesNavigation(navController: NavController) {
         exitTransition = { fadeOutWithBlur() },
         popEnterTransition = { fadeInWithBlur() },
         popExitTransition = { fadeOutWithBlur() }) { backStackEntry ->
+        val parentEntry = remember(navController) {
+            navController.getBackStackEntry(Routes.Sites)
+        }
         PostsPage(
+            viewModelStoreOwner = parentEntry,
             navToPost = navController::navToPost,
             navToSearch = { navController.navToSearch(backStackEntry.toRoute<Routes.Site>().url) },
             navToCustomTag = navController::navToCustomTag,

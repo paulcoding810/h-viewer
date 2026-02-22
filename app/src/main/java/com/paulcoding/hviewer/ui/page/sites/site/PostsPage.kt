@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavBackStackEntry
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.toCapital
 import com.paulcoding.hviewer.helper.BasePaginationHelper
@@ -46,11 +47,12 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun PostsPage(
     viewModel: SiteViewModel = koinViewModel(),
+    viewModelStoreOwner: NavBackStackEntry,
     navToPost: (PostItem) -> Unit,
     navToSearch: () -> Unit,
     navToCustomTag: (Tag) -> Unit,
     navToTabs: () -> Unit,
-    goBack: () -> Unit
+    goBack: () -> Unit,
 ) {
     val uiState by viewModel.stateFlow.collectAsState()
     val tabsCount by viewModel.tabsManager.tabsSizeFlow.collectAsState(initial = 0)
@@ -103,6 +105,7 @@ fun PostsPage(
             ) { pageIndex ->
                 val tag = listTag[pageIndex]
                 val viewModel = koinViewModel<PostsViewModel>(
+                    viewModelStoreOwner = viewModelStoreOwner,
                     key = tag.url,
                     parameters = { parametersOf(tag.url, false) }
                 )
@@ -132,7 +135,7 @@ internal fun PageContent(
     onClick: (PostItem) -> Unit
 ) {
     val uiState by viewModel.stateFlow.collectAsState()
-    val postItems by viewModel.postItems.collectAsState(emptyList())
+    val postItems by viewModel.postItems.collectAsState()
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let {

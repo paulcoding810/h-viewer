@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -27,6 +28,7 @@ import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
 
 @Composable
 fun PostList(
+    listState: LazyListState = rememberLazyListState(),
     paginationHelper: BasePaginationHelper,
     listPosts: List<PostItem>,
     endPos: Offset,
@@ -38,9 +40,6 @@ fun PostList(
     setFavorite: (PostItem, Boolean) -> Unit,
     onClick: (PostItem) -> Unit
 ) {
-
-    val listState = rememberLazyListState()
-
     var startPos by remember { mutableStateOf(Offset.Zero) }
     var isAnimating by remember { mutableStateOf(false) }
 

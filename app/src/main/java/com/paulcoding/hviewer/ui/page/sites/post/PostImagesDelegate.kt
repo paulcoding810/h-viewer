@@ -24,6 +24,7 @@ class PostImagesDelegate(
     val stateFlow = _stateFlow.asStateFlow()
 
     private val postUrl = postItem.url
+    var getImagesAtLaunch = false
 
     private val siteConfig = GlobalData.siteConfigMap[postUrl.host]!!
     private var js = JS(
@@ -72,6 +73,8 @@ class PostImagesDelegate(
         launchAndLoad {
             js.callFunction<PostData>("getImages", arrayOf(url, page))
                 .onSuccess { postData ->
+                    getImagesAtLaunch = true
+
                     _stateFlow.update {
                         it.copy(
                             isLoading = false,

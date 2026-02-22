@@ -102,11 +102,11 @@ class SettingsViewModel(
     }
 
     private fun checkForAppUpdate() {
-        checkedForUpdateAtLaunch = true
-
         viewModelScope.launch {
             updateAppRepository.getLatestAppRelease()
                 .onSuccess { release ->
+                    checkedForUpdateAtLaunch = true
+
                     if (release.version != BuildConfig.VERSION_NAME) {
                         _uiState.update { it.copy(newRelease = release) }
                     } else {

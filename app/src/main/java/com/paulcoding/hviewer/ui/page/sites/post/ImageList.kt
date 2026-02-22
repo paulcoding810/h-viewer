@@ -91,14 +91,10 @@ fun ImageList(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.getImages()
+        if (!viewModel.getImagesAtLaunch) {
+            viewModel.getImages()
+        }
     }
-
-    //LaunchedEffect(uiState.images) {
-    //    if (uiState.images.isNotEmpty()) {
-    //        viewModel.toggleSystemBarHidden()
-    //    }
-    //}
 
     val paginationHelper = remember {
         BasePaginationHelper(
