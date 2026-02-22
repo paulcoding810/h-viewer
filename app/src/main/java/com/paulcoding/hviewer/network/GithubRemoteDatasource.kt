@@ -1,6 +1,5 @@
 package com.paulcoding.hviewer.network
 
-import com.google.gson.Gson
 import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.helper.GithubParser
 import com.paulcoding.hviewer.model.HRelease
@@ -12,6 +11,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 class GithubRemoteDatasource(
     private val httpClient: HttpClient,
@@ -27,8 +27,7 @@ class GithubRemoteDatasource(
         }
         // use string as the content-type here is text/html, not application/json
         val resultText: String = response.body()
-        val remoteConfigs = Gson().fromJson(resultText, SiteConfigs::class.java)
-        remoteConfigs
+        Json.decodeFromString(resultText)
     }
 
     suspend fun getLatestAppRelease(): HRelease {

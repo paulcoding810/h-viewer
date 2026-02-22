@@ -2,6 +2,7 @@ package com.paulcoding.hviewer.model
 
 import kotlinx.serialization.Serializable
 
+@Serializable
 data class PostData(
     val images: List<String>,
     val total: Int,
@@ -54,12 +55,14 @@ data class Tag(
     val url: String = "",
 )
 
+@Serializable
 data class PostsEntity(
     val posts: List<PostItemEntity> = listOf(),
     val total: Int = 1,
     val next: String? = null
 )
 
+@Serializable
 data class Posts(
     val posts: List<PostItem> = listOf(),
     val total: Int = 1,

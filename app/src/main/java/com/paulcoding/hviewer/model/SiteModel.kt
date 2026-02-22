@@ -12,6 +12,7 @@ data class SiteConfig(
     val ads: Set<String> = setOf()
 )
 
+@Serializable
 data class SiteConfigs(
     val version: Int = 1,
     val sites: List<SiteConfig> = listOf()
