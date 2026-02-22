@@ -19,17 +19,22 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavBackStackEntry
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.page.sites.composable.InfoBottomSheet
 import com.paulcoding.hviewer.ui.page.sites.post.ImageList
+import com.paulcoding.hviewer.ui.page.sites.post.PostViewModel
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun TabsPage(
     viewModel: TabsViewModel,
+    viewModelStoreOwner: NavBackStackEntry,
     goBack: () -> Unit,
     navToCustomTag: (Tag) -> Unit,
 ) {
@@ -57,12 +62,18 @@ fun TabsPage(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
             beyondViewportPageCount = 2,
-            key = { reversedTabs[it].first.url }
+            key = { reversedTabs[it].url }
         ) { pageIndex ->
-            val (tab, delegate) = reversedTabs[pageIndex]
+            val tab = reversedTabs[pageIndex]
+
+            val postViewModel = koinViewModel<PostViewModel>(
+                viewModelStoreOwner = viewModelStoreOwner,
+                key = tab.url,
+                parameters = { parametersOf(tab) }
+            )
 
             ImageList(
-                delegate,
+                postViewModel,
                 goBack = goBack,
                 bottomRowActions = {
                     BottomRowActions(

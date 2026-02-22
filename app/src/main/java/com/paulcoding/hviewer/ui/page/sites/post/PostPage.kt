@@ -20,17 +20,16 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun PostPage(
-    viewModel: PostViewModel  = koinViewModel( ),
+    viewModel: PostViewModel,
     navToWebView: (String) -> Unit,
     navToCustomTag: (Tag) -> Unit,
     goBack: () -> Unit
 ) {
-    val delegate = viewModel.delegate
-    val uiState by delegate.stateFlow.collectAsState()
+    val uiState by viewModel.stateFlow.collectAsState()
     var infoSheetVisible by remember { mutableStateOf(false) }
 
     ImageList(
-        viewModel = delegate,
+        viewModel = viewModel,
         goBack = goBack,
         bottomRowActions = {
             HIcon(
@@ -44,7 +43,7 @@ fun PostPage(
             Spacer(modifier = Modifier.width(16.dp))
 
             HFavoriteIcon(isFavorite = uiState.isFavorite, rounded = true) {
-                delegate.toggleFavorite()
+                viewModel.toggleFavorite()
             }
         })
 

@@ -39,7 +39,6 @@ import org.koin.dsl.module
 val viewModelModule = module {
     viewModelOf(::SitesViewModel)
     viewModelOf(::SiteViewModel)
-    viewModelOf(::PostViewModel)
     viewModelOf(::TabsViewModel)
     viewModelOf(::FavoriteViewModel)
     viewModelOf(::SettingsViewModel)
@@ -55,6 +54,13 @@ val viewModelModule = module {
             isSearch = params.get(),
             favoriteRepository = get(),
             tabsManager = get(),
+        )
+    }
+    viewModel { params ->
+        PostViewModel(
+            postItem = params.get(),
+            historyRepository = get(),
+            favoriteRepository = get()
         )
     }
 }

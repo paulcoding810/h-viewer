@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 @OptIn(FlowPreview::class)
 @Composable
 fun ImageList(
-    viewModel: PostImagesDelegate,
+    viewModel: PostViewModel,
     goBack: () -> Unit,
     bottomRowActions: @Composable (RowScope.() -> Unit) = {},
 ) {

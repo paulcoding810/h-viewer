@@ -75,8 +75,11 @@ fun NavGraphBuilder.sitesNavigation(navController: NavController) {
         exitTransition = { fadeOutWithBlur() },
         popEnterTransition = { fadeInWithBlur() },
         popExitTransition = { fadeOutWithBlur() }) { backStackEntry ->
+
+        val postItem = backStackEntry.toRoute<Routes.Post>().postItem
+
         PostPage(
-            viewModel = koinViewModel(key = backStackEntry.toRoute<Routes.Post>().postItem.url),
+            viewModel = koinViewModel(key = postItem.url, parameters = { parametersOf(postItem) }),
             navToWebView = navController::navToWebView,
             navToCustomTag = navController::navToCustomTag,
             goBack = navController::navigateUp,
