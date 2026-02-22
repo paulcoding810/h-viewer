@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -55,7 +54,7 @@ import kotlinx.coroutines.launch
 fun ImageList(
     viewModel: PostViewModel,
     goBack: () -> Unit,
-    bottomRowActions: @Composable (RowScope.() -> Unit) = {},
+    bottomRowActions: @Composable (() -> Unit) = {},
 ) {
     val uiState by viewModel.stateFlow.collectAsState()
 
@@ -116,7 +115,7 @@ private fun ImageList(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     images: List<String> = emptyList(),
-    bottomRowActions: @Composable (RowScope.() -> Unit) = {},
+    bottomRowActions: @Composable (() -> Unit) = {},
     systemBarVisible: Boolean = true,
     isLoading: Boolean = false,
     currentPage: Int = 0,
