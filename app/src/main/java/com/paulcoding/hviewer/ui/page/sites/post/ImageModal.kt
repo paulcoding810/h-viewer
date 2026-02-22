@@ -1,24 +1,23 @@
 package com.paulcoding.hviewer.ui.page.sites.post
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.tooling.preview.Preview
 import com.paulcoding.hviewer.ui.component.HImage
+import com.paulcoding.hviewer.ui.component.HideSystemBar
 import me.saket.telephoto.zoomable.DoubleClickToZoomListener
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 
 @Composable
-fun ImageModal(url: String, dismiss: () -> Unit) {
+fun ImageModal(url: String, modifier: Modifier = Modifier, dismiss: () -> Unit = {}) {
     val zoomableState = rememberZoomableState(ZoomSpec(maxZoomFactor = 5f))
 
     val doubleClickToZoomListener =
@@ -28,33 +27,29 @@ fun ImageModal(url: String, dismiss: () -> Unit) {
             }
         }
 
-    Dialog(
-        onDismissRequest = { dismiss() },
-        properties = DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            modifier = Modifier
-                .fillMaxSize(),
-        ) {
-            Box(
-                modifier = Modifier
-                    .zoomable(
-                        state = zoomableState,
-                        //onClick = {
-                        //    if (!Preferences.showedTutHideImageModal) {
-                        //        makeToast(R.string.double_click_to_dismiss)
-                        //        Preferences.showedTutHideImageModal = true
-                        //    }
-                        //},
-                        onDoubleClick = doubleClickToZoomListener
-                    )
-            ) {
-                HImage(
-                    url,
-                    modifier = Modifier.align(Alignment.Center),
-                )
-            }
-        }
+    HideSystemBar(true, showSystemBarOnBack = false) {
+        dismiss()
     }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .zoomable(
+                state = zoomableState,
+                onClick = { dismiss() },
+                onDoubleClick = doubleClickToZoomListener
+            )
+    ) {
+        HImage(
+            url = url,
+            modifier = Modifier.align(Alignment.Center),
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewImageModal() {
+    ImageModal(url = "https://i.imgur.com/tGbaZCY.png")
 }

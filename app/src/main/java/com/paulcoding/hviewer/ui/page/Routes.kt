@@ -31,7 +31,6 @@ object Routes {
     data class Post(val postItem: PostItem) {
         companion object {
             val typeMap =
-                //mapOf(typeOf<PostItem>() to PostNavType())
                 mapOf(typeOf<PostItem>() to serializableType<PostItem>())
 
             fun from(savedStateHandle: SavedStateHandle) =

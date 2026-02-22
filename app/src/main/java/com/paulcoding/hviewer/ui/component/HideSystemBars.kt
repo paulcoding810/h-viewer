@@ -1,6 +1,7 @@
 package com.paulcoding.hviewer.ui.component
 
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
@@ -9,7 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
 @Composable
-fun SystemBar(isHidden: Boolean) {
+fun HideSystemBar(isHidden: Boolean, showSystemBarOnBack: Boolean = true, onBack: () -> Unit = {}) {
     val context = LocalContext.current
     val window = (context as? ComponentActivity)?.window
     val view = LocalView.current
@@ -27,6 +28,13 @@ fun SystemBar(isHidden: Boolean) {
         window?.let {
             val controller = WindowInsetsControllerCompat(it, view)
             controller.show(WindowInsetsCompat.Type.systemBars())
+        }
+    }
+
+    BackHandler {
+        onBack()
+        if (showSystemBarOnBack) {
+            showSystemBars()
         }
     }
 

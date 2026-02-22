@@ -13,8 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun HLoading() {
-    Box(modifier = Modifier.fillMaxWidth()) {
+fun HLoading(modifier: Modifier = Modifier) {
+    Box(modifier = modifier.fillMaxWidth()) {
         CircularProgressIndicator(
             modifier = Modifier
                 .width(64.dp)

@@ -1,11 +1,9 @@
 package com.paulcoding.hviewer.ui.page.sites.post
 
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -17,7 +15,9 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -36,16 +36,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.paulcoding.hviewer.MainApp.Companion.appContext
+import com.paulcoding.hviewer.extensions.isScrollingUp
 import com.paulcoding.hviewer.helper.BasePaginationHelper
 import com.paulcoding.hviewer.helper.LoadMoreHandler
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HLoading
-import com.paulcoding.hviewer.ui.component.SystemBar
+import com.paulcoding.hviewer.ui.component.HideSystemBar
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
@@ -63,15 +63,7 @@ fun ImageList(
         initialFirstVisibleItemIndex = uiState.scrollIndex,
         initialFirstVisibleItemScrollOffset = uiState.scrollOffset
     )
-
-    val scope = rememberCoroutineScope()
-
-    var selectedImage by remember { mutableStateOf<String?>(null) }
-
-    val translationY by animateDpAsState(
-        targetValue = if (uiState.isSystemBarHidden) (-100).dp else 0.dp,
-        animationSpec = tween(200)
-    )
+    val isScrollingUp by listState.isScrollingUp()
 
     // Throttle scroll position updates to avoid excessive updates
     LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
@@ -107,37 +99,60 @@ fun ImageList(
 
     LoadMoreHandler(uiState.images.size, listState, paginationHelper)
 
-    SystemBar(uiState.isSystemBarHidden)
+    ImageList(
+        listState = listState,
+        systemBarVisible = isScrollingUp,
+        images = uiState.images.toList(),
+        isLoading = uiState.isLoading,
+        currentPage = uiState.postPage,
+        totalPage = uiState.postTotalPage,
+        bottomRowActions = bottomRowActions,
+        goBack = goBack,
+    )
+}
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .clickable {
-                viewModel.toggleSystemBarHidden()
-            }) {
+@Composable
+private fun ImageList(
+    modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
+    images: List<String> = emptyList(),
+    bottomRowActions: @Composable (RowScope.() -> Unit) = {},
+    systemBarVisible: Boolean = true,
+    isLoading: Boolean = false,
+    currentPage: Int = 0,
+    totalPage: Int = 0,
+    goBack: () -> Unit = {},
+) {
+    val scope = rememberCoroutineScope()
+
+    var selectedImage by remember { mutableStateOf<String?>(null) }
+
+    val translationY by animateDpAsState(
+        targetValue = if (!systemBarVisible) (-100).dp else 0.dp,
+        animationSpec = tween(200)
+    )
+
+    HideSystemBar(isHidden = !systemBarVisible, onBack = goBack)
+
+    Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(uiState.images.toList(), key = { it }) { image ->
+            items(images, key = { it }) { image ->
                 PostImage(
                     url = image,
-                    onDoubleTap = {
-                        selectedImage = image
-                    },
+                    onDoubleTap = { },
                     onTap = {
-                        viewModel.toggleSystemBarHidden()
+                        selectedImage = image
                     },
                 )
             }
-            if (uiState.isLoading)
+            if (isLoading) {
                 item {
-                    Box(
-                        modifier = Modifier.statusBarsPadding()
-                    ) {
-                        HLoading()
-                    }
+                    HLoading(modifier.systemBarsPadding())
                 }
+            }
         }
 
         Row(
@@ -151,7 +166,19 @@ fun ImageList(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            HIcon(Icons.AutoMirrored.Outlined.ArrowBack, rounded = true) { goBack() }
+            HIcon(Icons.AutoMirrored.Outlined.ArrowBack, rounded = true, onClick = goBack)
+            Spacer(modifier = Modifier.weight(1f))
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(2.dp)
+            ) {
+                Text(
+                    text = "${currentPage}/${totalPage}",
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
         }
 
         Row(
@@ -179,31 +206,22 @@ fun ImageList(
                 }
             }
         }
-
-        if (selectedImage != null) {
-            ImageModal(url = selectedImage!!) {
-                selectedImage = null
-            }
-        }
-
-        AnimatedVisibility(
-            uiState.images.isNotEmpty(),
-            modifier = Modifier.align(Alignment.BottomEnd)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(Color.Gray.copy(alpha = 0.4f))
-                    .padding(horizontal = 28.dp),
-            ) {
-                Text(
-                    "${uiState.postPage}/${uiState.postTotalPage}",
-                    modifier = Modifier.align(Alignment.BottomEnd),
-                    fontSize = 10.sp,
-                    maxLines = 1,
-                    color = Color.White,
-                )
-            }
+        selectedImage?.let {
+            ImageModal(
+                url = it,
+                dismiss = { selectedImage = null })
         }
     }
+}
+
+@Preview
+@Composable
+fun PreviewImageList() {
+    ImageList(
+        images = List(20) { "https://picsum.photos/id/$it/200/300" },
+        isLoading = false,
+        systemBarVisible = true,
+        currentPage = 1,
+        totalPage = 20,
+    )
 }
