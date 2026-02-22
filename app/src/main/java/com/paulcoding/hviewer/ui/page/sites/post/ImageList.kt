@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -35,9 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.google.common.collect.Multimaps.index
 import com.paulcoding.hviewer.MainApp.Companion.appContext
 import com.paulcoding.hviewer.extensions.isScrollingUp
 import com.paulcoding.hviewer.helper.BasePaginationHelper
@@ -124,7 +126,8 @@ private fun ImageList(
 ) {
     val scope = rememberCoroutineScope()
 
-    var selectedImage by remember { mutableStateOf<String?>(null) }
+    var selectedImage by remember { mutableStateOf<Int?>(null) }
+    var selectedImageOffset = remember<Offset?> { null }
 
     val translationY by animateDpAsState(
         targetValue = if (!systemBarVisible) (-100).dp else 0.dp,
@@ -138,13 +141,13 @@ private fun ImageList(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(images, key = { it }) { image ->
+            itemsIndexed(images, key = { _, image -> image }) { index, image ->
                 PostImage(
                     url = image,
-                    onDoubleTap = { },
-                    onTap = {
-                        selectedImage = image
+                    onDoubleTap = {
+                        selectedImage = index
                     },
+                    onTap = {},
                 )
             }
             if (isLoading) {
@@ -205,10 +208,21 @@ private fun ImageList(
                 }
             }
         }
-        selectedImage?.let {
+        selectedImage?.let { index ->
             ImageModal(
-                url = it,
-                dismiss = { selectedImage = null })
+                url = images[index],
+                onImageFirstOffset = {
+                    selectedImageOffset = it
+                },
+                dismiss = {
+                    scope.launch {
+                        val offsetY = selectedImageOffset?.y?.toInt() ?: 0
+                        listState.animateScrollToItem(index, -offsetY)
+                        selectedImageOffset = null
+                        selectedImage = null
+                    }
+                }
+            )
         }
     }
 }
