@@ -11,6 +11,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 fun HWebView(
     modifier: Modifier = Modifier,
     url: String,
+    onWebViewCreated: (WebView) -> Unit = {}
 ) {
     AndroidView(
         modifier = modifier,
@@ -21,6 +22,7 @@ fun HWebView(
                 val jsInterface = WebAppInterface()
                 addJavascriptInterface(jsInterface, "HViewer")
                 loadUrl(url)
+                onWebViewCreated(this)
             }
         }
     )

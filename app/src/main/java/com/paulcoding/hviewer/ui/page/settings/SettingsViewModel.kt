@@ -53,6 +53,7 @@ class SettingsViewModel(
             is Action.SetEditPinModalVisible -> setEditPinModalVisible(action.visible)
             is Action.DismissAppUpdate -> dismissAppUpdate()
             is Action.DownloadAndInstallApk -> downloadAndInstallApk()
+            is Action.InstallApk -> installApk(context, action.uri)
             is Action.ToggleRemoteModal -> setRemoteModalVisible(action.visible)
 
         }
@@ -183,6 +184,7 @@ class SettingsViewModel(
         data class CheckForAppUpdate(val showToast: Boolean = false) : Action()
         data object DismissAppUpdate : Action()
         data object DownloadAndInstallApk : Action()
+        data class InstallApk(val uri: Uri) : Action()
         data class ToggleRemoteModal(val visible: Boolean) : Action()
         data class SetEditPinModalVisible(val visible: Boolean) : Action()
         data class ConsumeEffect(val effect: Effect?) : Action()

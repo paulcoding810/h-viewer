@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +37,14 @@ import com.paulcoding.hviewer.ui.component.HBackIcon
 @Composable
 fun WebPage(goBack: () -> Unit, url: String) {
     var showBottomSheet by remember { mutableStateOf(false) }
+    var webViewState by remember { mutableStateOf<android.webkit.WebView?>(null) }
 
+    webViewState?.let {
+        val cookie = android.webkit.CookieManager.getInstance().getCookie(webViewState?.url ?: url)
+        println("🚀 ~ cookie: $cookie")
+        val userAgent = webViewState?.settings?.userAgentString
+        println("🚀 ~ userAgent: $userAgent")
+    }
     val activity = LocalActivity.current
 
     Scaffold(
@@ -58,7 +66,11 @@ fun WebPage(goBack: () -> Unit, url: String) {
             )
         },
     ) { paddings ->
-        HWebView(modifier = Modifier.padding(paddings), url = url)
+        HWebView(
+            modifier = Modifier.padding(paddings), 
+            url = url,
+            onWebViewCreated = { webViewState = it }
+        )
     }
 
     if (showBottomSheet) {

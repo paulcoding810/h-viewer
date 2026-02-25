@@ -19,7 +19,6 @@ import com.paulcoding.hviewer.ui.page.sites.search.SearchPage
 import com.paulcoding.hviewer.ui.page.sites.site.PostsPage
 import com.paulcoding.hviewer.ui.page.sites.tag.CustomTagPage
 import com.paulcoding.hviewer.ui.page.tabs.navToTabs
-import com.paulcoding.hviewer.ui.page.web.navToWebView
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -84,7 +83,6 @@ fun NavGraphBuilder.sitesNavigation(navController: NavController) {
                 key = postItem.url,
                 viewModelStoreOwner = viewModelStoreOwner,
                 parameters = { parametersOf(postItem) }),
-            navToWebView = navController::navToWebView,
             navToCustomTag = navController::navToCustomTag,
             goBack = navController::navigateUp,
         )

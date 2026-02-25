@@ -13,7 +13,6 @@ import com.paulcoding.hviewer.ui.page.sites.composable.InfoBottomSheet
 @Composable
 fun PostPage(
     viewModel: PostViewModel,
-    navToWebView: (String) -> Unit,
     navToCustomTag: (Tag) -> Unit,
     goBack: () -> Unit
 ) {

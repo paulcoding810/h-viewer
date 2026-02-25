@@ -44,9 +44,9 @@ class PostViewModel(
 
     fun toggleFavorite() {
         viewModelScope.launch {
-            val isFavorite = !_stateFlow.value.isFavorite
+            val isFavorite = !_stateFlow.value.postItem.favorite
             favoriteRepository.toggleFavorite(postItem)
-            _stateFlow.update { it.copy(isFavorite = isFavorite) }
+            _stateFlow.update { state -> state.copy(postItem = state.postItem.copy(favorite = isFavorite)) }
         }
     }
 
@@ -100,17 +100,12 @@ class PostViewModel(
         return _stateFlow.value.postPage < _stateFlow.value.postTotalPage
     }
 
-    fun toggleSystemBarHidden() {
-        _stateFlow.update { it.copy(isSystemBarHidden = !it.isSystemBarHidden) }
-    }
-
     data class UiState(
         val postItem: PostItem,
         val images: Set<String> = setOf(),
         val postPage: Int = 1,
         val postTotalPage: Int = 1,
         val nextPage: String? = null,
-        val isFavorite: Boolean = false,
         val isLoading: Boolean = false,
         val error: Throwable? = null,
         val currentPostUrl: String = "",
