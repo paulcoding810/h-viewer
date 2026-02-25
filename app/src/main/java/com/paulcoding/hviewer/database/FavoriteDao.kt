@@ -20,4 +20,7 @@ interface FavoriteDao {
 
     @Query("DELETE FROM favorite WHERE url = :url")
     suspend fun delete(url: String)
+
+    @Query("SELECT EXISTS (SELECT 1 FROM favorite WHERE url = :url)")
+    fun isFavorite(url: String): Flow<Boolean>
 }

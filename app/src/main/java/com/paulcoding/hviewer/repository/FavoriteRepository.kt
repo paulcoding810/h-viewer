@@ -23,4 +23,6 @@ class FavoriteRepository(private val favoriteDao: FavoriteDao) {
             addFavorite(postItem)
         }
     }
+
+   fun isFavorite(postItem: PostItem) = favoriteDao.isFavorite(postItem.url)
 }

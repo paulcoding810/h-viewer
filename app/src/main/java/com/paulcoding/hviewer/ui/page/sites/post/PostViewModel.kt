@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PostViewModel(
-    private val postItem: PostItem,
+    postItem: PostItem,
     private val historyRepository: HistoryRepository,
     private val favoriteRepository: FavoriteRepository,
 ) : ViewModel() {
@@ -36,6 +36,11 @@ class PostViewModel(
         viewModelScope.launch {
             historyRepository.insert(postItem)
         }
+        viewModelScope.launch {
+            favoriteRepository.isFavorite(postItem).collect { isFavorite ->
+                _stateFlow.update { it.copy(postItem = it.postItem.copy(favorite = isFavorite)) }
+            }
+        }
     }
 
     fun updateScrollIndex(scrollIndex: Int, scrollOffset: Int) {
@@ -44,9 +49,7 @@ class PostViewModel(
 
     fun toggleFavorite() {
         viewModelScope.launch {
-            val isFavorite = !_stateFlow.value.postItem.favorite
-            favoriteRepository.toggleFavorite(postItem)
-            _stateFlow.update { state -> state.copy(postItem = state.postItem.copy(favorite = isFavorite)) }
+            favoriteRepository.toggleFavorite(_stateFlow.value.postItem)
         }
     }
 

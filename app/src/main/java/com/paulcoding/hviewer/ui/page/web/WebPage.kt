@@ -41,10 +41,9 @@ fun WebPage(goBack: () -> Unit, url: String) {
 
     webViewState?.let {
         val cookie = android.webkit.CookieManager.getInstance().getCookie(webViewState?.url ?: url)
-        println("🚀 ~ cookie: $cookie")
         val userAgent = webViewState?.settings?.userAgentString
-        println("🚀 ~ userAgent: $userAgent")
     }
+
     val activity = LocalActivity.current
 
     Scaffold(
