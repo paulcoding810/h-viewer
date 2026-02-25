@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.helper.GlobalData
 import com.paulcoding.hviewer.helper.SCRIPTS_DIR
+import com.paulcoding.hviewer.helper.getTitle
 import com.paulcoding.hviewer.helper.host
 import com.paulcoding.hviewer.model.PostData
 import com.paulcoding.hviewer.model.PostItem
@@ -39,6 +40,18 @@ class PostViewModel(
         viewModelScope.launch {
             favoriteRepository.isFavorite(postItem).collect { isFavorite ->
                 _stateFlow.update { it.copy(postItem = it.postItem.copy(favorite = isFavorite)) }
+            }
+        }
+
+        if (postItem.isDeepLink) {
+            viewModelScope.launch {
+                js.getTitle(postItem.url)
+                    .onSuccess { title ->
+                        _stateFlow.update { it.copy(postItem = it.postItem.copy(name = title)) }
+                    }
+                    .onFailure {
+                        it.printStackTrace()
+                    }
             }
         }
     }

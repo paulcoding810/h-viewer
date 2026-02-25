@@ -33,6 +33,7 @@ data class PostItem(
     val favoriteAt: Long = 0,
     val viewed: Boolean = false,
     val viewedAt: Long = 0,
+    val isDeepLink: Boolean = false,
 )
 
 fun PostItemEntity.toPostItem(): PostItem {

@@ -71,7 +71,7 @@ fun Content(intent: Intent?) {
     val navController = rememberNavController()
 
     fun handleIntentUrl(url: String) {
-        val postItem = PostItem(url = url)
+        val postItem = PostItem(url = url, isDeepLink = true)
         if (GlobalData.siteConfigMap[url.host] != null) {
             navController.navToPost(postItem)
         } else {
