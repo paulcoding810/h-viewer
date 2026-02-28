@@ -17,12 +17,16 @@ import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,25 +58,43 @@ fun SitesPage(
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val effect by viewModel.effect.collectAsStateWithLifecycle()
 
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Scaffold(topBar = {
-        TopAppBar(title = { Text(stringResource(R.string.sites)) }, actions = {
-            HIcon(Icons.Outlined.Download) {
-                navToDownloads()
+    LaunchedEffect(effect) {
+        when (val e = effect) {
+            is SitesViewModel.Effect.UpdatedConfigs -> {
+                snackbarHostState.showSnackbar(
+                    message = "\uD83D\uDE80 Configs updated to version ${e.version}",
+                    withDismissAction = true
+                )
             }
-            HIcon(Icons.Outlined.History) {
-                navToHistory()
-            }
-            HFavoriteIcon(isFavorite = false) {
-                navToFavorite()
-            }
-            HIcon(Icons.Outlined.Settings, "Settings") {
-                navToSettings()
-            }
-        })
-    }) {
+            null -> {}
+        }
+        viewModel.dispatch(SitesViewModel.Actions.ConsumeEffect)
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(stringResource(R.string.sites)) }, actions = {
+                HIcon(Icons.Outlined.Download) {
+                    navToDownloads()
+                }
+                HIcon(Icons.Outlined.History) {
+                    navToHistory()
+                }
+                HFavoriteIcon(isFavorite = false) {
+                    navToFavorite()
+                }
+                HIcon(Icons.Outlined.Settings, "Settings") {
+                    navToSettings()
+                }
+            })
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+    ) {
         PullToRefreshBox(
             modifier = Modifier
                 .fillMaxSize()

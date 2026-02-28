@@ -19,33 +19,24 @@ class SitesViewModel(
     private val _uiState = MutableStateFlow(UiState())
     val uiState = _uiState.asStateFlow()
 
-    private var _remoteConfigs: SiteConfigs? = null
+    private val _effect = MutableStateFlow<Effect?>(null)
+    val effect = _effect.asStateFlow()
 
     init {
         siteConfigsRepository.siteConfigs.onEach { configs -> setConfigs(configs) }.launchIn(viewModelScope)
+        loadSites()
     }
 
     fun dispatch(action: Actions) {
         when (action) {
             is Actions.LoadSites -> loadSites()
-            is Actions.UpdateConfigs -> updateConfigs()
+            is Actions.ConsumeEffect -> {
+                _effect.value = null
+            }
         }
     }
 
     private fun loadSites() {
-        //if (remoteUrl.isEmpty()) {
-        //    throw (Exception("Remote url is empty"))
-        //}
-        //if (remoteUrl != preferences.getRemote()) {
-        //    downloadAndGetConfig(remoteUrl)
-        //    return@withContext SiteConfigsState.NewConfigsInstall(remoteUrl)
-        //}
-
-        //if (currentConfigs == null) {
-        //    downloadAndGetConfig()
-        //    return@withContext SiteConfigsState.NewConfigsInstall(remoteUrl)
-        //} else {
-
         viewModelScope.launch {
             val localConfigs = _uiState.value.siteConfigs ?: return@launch
 
@@ -56,29 +47,19 @@ class SitesViewModel(
 
             siteConfigsRepository.getRemoteConfigs(remoteUrl, branch)
                 .onSuccess { remoteConfigs ->
-                    _remoteConfigs = remoteConfigs
                     if (remoteConfigs.version > localConfigs.version) {
-                        _uiState.update {
-                            it.copy(
-                                updateState = UpdateState(
-                                    version = remoteConfigs.version,
-                                )
-                            )
-                        }
+                        updateConfigs(remoteConfigs)
                     }
                 }
         }
     }
 
-    private fun updateConfigs() {
-        if (_remoteConfigs == null) return
-
+    private fun updateConfigs(remoteConfigs: SiteConfigs) {
         viewModelScope.launch {
-            _uiState.update { it.copy(updateState = it.updateState?.copy(isLoading = true)) }
-            siteConfigsRepository.saveRemoteScripts(_remoteConfigs!!)
+            siteConfigsRepository.saveRemoteScripts(remoteConfigs)
                 .onSuccess {
-                    _uiState.update { it.copy(updateState = null) }
-                    _remoteConfigs = null
+                    _effect.value = Effect.UpdatedConfigs(remoteConfigs.version)
+                    println("🚀 ~ UpdatedConfigs")
                 }
                 .onFailure { exception ->
                     _uiState.update {
@@ -101,9 +82,13 @@ class SitesViewModel(
         }
     }
 
+    sealed class Effect {
+        data class UpdatedConfigs(val version: Int) : Effect()
+    }
+
     sealed class Actions {
         object LoadSites : Actions()
-        object UpdateConfigs : Actions()
+        object ConsumeEffect : Actions()
     }
 
     data class UiState(

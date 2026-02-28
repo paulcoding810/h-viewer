@@ -17,7 +17,7 @@ class Downloader(
         destination: File,
     ): File {
         val input = httpClient
-            .get(downloadUrl){
+            .get(downloadUrl) {
                 header(HttpHeaders.ContentType, ContentType.Application.OctetStream)
             }
             .readRawBytes().inputStream()
@@ -29,8 +29,9 @@ class Downloader(
 
     suspend fun saveGz(tarUrl: String, destination: File) {
         try {
-
-            val response = httpClient.get(tarUrl)
+            val response = httpClient.get(tarUrl) {
+                header(HttpHeaders.ContentType, ContentType.Application.OctetStream)
+            }
             val inputStream = response.readRawBytes().inputStream()
             extractTarGzFromResponseBody(inputStream, destination)
         } catch (e: Exception) {
