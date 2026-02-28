@@ -96,7 +96,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
-    implementation(libs.js)
+    implementation(libs.js) {
+        exclude(
+            group = "io.ktor",
+        )
+    }
     implementation(libs.androidx.navigation.compose)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.mmkv)
