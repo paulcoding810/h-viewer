@@ -1,9 +1,7 @@
 package com.paulcoding.hviewer.ui.page.web
 
 import android.annotation.SuppressLint
-import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
@@ -13,27 +11,18 @@ import androidx.compose.ui.viewinterop.AndroidView
 fun HWebView(
     modifier: Modifier = Modifier,
     url: String,
+    onWebViewCreated: (WebView) -> Unit = {}
 ) {
-    class WebAppInterface {
-        @JavascriptInterface
-        fun senData(data: String) {
-            println(data)
-        }
-    }
     AndroidView(
         modifier = modifier,
         factory = { context ->
             WebView(context).apply {
                 settings.javaScriptEnabled = true
-                webViewClient = object : WebViewClient() {
-                    override fun onPageFinished(webview: WebView, url: String?) {
-                        super.onPageFinished(webview, url)
-                        webview.loadUrl("javascript:window.HViewer.senData('Hello from WebView')")
-                    }
-                }
+                webViewClient = HWebViewClient(url)
                 val jsInterface = WebAppInterface()
                 addJavascriptInterface(jsInterface, "HViewer")
                 loadUrl(url)
+                onWebViewCreated(this)
             }
         }
     )

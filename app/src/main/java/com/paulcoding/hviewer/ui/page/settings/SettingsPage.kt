@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.page.settings
 
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -32,11 +33,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,46 +44,48 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.setSecureScreen
-import com.paulcoding.hviewer.helper.makeToast
-import com.paulcoding.hviewer.preference.Preferences
-import com.paulcoding.hviewer.ui.component.ConfirmDialog
+import com.paulcoding.hviewer.model.ListScriptType
 import com.paulcoding.hviewer.ui.component.H7Tap
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.component.HLoading
-import com.paulcoding.hviewer.ui.page.AppViewModel
+import com.paulcoding.hviewer.ui.component.NewAppReleaseDialog
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsPage(
-    appViewModel: AppViewModel,
+    viewModel: SettingsViewModel = koinViewModel(),
+    navToListScript: (ListScriptType) -> Unit,
     goBack: () -> Boolean,
-    navToListScript: () -> Unit,
-    navToListCrashLog: () -> Unit
 ) {
-    val appState by appViewModel.stateFlow.collectAsState()
-    var modalVisible by remember { mutableStateOf(false) }
-    var secureScreen by remember { mutableStateOf(Preferences.secureScreen) }
     val context = LocalContext.current
     val window = (context as ComponentActivity).window
-    var lockModalVisible by remember { mutableStateOf(false) }
-    var appLockEnabled by remember { mutableStateOf(Preferences.pin.isNotEmpty()) }
-    var newVersion by remember { mutableStateOf("") }
-    var downloadUrl by remember { mutableStateOf("") }
+
     val scrollState = rememberScrollState()
 
+    val uiState by viewModel.uiState.collectAsState()
+    val effect by viewModel.effect.collectAsState()
+
+
     fun onAppLockEnabled(pin: String) {
-        Preferences.pin = pin
-        appLockEnabled = true
-        appViewModel.lock()
+        viewModel.dispatch(SettingsViewModel.Action.SetPin(pin))
     }
 
     fun onAppLockDisabled() {
-        Preferences.pin = ""
-        appLockEnabled = false
+        viewModel.dispatch(SettingsViewModel.Action.DisableLock)
+    }
+
+    LaunchedEffect(effect) {
+        when (val _effect = effect) {
+            is SettingsViewModel.Effect.Toast -> {
+                Toast.makeText(context, _effect.message, Toast.LENGTH_LONG).show()
+            }
+            null -> {}
+        }
+        viewModel.dispatch(SettingsViewModel.Action.ConsumeEffect(effect))
     }
 
     Scaffold(topBar = {
@@ -102,11 +103,11 @@ fun SettingsPage(
                     .weight(1f)
                     .verticalScroll(scrollState), verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                SettingRow(stringResource(R.string.remote_url),
-                    description = Preferences.getRemote()
-                        .ifEmpty { "https://github.com/{OWNER}/{REPO}/" },
+                SettingRow(
+                    stringResource(R.string.remote_url),
+                    description = uiState.remoteUrl,
                     onClick = {
-                        modalVisible = true
+                        viewModel.dispatch(SettingsViewModel.Action.ToggleRemoteModal(true))
                     }) {
                     Icon(Icons.Outlined.Edit, "Edit remote url")
                 }
@@ -114,10 +115,10 @@ fun SettingsPage(
                 HorizontalDivider()
 
                 SettingRow(stringResource(R.string.enable_secure_screen)) {
-                    SettingSwitch(checked = secureScreen,
+                    SettingSwitch(
+                        checked = uiState.isSecureScreenEnabled,
                         onCheckedChange = {
-                            secureScreen = it
-                            Preferences.secureScreen = it
+                            viewModel.dispatch(SettingsViewModel.Action.SetSecureScreen(it))
                             window.setSecureScreen(it)
                         })
                 }
@@ -125,9 +126,9 @@ fun SettingsPage(
                 HorizontalDivider()
 
                 SettingRow(stringResource(R.string.lock_screen)) {
-                    SettingSwitch(checked = appLockEnabled, onCheckedChange = { locked ->
+                    SettingSwitch(checked = uiState.isLockScreenEnabled, onCheckedChange = { locked ->
                         if (locked) {
-                            lockModalVisible = true
+                            viewModel.dispatch(SettingsViewModel.Action.SetEditPinModalVisible(true))
                         } else {
                             onAppLockDisabled()
                         }
@@ -136,10 +137,10 @@ fun SettingsPage(
 
                 HorizontalDivider()
 
-                if (appState.isDevMode) {
+                if (uiState.isDevMode) {
                     SettingRow(
                         stringResource(R.string.open_crash_log),
-                        onClick = navToListCrashLog
+                        onClick = { navToListScript(ListScriptType.Crash) }
                     ) {
                         Icon(Icons.Outlined.BugReport, "Open crash log files", Modifier.size(24.dp))
                     }
@@ -147,7 +148,7 @@ fun SettingsPage(
 
                     SettingRow(
                         stringResource(R.string.edit_local_scripts),
-                        onClick = navToListScript
+                        onClick = { navToListScript(ListScriptType.Script) }
                     ) {
                         Icon(
                             Icons.Outlined.Description,
@@ -163,56 +164,39 @@ fun SettingsPage(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 H7Tap() {
-                    appViewModel.setDevMode(it)
+                    viewModel.dispatch(SettingsViewModel.Action.SetDevMode(true))
                 }
                 HIcon(Icons.Outlined.Update, tint = MaterialTheme.colorScheme.primary) {
-                    appViewModel.checkForUpdate(BuildConfig.VERSION_NAME,
-                        onUpToDate = {
-                            makeToast(R.string.up_to_date)
-                        },
-                        onUpdateAvailable = { version, url ->
-                            newVersion = version
-                            downloadUrl = url
-                        })
+                    viewModel.dispatch(SettingsViewModel.Action.CheckForAppUpdate(showToast = true))
                 }
             }
         }
     }
 
-    if (modalVisible) InputRemoteModal(
-        initialText = Preferences.getRemote(),
-        initialBranch = Preferences.branch,
-        setVisible = {
-            modalVisible = it
-        }) { repo, branch ->
-        Preferences.branch = branch
-        appViewModel.checkVersionOrUpdate(repo, onUpdate = { state ->
-            makeToast(state.getToastMessage())
-            goBack()
-        })
-    }
-
-    if (lockModalVisible) LockModal(onDismiss = { lockModalVisible = false }) {
-        onAppLockEnabled(it)
-    }
-
-    ConfirmDialog(
-        showDialog = newVersion.isNotEmpty(),
-        title = stringResource(R.string.update_available),
-        text = newVersion,
-        confirmColor = MaterialTheme.colorScheme.primary,
-        confirmText = stringResource(R.string.install_now),
-        dismissColor = MaterialTheme.colorScheme.onBackground,
+    if (uiState.showRemoteModal) InputRemoteModal(
+        initialText = uiState.remoteUrl,
+        initialBranch = uiState.remoteBranch,
         onDismiss = {
-            newVersion = ""
-        },
-        onConfirm = {
-            appViewModel.downloadAndInstallApk(context, downloadUrl)
-            newVersion = ""
-        }
-    )
+            viewModel.dispatch(SettingsViewModel.Action.ToggleRemoteModal(false))
+        }) { repo, branch ->
+        viewModel.dispatch(SettingsViewModel.Action.UpdateRemoteUrl(repo, branch))
+    }
 
-    if (appState.updatingApk) {
+    if (uiState.showOinModal) {
+        LockModal(
+            onDismiss = { viewModel.dispatch(SettingsViewModel.Action.SetEditPinModalVisible(false)) },
+            onPinConfirmed = { onAppLockEnabled(it) }
+        )
+    }
+
+    uiState.newRelease?.let {
+        NewAppReleaseDialog(
+            release = it,
+            onAction = viewModel::dispatch
+        )
+    }
+
+    if (uiState.isUpdating) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

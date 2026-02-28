@@ -11,22 +11,29 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.FileProvider
 import com.paulcoding.hviewer.ACTION_INSTALL_APK
+import com.paulcoding.hviewer.APK_NAME
 import com.paulcoding.hviewer.CHECK_FOR_UPDATE_APK_CHANNEL
 import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.helper.DownloadImageService
+import com.paulcoding.hviewer.helper.DownloadImageService.Companion.ACTION_STOP_SERVICE
+import com.paulcoding.hviewer.helper.Downloader
 import com.paulcoding.hviewer.model.HRelease
-import com.paulcoding.hviewer.network.Github
-import com.paulcoding.hviewer.ui.page.post.DownloadService
-import com.paulcoding.hviewer.ui.page.post.DownloadService.Companion.ACTION_STOP_SERVICE
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
+import org.koin.android.ext.android.inject
+import java.io.File
 import kotlin.coroutines.CoroutineContext
 
-class DownloadApkService : Service() {
+class DownloadApkService() : Service() {
     private lateinit var notificationManager: NotificationManager
     private lateinit var notificationBuilder: NotificationCompat.Builder
+
+    private val downloader: Downloader  by inject()
+    private val json: Json by inject()
 
     private val job = SupervisorJob()
     private val coroutineContext: CoroutineContext
@@ -56,7 +63,7 @@ class DownloadApkService : Service() {
             return START_NOT_STICKY
         }
 
-        val release = intent.getParcelableExtra<HRelease>("release")
+        val release = intent.getStringExtra(EXTRA_NEW_RELEASE)?.run { json.decodeFromString<HRelease>(this) }
 
         if (release == null) {
             stopSelf()
@@ -77,14 +84,16 @@ class DownloadApkService : Service() {
     private fun downloadAndInstall(context: Context, release: HRelease) {
         try {
             CoroutineScope(coroutineContext).launch {
-                Github.downloadApk(context, release.downloadUrl) { file ->
-                    val uri = FileProvider.getUriForFile(
-                        context,
-                        "${context.packageName}.fileprovider",
-                        file
-                    )
-                    showDownloadCompleteNotification(release, uri)
-                }
+                val file = downloader.download(
+                    downloadUrl = release.downloadUrl,
+                    destination = File(context.cacheDir, APK_NAME)
+                )
+                val uri = FileProvider.getUriForFile(
+                    context,
+                    "${context.packageName}.fileprovider",
+                    file
+                )
+                showDownloadCompleteNotification(release, uri)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -104,7 +113,7 @@ class DownloadApkService : Service() {
     }
 
     private fun createNotification(): Notification {
-        val stopIntent = Intent(this, DownloadService::class.java).apply {
+        val stopIntent = Intent(this, DownloadImageService::class.java).apply {
             action = ACTION_STOP_SERVICE
         }
         val stopPendingIntent =
@@ -154,5 +163,15 @@ class DownloadApkService : Service() {
                 .build()
 
         notificationManager.notify(notificationId, completedNotification)
+    }
+
+    companion object {
+        const val EXTRA_NEW_RELEASE = "extra_new_release"
+
+        fun getIntent(context: Context, json: Json, release: HRelease): Intent {
+            return Intent(context, DownloadApkService::class.java).apply {
+                putExtra(EXTRA_NEW_RELEASE, json.encodeToString(release))
+            }
+        }
     }
 }

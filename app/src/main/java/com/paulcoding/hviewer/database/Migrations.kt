@@ -56,13 +56,71 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         )
 
         // Step 2: Copy data from favorite_posts to post_items
-        db.execSQL("""
+        db.execSQL(
+            """
             INSERT INTO post_items (url, name, thumbnail, createdAt, tags, size, views, quantity, favorite, favoriteAt, viewed, viewedAt)
             SELECT url, name, thumbnail, createdAt, tags, size, views, quantity, 1, createdAt, 1, createdAt FROM favorite_posts
-        """.trimIndent())
+        """.trimIndent()
+        )
 
         // Step 3: Drop tables
         db.execSQL("DROP TABLE favorite_posts")
         db.execSQL("DROP TABLE history")
     }
 }
+
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        // Step 1: Create a new tables favorite, history
+        db.execSQL("DROP TABLE IF EXISTS favorite")
+        db.execSQL("DROP TABLE IF EXISTS history")
+        db.execSQL("DROP TABLE IF EXISTS favorite_posts")
+        db.execSQL("DROP TABLE IF EXISTS tags")
+
+        db.execSQL(
+            """
+                CREATE TABLE IF NOT EXISTS favorite (
+                    `url`        TEXT NOT NULL,
+                    `name`       TEXT NOT NULL,
+                    `thumbnail`  TEXT NOT NULL,
+                    `tags`       TEXT,
+                    `favoriteAt` INTEGER NOT NULL,
+                    PRIMARY KEY (`url`)
+                );
+        """.trimIndent()
+        )
+        db.execSQL(
+            """
+              CREATE TABLE IF NOT EXISTS history (
+                    `url`        TEXT NOT NULL,
+                    `name`       TEXT NOT NULL,
+                    `thumbnail`  TEXT NOT NULL,
+                    `tags`       TEXT,
+                    `viewedAt` INTEGER NOT NULL,
+                    PRIMARY KEY (`url`)
+              );
+        """.trimIndent()
+        )
+
+        // Step 2: Copy data from post_items to favorite, history
+        db.execSQL(
+            """
+            INSERT INTO favorite (url, name, thumbnail, tags, favoriteAt)
+            SELECT url, name, thumbnail, tags, favoriteAt FROM post_items WHERE favorite = 1
+        """.trimIndent()
+        )
+        db.execSQL(
+            """
+            INSERT INTO history (url, name, thumbnail, tags, viewedAt)
+            SELECT url, name, thumbnail, tags, viewedAt
+            FROM post_items WHERE viewed = 1
+        """.trimIndent()
+        )
+
+        // Step 3: Drop tables
+        db.execSQL("DROP TABLE post_items")
+    }
+}
+
+val migrations = arrayOf(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)

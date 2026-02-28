@@ -7,7 +7,7 @@ commonsCompress = "1.27.1"
 concurrentFuturesKtx = "1.2.0"
 desugar_jdk_libs = "2.1.5"
 javascriptengine = "1.0.0-beta01"
-js = "1.0.3"
+js = "1.0.4"
 kotlin = "2.1.10"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -19,7 +19,6 @@ ktorClientAndroid = "3.1.1"
 ktorClientContentNegotiation = "3.1.1"
 ktorClientCore = "3.1.1"
 ktorClientLogging = "3.1.1"
-ktorSerializationGson = "3.1.1"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.1"
 composeBom = "2025.02.00"
@@ -31,7 +30,13 @@ roomRuntime = "2.6.1"
 webkit = "1.13.0-rc01"
 workRuntimeKtx = "2.10.0"
 zoomable = "0.15.1"
-material3 = "1.3.1"
+material3 = "1.4.0"
+
+koin = "4.1.0"
+koin-annotations = "2.3.0"
+koin-plugin = "0.3.0"
+
+kotlinx-serialization = "1.9.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
@@ -73,15 +78,24 @@ ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "k
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClientContentNegotiation" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
 ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
-ktor-serialization-gson = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktorSerializationGson" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktorClientCore" }
 language-textmate = { module = "io.github.Rosemoe.sora-editor:language-textmate" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 mmkv = { module = "com.tencent:mmkv", version.ref = "mmkv" }
 zoomable = { module = "me.saket.telephoto:zoomable", version.ref = "zoomable" }
+
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-androidx-workmanager = { module = "io.insert-koin:koin-androidx-workmanager", version.ref = "koin" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-ktor = { module = "io.insert-koin:koin-ktor", version.ref = "koin" }
+koin-logger-slf4j = { module = "io.insert-koin:koin-logger-slf4j", version.ref = "koin" }
+koin-annotations = { module = "io.insert-koin:koin-annotations", version.ref = "koin-annotations" }
+
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-
+koin-compiler = { id = "io.insert-koin.compiler.plugin", version.ref = "koin-plugin" }

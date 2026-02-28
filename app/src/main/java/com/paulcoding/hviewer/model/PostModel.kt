@@ -1,24 +1,30 @@
 package com.paulcoding.hviewer.model
 
-import android.os.Parcelable
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class PostData(
     val images: List<String>,
     val total: Int,
     val next: String? = null
 )
 
-
-@Entity(tableName = "post_items")
-data class PostItem(
-    @PrimaryKey
+@Serializable
+data class PostItemEntity(
     val url: String = "",
     val name: String = "",
     val thumbnail: String = "",
-    val createdAt: Long = 0,
+    val tags: List<Tag>? = null,
+    val size: Int? = null,
+    val views: Int? = null,
+    val quantity: Int? = null,
+)
+
+@Serializable
+data class PostItem(
+    val url: String = "",
+    val name: String = "",
+    val thumbnail: String = "",
     val tags: List<Tag>? = null,
     val size: Int? = null,
     val views: Int? = null,
@@ -27,25 +33,47 @@ data class PostItem(
     val favoriteAt: Long = 0,
     val viewed: Boolean = false,
     val viewedAt: Long = 0,
-) {
-    fun getHost(): String {
-        return url.split("/").getOrNull(2) ?: ""
-    }
+    val isDeepLink: Boolean = false,
+)
 
-    fun getSiteConfig(hostsMap: Map<String, SiteConfig>): SiteConfig? {
-        val host = getHost()
-        return hostsMap[host]
-    }
+fun PostItemEntity.toPostItem(): PostItem {
+    return PostItem(
+        url = url,
+        name = name,
+        thumbnail = thumbnail,
+        tags = tags,
+        size = size,
+        views = views,
+        quantity = quantity,
+        favorite = false,
+        viewed = false
+    )
 }
 
-@Parcelize
+@Serializable
 data class Tag(
     val name: String = "",
     val url: String = "",
-) : Parcelable
+)
 
+@Serializable
+data class PostsEntity(
+    val posts: List<PostItemEntity> = listOf(),
+    val total: Int = 1,
+    val next: String? = null
+)
+
+@Serializable
 data class Posts(
     val posts: List<PostItem> = listOf(),
     val total: Int = 1,
     val next: String? = null
 )
+
+fun PostsEntity.toPosts(): Posts {
+    return Posts(
+        posts = posts.map { it.toPostItem() },
+        total = total,
+        next = next
+    )
+}

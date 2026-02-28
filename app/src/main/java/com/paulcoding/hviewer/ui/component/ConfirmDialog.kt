@@ -12,7 +12,6 @@ import com.paulcoding.hviewer.R
 
 @Composable
 fun ConfirmDialog(
-    showDialog: Boolean,
     title: String = "",
     text: String = "",
     confirmColor: Color? = null,
@@ -22,27 +21,25 @@ fun ConfirmDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { onDismiss() },
-            title = { Text(text = title) },
-            text = { Text(text = text) },
-            confirmButton = {
-                TextButton(onClick = { onConfirm() }) {
-                    Text(
-                        confirmText ?: stringResource(R.string.confirm),
-                        color = confirmColor ?: MaterialTheme.colorScheme.error
-                    )
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { onDismiss() }) {
-                    Text(
-                        dismissText ?: stringResource(R.string.cancel),
-                        color = dismissColor ?: MaterialTheme.colorScheme.onBackground
-                    )
-                }
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = { Text(text = title) },
+        text = { Text(text = text) },
+        confirmButton = {
+            TextButton(onClick = { onConfirm() }) {
+                Text(
+                    confirmText ?: stringResource(R.string.confirm),
+                    color = confirmColor ?: MaterialTheme.colorScheme.error
+                )
             }
-        )
-    }
+        },
+        dismissButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text(
+                    dismissText ?: stringResource(R.string.cancel),
+                    color = dismissColor ?: MaterialTheme.colorScheme.onBackground
+                )
+            }
+        }
+    )
 }

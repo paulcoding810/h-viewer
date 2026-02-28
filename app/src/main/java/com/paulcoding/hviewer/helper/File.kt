@@ -2,8 +2,9 @@ package com.paulcoding.hviewer.helper
 
 import android.content.Context
 import android.os.Environment
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -54,19 +55,14 @@ fun Context.readFile(fileName: String, fileDir: File = scriptsDir): String {
     }
 }
 
-inline fun <reified T> Context.readJsonFile(fileName: String): Result<T> {
-    return runCatching {
-        val content = readFile(fileName)
-        return@runCatching Gson().fromJson(content, T::class.java)
-    }
+inline fun <reified T> Context.readJsonFile(fileName: String): Result<T> = runCatching {
+    val content = readFile(fileName)
+    Json.decodeFromString(content)
 }
 
-inline fun <reified T> Context.readConfigFile(): Result<T> {
-    return runCatching {
-        if (!configFile.exists())
-            throw (FileNotFoundException(configFile.absolutePath))
-        val content = readFile(CONFIG_FILE)
-        val type = object : TypeToken<T>() {}.type
-        Gson().fromJson(content, type) as T
-    }
+suspend inline fun <reified T> Context.readConfigFile(): T = withContext(Dispatchers.IO) {
+    if (!configFile.exists())
+        throw (FileNotFoundException(configFile.absolutePath))
+    val content = readFile(CONFIG_FILE)
+    Json.decodeFromString(content)
 }

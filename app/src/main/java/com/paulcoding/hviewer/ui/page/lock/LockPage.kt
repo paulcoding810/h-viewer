@@ -19,15 +19,16 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.paulcoding.hviewer.PIN_COUNT
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.helper.makeToast
-import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.ui.component.HOTP
 import kotlinx.coroutines.delay
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LockPage(onUnlocked: () -> Unit) {
+fun LockPage(lockViewModel: LockViewModel = koinInject(), onUnlocked: () -> Unit) {
     val focusRequester = remember { FocusRequester() }
     val context = LocalContext.current
 
@@ -51,8 +52,8 @@ fun LockPage(onUnlocked: () -> Unit) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(stringResource(R.string.enter_your_pin))
                 Spacer(modifier = Modifier.height(12.dp))
-                HOTP(modifier = Modifier.focusRequester(focusRequester)) {
-                    if (it == Preferences.pin) {
+                HOTP(modifier = Modifier.focusRequester(focusRequester), pinCount = PIN_COUNT) {
+                    if (it == lockViewModel.pin) {
                         onUnlocked()
                     } else {
                         makeToast(context.getString(R.string.wrong_pin))

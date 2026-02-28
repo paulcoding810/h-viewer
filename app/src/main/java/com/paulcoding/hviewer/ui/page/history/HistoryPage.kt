@@ -32,19 +32,19 @@ import com.paulcoding.hviewer.ui.component.ConfirmDialog
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HIcon
-import com.paulcoding.hviewer.ui.page.AppViewModel
-import com.paulcoding.hviewer.ui.page.posts.PostCard
+import com.paulcoding.hviewer.ui.page.sites.composable.PostCard
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryPage(
-    goBack: () -> Unit, appViewModel: AppViewModel,
+    viewModel: HistoryViewModel = koinViewModel(),
+    goBack: () -> Unit,
     navToImages: (PostItem) -> Unit,
-    navToCustomTag: (PostItem, Tag) -> Unit,
-    clearHistory: () -> Unit,
-    deleteHistory: (post: PostItem) -> Unit
+    navToCustomTag: (Tag) -> Unit,
 ) {
-    val historyPosts by appViewModel.historyPosts.collectAsState(initial = listOf())
+    val historyPosts by viewModel.viewedPosts.collectAsState()
+
     var showsConfirmClearHistory by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -78,9 +78,7 @@ fun HistoryPage(
                 items(historyPosts) {
                     PostCard(
                         postItem = it,
-                        onTagClick = { tag ->
-                            navToCustomTag(it, tag)
-                        },
+                        onTagClick = navToCustomTag,
                         onClick = {
                             navToImages(it)
                         }) {
@@ -88,7 +86,7 @@ fun HistoryPage(
                             Icons.Outlined.Delete,
                             "Delete",
                         ) {
-                            deleteHistory(it)
+                            viewModel.deleteHistory(it)
                         }
                     }
                 }
@@ -100,13 +98,16 @@ fun HistoryPage(
                 )
         }
 
-        ConfirmDialog(showDialog = showsConfirmClearHistory,
-            onDismiss = { showsConfirmClearHistory = false },
-            title = stringResource(R.string.clear_history),
-            text = stringResource(R.string.clear_history_confirm),
-            onConfirm = {
-                clearHistory()
-                showsConfirmClearHistory = true
-            })
+        if (showsConfirmClearHistory) {
+            ConfirmDialog(
+                onDismiss = { showsConfirmClearHistory = false },
+                title = stringResource(R.string.clear_history),
+                text = stringResource(R.string.clear_history_confirm),
+                onConfirm = {
+                    viewModel.deleteAllHistory()
+                    showsConfirmClearHistory = true
+                }
+            )
+        }
     }
 }

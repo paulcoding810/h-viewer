@@ -37,15 +37,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.helper.GithubParser
 import com.paulcoding.hviewer.helper.makeToast
-import com.paulcoding.hviewer.network.Github
 
 
 @Composable
 fun InputRemoteModal(
     initialText: String = "",
     initialBranch: String = "main",
-    setVisible: (Boolean) -> Unit,
+    onDismiss: () -> Unit,
     onSubmit: (String, String) -> Unit
 ) {
     var textFieldValue by remember { mutableStateOf(TextFieldValue(initialText)) }
@@ -53,17 +53,13 @@ fun InputRemoteModal(
     val focusRequester = remember { FocusRequester() }
 
     fun submit() {
-        val url = Github.parseRemoteUrl(textFieldValue.text)
+        val url = GithubParser.parseRemoteUrl(textFieldValue.text)
         if (url.isNullOrEmpty()) {
             return makeToast(R.string.invalid_repo)
         } else {
-            setVisible(false)
+            onDismiss()
             onSubmit(textFieldValue.text, branch)
         }
-    }
-
-    fun dismiss() {
-        setVisible(false)
     }
 
     LaunchedEffect(Unit) {
@@ -71,7 +67,7 @@ fun InputRemoteModal(
     }
 
     Dialog(
-        onDismissRequest = { dismiss() },
+        onDismissRequest = onDismiss,
         properties = DialogProperties(dismissOnClickOutside = true)
     ) {
         Box(
@@ -121,7 +117,7 @@ fun InputRemoteModal(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(onClick = { dismiss() }) {
+                    TextButton(onClick = onDismiss) {
                         Text(
                             stringResource(R.string.cancel),
                             color = MaterialTheme.colorScheme.onBackground

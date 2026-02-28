@@ -15,8 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.extensions.isScrollingUp
-import com.paulcoding.hviewer.ui.page.fadeInWithBlur
-import com.paulcoding.hviewer.ui.page.fadeOutWithBlur
+import com.paulcoding.hviewer.helper.fadeInWithBlur
+import com.paulcoding.hviewer.helper.fadeOutWithBlur
 import kotlinx.coroutines.launch
 
 @Composable

@@ -8,53 +8,36 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.BugReport
-import androidx.compose.material.icons.outlined.Javascript
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.paulcoding.hviewer.helper.makeToast
+import com.paulcoding.hviewer.model.ListScriptType
 import com.paulcoding.hviewer.ui.component.HBackIcon
-import com.paulcoding.hviewer.ui.page.AppViewModel
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ListScriptPage(
-    appViewModel: AppViewModel,
-    type: String,
+    viewModel: ListScriptViewModel = koinViewModel(),
     goBack: () -> Unit,
-    navToEditor: (String) -> Unit,
+    navToEditor: (ListScriptType, String) -> Unit,
 ) {
 
-    val listFiles = when (type) {
-        "script" -> appViewModel.listScriptFiles
-        "crash_log" -> appViewModel.listCrashLogFiles
-        else -> emptyList()
-    }
-
-    val title = when (type) {
-        "script" -> "List Script"
-        "crash_log" -> "List Crash Log"
-        else -> ""
-    }
-
-    val fileIcon = when (type) {
-        "script" -> Icons.Outlined.Javascript
-        "crash_log" -> Icons.Outlined.BugReport
-        else -> return makeToast("Unknown type $type")
-    }
+    val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(title = { Text(text = title) },
+            TopAppBar(
+                title = { Text(text = uiState.title) },
                 navigationIcon = {
                     HBackIcon {
                         goBack()
@@ -67,18 +50,18 @@ fun ListScriptPage(
                 .padding(paddings)
                 .fillMaxSize()
         ) {
-            items(listFiles, key = { it.name }) {
+            items(uiState.files, key = { it.name }) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                         .clickable {
-                            navToEditor(it.name)
+                            navToEditor(uiState.type, it.name)
                         },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        fileIcon,
+                        uiState.icon,
                         contentDescription = "Javascript",
                         modifier = Modifier.size(32.dp),
                     )
