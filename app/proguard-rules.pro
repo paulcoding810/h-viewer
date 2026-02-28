@@ -38,6 +38,7 @@
 -keep class io.ktor.** { *; }
 -dontwarn java.lang.management.ManagementFactory
 -dontwarn java.lang.management.RuntimeMXBean
+-dontwarn com.sun.nio.file.SensitivityWatchEventModifier
 
 ### Gson
 -keep class com.google.gson.** { *; }
