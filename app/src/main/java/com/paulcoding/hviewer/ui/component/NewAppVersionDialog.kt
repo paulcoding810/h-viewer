@@ -11,7 +11,7 @@ import com.paulcoding.hviewer.ui.page.settings.SettingsViewModel
 fun NewAppReleaseDialog(release: HRelease, onAction: (SettingsViewModel.Action) -> Unit) {
     ConfirmDialog(
         title = stringResource(R.string.update_available),
-        text = release.version,
+        text = "${stringResource(R.string.version_, release.version)}\n${release.body}",
         confirmColor = MaterialTheme.colorScheme.primary,
         confirmText = stringResource(R.string.install_now),
         dismissColor = MaterialTheme.colorScheme.onBackground,
