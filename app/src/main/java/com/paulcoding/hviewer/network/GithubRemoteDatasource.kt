@@ -36,6 +36,7 @@ class GithubRemoteDatasource(
         val jsonObject: Release = httpClient.get(url).body()
         val latestVersion = jsonObject.tagName.substring(1)
         val downloadUrl = jsonObject.assets[0].browserDownloadUrl
-        return HRelease(latestVersion, downloadUrl)
+        val body = jsonObject.body
+        return HRelease(version = latestVersion, downloadUrl = downloadUrl, body = body)
     }
 }

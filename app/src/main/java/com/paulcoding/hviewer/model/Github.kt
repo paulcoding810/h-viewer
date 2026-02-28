@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
     @SerialName("tag_name")
     val tagName: String,
     val assets: List<Asset>,
-
+    val body: String,
     )
 
 @Serializable
@@ -22,7 +22,8 @@ data class Asset(
 @Serializable
 data class HRelease(
     val version: String,
-    val downloadUrl: String
+    val downloadUrl: String,
+    val body: String
 )
 
 val HRelease.isUpdatable

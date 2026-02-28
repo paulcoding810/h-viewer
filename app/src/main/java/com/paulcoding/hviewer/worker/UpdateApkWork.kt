@@ -50,11 +50,10 @@ class UpdateApkWorker(
         val notificationManager = context.getSystemService(NotificationManager::class.java)
         val notificationBuilder = NotificationCompat.Builder(context, CHECK_FOR_UPDATE_APK_CHANNEL)
             .setContentTitle(context.getString(R.string.new_version_available))
-            .setContentText(
-                context.getString(
-                    R.string.version_,
-                    release.version,
-                )
+            .setContentText(release.version)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText("${context.getString(R.string.version_, release.version)}\n${release.body}")
             )
             .setSmallIcon(R.mipmap.ic_launcher_foreground)
             .addAction(
