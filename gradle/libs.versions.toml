@@ -32,8 +32,8 @@ workRuntimeKtx = "2.10.0"
 zoomable = "0.15.1"
 material3 = "1.4.0"
 
-koin = "4.1.0"
-koin-annotations = "2.3.0"
+koin = "4.1.1"
+koin-annotations = "2.3.1"
 koin-plugin = "0.3.0"
 
 kotlinx-serialization = "1.9.0"
