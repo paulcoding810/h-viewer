@@ -34,8 +34,8 @@ class GithubRemoteDatasource(
         val (owner, repo) = GithubParser.parseRepo(BuildConfig.REPO_URL)
         val url = "https://api.github.com/repos/${owner}/${repo}/releases/latest"
         val jsonObject: Release = httpClient.get(url).body()
-        val latestVersion = jsonObject.tag_name.substring(1)
-        val downloadUrl = jsonObject.assets[0].browser_download_url
+        val latestVersion = jsonObject.tagName.substring(1)
+        val downloadUrl = jsonObject.assets[0].browserDownloadUrl
         return HRelease(latestVersion, downloadUrl)
     }
 }

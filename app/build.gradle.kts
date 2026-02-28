@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    //alias(libs.plugins.koin.compiler)
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.devtools.ksp")
     id("kotlin-parcelize")
@@ -23,13 +22,12 @@ android {
     namespace = "com.paulcoding.hviewer"
     compileSdk = 36
 
-    //val repoUrl = providers.exec {
-    //    commandLine = "git remote get-url origin".split(' ')
-    //}.standardOutput.asText.get().trim().removePrefix("https://github.com/")
-    //    .removePrefix("git@github.com:")
-    //    .removeSuffix(".git")
-    //    .prefixIfNot("https://github.com/")
-    val repoUrl = "https://github.com/paulcoding810/h-viewer"
+    val repoUrl = providers.exec {
+        commandLine = "git remote get-url origin".split(' ')
+    }.standardOutput.asText.get().trim().removePrefix("https://github.com/")
+        .removePrefix("git@github.com:")
+        .removeSuffix(".git")
+        .prefixIfNot("https://github.com/")
 
     defaultConfig {
         applicationId = "com.paulcoding.hviewer"

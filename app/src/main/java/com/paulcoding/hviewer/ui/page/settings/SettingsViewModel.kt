@@ -7,8 +7,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.APK_NAME
-import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.model.HRelease
+import com.paulcoding.hviewer.model.isUpdatable
 import com.paulcoding.hviewer.preference.Preferences
 import com.paulcoding.hviewer.repository.SiteConfigsRepository
 import com.paulcoding.hviewer.repository.UpdateAppRepository
@@ -108,7 +108,7 @@ class SettingsViewModel(
                 .onSuccess { release ->
                     checkedForUpdateAtLaunch = true
 
-                    if (release.version != BuildConfig.VERSION_NAME) {
+                    if (release.isUpdatable) {
                         _uiState.update { it.copy(newRelease = release) }
                     } else {
                         _effect.value = Effect.Toast("App is up to date")

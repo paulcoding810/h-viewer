@@ -30,6 +30,7 @@ import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.serialization.json.Json
 import org.koin.androidx.workmanager.dsl.workerOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
@@ -98,6 +99,15 @@ val appModule = module {
 
     single {
         get<AppDatabase>().favoriteItemDao()
+    }
+
+    single {
+        Json {
+            // Allows unquoted keys and values, and other minor malformations not strictly compliant with the RFC spec.
+            isLenient = true
+            // Ignores fields in the JSON payload that are not present in your Kotlin data class.
+            ignoreUnknownKeys = true
+        }
     }
 
     single {

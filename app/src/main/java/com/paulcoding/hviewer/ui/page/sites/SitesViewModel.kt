@@ -59,7 +59,6 @@ class SitesViewModel(
             siteConfigsRepository.saveRemoteScripts(remoteConfigs)
                 .onSuccess {
                     _effect.value = Effect.UpdatedConfigs(remoteConfigs.version)
-                    println("🚀 ~ UpdatedConfigs")
                 }
                 .onFailure { exception ->
                     _uiState.update {

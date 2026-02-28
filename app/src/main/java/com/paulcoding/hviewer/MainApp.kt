@@ -16,6 +16,7 @@ import com.paulcoding.js.JS
 import com.tencent.mmkv.MMKV
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
+import org.koin.androidx.workmanager.koin.workManagerFactory
 import org.koin.core.context.startKoin
 
 class MainApp : Application() {
@@ -36,10 +37,10 @@ class MainApp : Application() {
         startKoin {
             androidLogger()
             androidContext(this@MainApp)
+            workManagerFactory()
             modules(networkModule)
             modules(viewModelModule)
             modules(repositoryModule)
-            modules(appModule)
             modules(appModule)
         }
     }

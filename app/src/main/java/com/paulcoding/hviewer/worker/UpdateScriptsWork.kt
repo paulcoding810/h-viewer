@@ -12,19 +12,21 @@ import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.CHECK_FOR_UPDATE_CHANNEL
 import com.paulcoding.hviewer.MainActivity
 import com.paulcoding.hviewer.R
-import com.paulcoding.hviewer.repository.UpdateAppRepository
+import com.paulcoding.hviewer.model.SiteConfigs
+import com.paulcoding.hviewer.repository.SiteConfigsRepository
 import java.time.LocalDateTime
 import kotlin.random.Random
 
 class UpdateScriptsWorker(
     val context: Context,
-    private val updateAppRepository: UpdateAppRepository,
+    private val siteConfigsRepository: SiteConfigsRepository,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
     override suspend fun doWork(): Result {
         try {
-            //val result = updateAppRepository.checkVersionOrUpdate()
-            //notify(context, result)
+            val localSiteConfigs = siteConfigsRepository.getLocalConfigs().getOrNull() ?: return Result.success()
+            val remoteSiteConfigs = siteConfigsRepository.getRemoteConfigs().getOrThrow()
+            notify(context, localSiteConfigs, remoteSiteConfigs)
             return Result.success()
         } catch (e: Exception) {
             e.printStackTrace()
@@ -32,45 +34,44 @@ class UpdateScriptsWorker(
             return Result.failure(data)
         }
     }
-    //
-    //private fun notify(context: Context, result: SiteConfigsState) {
-    //    val intent = Intent(context, MainActivity::class.java)
-    //    val pendingIntent =
-    //        PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-    //    val notificationManager = context.getSystemService(NotificationManager::class.java)
-    //    val notificationBuilder = NotificationCompat.Builder(context, CHECK_FOR_UPDATE_CHANNEL)
-    //        .setSmallIcon(R.mipmap.ic_launcher_foreground)
-    //        .setContentIntent(pendingIntent)
-    //        .setAutoCancel(true)
-    //
-    //    when (result) {
-    //        is SiteConfigsState.Updated -> {
-    //            notificationBuilder
-    //                .setContentTitle(context.getString(R.string.scripts_updated))
-    //                .setContentText(
-    //                    context.getString(
-    //                        R.string.version_,
-    //                        result.newVersion.toString()
-    //                    )
-    //                )
-    //            notificationManager.notify(1, notificationBuilder.build())
-    //        }
-    //
-    //        is SiteConfigsState.NewConfigsInstall -> {
-    //            notificationBuilder
-    //                .setContentTitle(context.getString(R.string.scripts_installed))
-    //                .setContentText(context.getString(R.string.from_repo_, result.repoUrl))
-    //            notificationManager.notify(1, notificationBuilder.build())
-    //        }
-    //
-    //        else -> {
-    //            if (BuildConfig.DEBUG) {
-    //                notificationBuilder
-    //                    .setContentTitle("Up to date")
-    //                    .setContentText(LocalDateTime.now().toString())
-    //                notificationManager.notify(Random.nextInt(2, 100), notificationBuilder.build())
-    //            }
-    //        }
-    //    }
-    //}
+
+    private suspend fun notify(context: Context, localSiteConfigs: SiteConfigs, remoteSiteConfigs: SiteConfigs) {
+        val intent = Intent(context, MainActivity::class.java)
+        val pendingIntent =
+            PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val notificationManager = context.getSystemService(NotificationManager::class.java)
+        val notificationBuilder = NotificationCompat.Builder(context, CHECK_FOR_UPDATE_CHANNEL)
+            .setSmallIcon(R.mipmap.ic_launcher_foreground)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        when {
+            remoteSiteConfigs.version == localSiteConfigs.version -> {
+                if (BuildConfig.DEBUG) {
+                    notificationBuilder
+                        .setContentTitle(context.getString(R.string.scripts_up_to_date))
+                        .setContentText(LocalDateTime.now().toString())
+                    notificationManager.notify(Random.nextInt(2, 100), notificationBuilder.build())
+                }
+            }
+
+            remoteSiteConfigs.version > localSiteConfigs.version -> {
+                siteConfigsRepository.saveRemoteScripts(remoteSiteConfigs)
+                    .onSuccess {
+                        notificationBuilder
+                            .setContentTitle(context.getString(R.string.new_scripts_available))
+                            .setContentText(
+                                context.getString(
+                                    R.string.version_,
+                                    remoteSiteConfigs.toString()
+                                )
+                            )
+                        notificationManager.notify(1, notificationBuilder.build())
+                    }
+                    .onFailure {
+                        it.printStackTrace()
+                    }
+            }
+        }
+    }
 }

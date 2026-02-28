@@ -3,19 +3,20 @@ package com.paulcoding.hviewer.worker
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.CHECK_FOR_UPDATE_APK_CHANNEL
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.HRelease
+import com.paulcoding.hviewer.model.isUpdatable
 import com.paulcoding.hviewer.repository.UpdateAppRepository
+import kotlinx.serialization.json.Json
 
 class UpdateApkWorker(
     val context: Context,
+    val json: Json,
     val updateAppRepository: UpdateAppRepository,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
@@ -24,7 +25,7 @@ class UpdateApkWorker(
     override suspend fun doWork(): Result {
         try {
             val hRelease = updateAppRepository.getLatestAppRelease().getOrThrow()
-            if (hRelease.version != BuildConfig.VERSION_NAME) {
+            if (hRelease.isUpdatable) {
                 notify(context, hRelease)
             }
             return Result.success()
@@ -36,9 +37,7 @@ class UpdateApkWorker(
     }
 
     private fun notify(context: Context, release: HRelease) {
-        val intent = Intent(context, DownloadApkService::class.java).apply {
-            putExtra("release", release)
-        }
+        val intent = DownloadApkService.getIntent(context, json, release)
 
         val pendingIntent =
             PendingIntent.getService(

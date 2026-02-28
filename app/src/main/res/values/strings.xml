@@ -47,7 +47,8 @@
     <string name="branch">Branch</string>
     <string name="clear_history">Clear history</string>
     <string name="clear_history_confirm">Are you sure you want to clear history?</string>
-    <string name="new_version_available">New version available</string>
+    <string name="new_version_available">New app version available</string>
+    <string name="new_scripts_available">New scripts available</string>
     <string name="downloading_apk">Downloading APK</string>
     <string name="install_now">Install now</string>
     <string name="error">Error</string>
@@ -66,4 +67,5 @@
     <string name="download_channel_description">Notifications for image download progress</string>
     <string name="permission_denied">Permission denied!</string>
     <string name="notification_permission_denied">Notification permission denied!</string>
+    <string name="scripts_up_to_date">Scripts are up to date!</string>
 </resources>

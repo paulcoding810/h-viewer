@@ -11,19 +11,13 @@ import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 
 val networkModule = module {
     single {
         HttpClient(Android) {
             install(ContentNegotiation) {
-                json(Json {
-                    //// Allows unquoted keys and values, and other minor malformations not strictly compliant with the RFC spec.
-                    //isLenient = true
-                    //// Ignores fields in the JSON payload that are not present in your Kotlin data class.
-                    //ignoreUnknownKeys = true
-                })
+                json(get())
             }
             install(Logging) {
                 logger = Logger.SIMPLE

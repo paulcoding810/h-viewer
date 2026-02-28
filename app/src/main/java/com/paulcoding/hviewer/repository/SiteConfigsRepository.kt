@@ -50,7 +50,7 @@ class SiteConfigsRepository(
 
     suspend fun getLocalConfigs() = runCatching { context.readConfigFile<SiteConfigs>() }
 
-    suspend fun getRemoteConfigs(repoUrl: String, branch: String) =
+    suspend fun getRemoteConfigs(repoUrl: String = this.remoteUrl, branch: String = this.branch) =
         runCatching { githubRemoteDatasource.getRemoteSiteConfigs(repoUrl, branch) }
 
     suspend fun saveRemoteScripts(remoteConfigs: SiteConfigs) = runCatching {
