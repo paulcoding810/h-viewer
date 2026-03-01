@@ -6,7 +6,7 @@ import androidx.room.TypeConverters
 import com.paulcoding.hviewer.model.FavoriteEntity
 import com.paulcoding.hviewer.model.HistoryEntity
 
-@Database(entities = [FavoriteEntity::class, HistoryEntity::class], version = 7, exportSchema = true)
+@Database(entities = [FavoriteEntity::class, HistoryEntity::class], version = 8, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteItemDao(): FavoriteDao

@@ -7,11 +7,11 @@ import kotlinx.serialization.Serializable
 @Entity("history")
 @Serializable
 data class HistoryEntity(
-    @PrimaryKey
     val url: String = "",
     val name: String = "",
     val thumbnail: String = "",
     val tags: List<Tag>? = null,
+    @PrimaryKey
     val viewedAt: Long = System.currentTimeMillis(),
 )
 
