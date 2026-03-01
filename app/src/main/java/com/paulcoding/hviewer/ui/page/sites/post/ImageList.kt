@@ -40,7 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.MainApp.Companion.appContext
-import com.paulcoding.hviewer.extensions.isScrollingUp
+import com.paulcoding.hviewer.extensions.isScrollingUpwards
 import com.paulcoding.hviewer.helper.BasePaginationHelper
 import com.paulcoding.hviewer.helper.LoadMoreHandler
 import com.paulcoding.hviewer.ui.component.HIcon
@@ -63,7 +63,7 @@ fun ImageList(
         initialFirstVisibleItemIndex = uiState.scrollIndex,
         initialFirstVisibleItemScrollOffset = uiState.scrollOffset
     )
-    val isScrollingUp by listState.isScrollingUp()
+    val isScrollingUp by listState.isScrollingUpwards()
 
     // Throttle scroll position updates to avoid excessive updates
     LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {

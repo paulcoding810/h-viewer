@@ -5,10 +5,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.snapshotFlow
-import kotlinx.coroutines.flow.debounce
 
+/**
+ * Tracks whether the list is scrolling upward.
+ * Returns true when scrolling up, false when scrolling down or stationary.
+ * Uses throttling to prevent excessive state updates.
+ */
 @Composable
-fun LazyListState.isScrollingUp(): State<Boolean> {
+fun LazyListState.isScrollingUpwards(): State<Boolean> {
     return produceState(initialValue = true) {
         var previousIndex = firstVisibleItemIndex
         var previousOffset = firstVisibleItemScrollOffset
