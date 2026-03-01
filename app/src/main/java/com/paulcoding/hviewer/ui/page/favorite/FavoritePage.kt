@@ -3,35 +3,53 @@ package com.paulcoding.hviewer.ui.page.favorite
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
+import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.page.sites.composable.FavoriteCard
 import com.paulcoding.hviewer.ui.page.sites.composable.TabsIcon
 import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
@@ -51,15 +69,19 @@ fun FavoritePage(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    val favoritePosts by viewModel.favoritePosts.collectAsState(initial = emptyList())
+    val favoritePosts by viewModel.favoritePostsWithQuery.collectAsState()
+    val query by viewModel.query.collectAsState()
     val tabsCount by viewModel.tabsManager.tabsSizeFlow.collectAsState(initial = 0)
 
     var tabsIconPosition by remember { mutableStateOf(Offset.Zero) }
     var startPos by remember { mutableStateOf(Offset.Zero) }
     var isAnimating by remember { mutableStateOf(false) }
+    var showSearchBar by remember { mutableStateOf(false) }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val focusRequester = remember { FocusRequester() }
 
     fun removeWithUndo(post: PostItem) {
-        viewModel.deleteFavorite(post)
+        viewModel.onAction(FavoriteViewModel.Action.Delete(post))
 
         scope.launch {
             val result = snackbarHostState.showSnackbar(
@@ -69,7 +91,7 @@ fun FavoritePage(
             )
             when (result) {
                 SnackbarResult.ActionPerformed -> {
-                    viewModel.undoDelete()
+                    viewModel.onAction(FavoriteViewModel.Action.UndoDelete)
                 }
 
                 SnackbarResult.Dismissed -> {
@@ -79,18 +101,64 @@ fun FavoritePage(
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(title = { Text(stringResource(R.string.favorite)) }, navigationIcon = {
-                HBackIcon { goBack() }
-            }, actions = {
-                TabsIcon(
-                    onClick = navToTabs,
-                    size = tabsCount,
-                    onGloballyPositioned = { tabsIconPosition = it }
-                )
-            })
+            LargeTopAppBar(
+                title = {
+                    if (!showSearchBar) {
+                        Text(text = stringResource(R.string.favorite))
+                    } else {
+                        LaunchedEffect(Unit) {
+                            focusRequester.requestFocus()
+                        }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedTextField(
+                                value = query,
+                                modifier = Modifier.focusRequester(focusRequester),
+                                textStyle = TextStyle(fontSize = 14.sp),
+                                onValueChange = { viewModel.onAction(FavoriteViewModel.Action.QueryChanged(it)) },
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Text,
+                                    imeAction = ImeAction.Go
+                                ),
+                                trailingIcon = {
+                                    if (query.isNotEmpty())
+                                        HIcon(Icons.Outlined.Clear) {
+                                            viewModel.onAction(FavoriteViewModel.Action.QueryChanged(""))
+                                        }
+                                }
+                            )
+                        }
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                navigationIcon = {
+                    HBackIcon { goBack() }
+                }, actions = {
+                    if (showSearchBar) {
+                        HIcon(Icons.Default.Close, onClick = {
+                            showSearchBar = false
+                            viewModel.onAction(FavoriteViewModel.Action.QueryChanged(""))
+                            focusRequester.freeFocus()
+                        })
+                    } else {
+                        HIcon(Icons.Default.Search, onClick = {
+                            showSearchBar = true
+                        })
+                    }
+                    TabsIcon(
+                        onClick = navToTabs,
+                        size = tabsCount,
+                        onGloballyPositioned = { tabsIconPosition = it }
+                    )
+                })
         },
     ) { paddings ->
         Column(
@@ -121,8 +189,9 @@ fun FavoritePage(
                         })
                 }
             }
-            if (favoritePosts.isEmpty())
+            if (favoritePosts.isEmpty()) {
                 HEmpty()
+            }
         }
 
         AddToCartAnimation(

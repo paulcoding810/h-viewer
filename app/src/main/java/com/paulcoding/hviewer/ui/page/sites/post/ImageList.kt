@@ -162,7 +162,7 @@ private fun ImageList(
             }
             if (isLoading) {
                 item {
-                    HLoading(modifier.systemBarsPadding())
+                    HLoading(Modifier.systemBarsPadding())
                 }
             }
         }
