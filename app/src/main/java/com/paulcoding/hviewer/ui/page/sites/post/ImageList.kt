@@ -19,6 +19,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
@@ -115,6 +118,7 @@ fun ImageList(
 private fun ImageList(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
+    pagerState: PagerState = rememberPagerState { images.size },
     images: List<String> = emptyList(),
     bottomRowActions: @Composable (() -> Unit) = {},
     systemBarVisible: Boolean = true,
@@ -126,14 +130,20 @@ private fun ImageList(
     val scope = rememberCoroutineScope()
 
     var selectedImage by remember { mutableStateOf<Int?>(null) }
-    var selectedImageOffset = remember<Offset?> { null }
 
     val translationY by animateDpAsState(
         targetValue = if (!systemBarVisible) (-100).dp else 0.dp,
         animationSpec = tween(200)
     )
 
-    HideSystemBar(isHidden = !systemBarVisible, onBack = goBack)
+    // TODO: Nested BackHandler not working
+    HideSystemBar(isHidden = !systemBarVisible, onBack = {
+        if (selectedImage != null) {
+            selectedImage = null
+        } else {
+            goBack()
+        }
+    })
 
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
@@ -207,19 +217,49 @@ private fun ImageList(
                 }
             }
         }
-        selectedImage?.let { index ->
+    }
+
+    selectedImage?.let { selectedIndex ->
+        HorizontalImageList(
+            pagerState = pagerState,
+            images = images,
+            initialPage = selectedIndex,
+            onDismiss = { offsetY ->
+                selectedImage = null
+                scope.launch {
+                    listState.scrollToItem(pagerState.currentPage, -offsetY)
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun HorizontalImageList(
+    pagerState: PagerState = rememberPagerState { images.size },
+    images: List<String>,
+    initialPage: Int,
+    onDismiss: (currentImageOffsetY: Int) -> Unit
+) {
+    LaunchedEffect(Unit) {
+        pagerState.scrollToPage(initialPage)
+    }
+
+    val offset = remember<MutableMap<Int, Offset?>> { mutableMapOf() }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier,
+            beyondViewportPageCount = 2,
+        ) { pageIndex ->
             ImageModal(
-                url = images[index],
+                url = images[pageIndex],
                 onImageFirstOffset = {
-                    selectedImageOffset = it
+                    offset[pageIndex] = it
                 },
                 dismiss = {
-                    scope.launch {
-                        val offsetY = selectedImageOffset?.y?.toInt() ?: 0
-                        listState.animateScrollToItem(index, -offsetY)
-                        selectedImageOffset = null
-                        selectedImage = null
-                    }
+                    onDismiss(offset[pageIndex]?.y?.toInt() ?: 0)
                 }
             )
         }
