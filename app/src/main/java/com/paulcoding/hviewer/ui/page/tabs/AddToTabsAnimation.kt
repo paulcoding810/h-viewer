@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -63,7 +62,7 @@ fun AddToCartAnimation(
             .size(40.dp)
             .clip(CircleShape)
             .alpha(alpha = alphaAnim)
-            .background(Color.White),
+            .background(MaterialTheme.colorScheme.onPrimary),
         contentAlignment = Alignment.Center,
     ) {
         Icon(

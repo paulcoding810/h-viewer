@@ -1,22 +1,24 @@
 package com.paulcoding.hviewer.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.paulcoding.hviewer.ui.theme.favorite
 
 @Composable
 fun HBackIcon(onClick: () -> Unit) {
@@ -33,13 +35,15 @@ fun HFavoriteIcon(
     onClick: () -> Unit
 ) {
     val icon = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder
-    val tint: Color = if (isFavorite) Color.Red else LocalContentColor.current
+
+    val colors =
+        if (isFavorite) IconButtonDefaults.filledTonalIconButtonColors(contentColor = MaterialTheme.colorScheme.favorite) else IconButtonDefaults.filledTonalIconButtonColors()
 
     HIcon(
         modifier = modifier,
         imageVector = icon,
         onClick = onClick,
-        tint = tint,
+        colors = colors,
         rounded = rounded
     )
 }
@@ -50,19 +54,44 @@ fun HIcon(
     description: String = "",
     size: Int = 24,
     modifier: Modifier = Modifier,
-    tint: Color = LocalContentColor.current,
+    colors: IconButtonColors = IconButtonDefaults.filledTonalIconButtonColors(),
     rounded: Boolean = false,
     enabled: Boolean = true,
     onClick: () -> Unit
 ) {
-    IconButton(
-        onClick = { onClick() },
-        enabled = enabled,
-        modifier = if (rounded) modifier
-            .clip(CircleShape)
-            .background(Color.White)
-        else modifier
-    ) {
-        Icon(imageVector, description, tint = tint, modifier = Modifier.size(size.dp))
-    }
+    if (rounded)
+        FilledTonalIconButton(
+            onClick = { onClick() },
+            enabled = enabled,
+            colors = colors
+        ) {
+            Icon(imageVector, description, modifier = Modifier.size(size.dp))
+        }
+    else
+        IconButton(
+            onClick = { onClick() },
+            enabled = enabled,
+            colors = colors.copy(containerColor = Color.Transparent)
+        ) {
+            Icon(imageVector, description, modifier = modifier.size(size.dp))
+        }
+}
+
+
+@Preview
+@Composable
+private fun PreviewHFavoriteIcon() {
+    HFavoriteIcon(isFavorite = true) {}
+}
+
+@Preview
+@Composable
+private fun PreviewHNotFavoriteIcon() {
+    HFavoriteIcon(isFavorite = false, rounded = true) {}
+}
+
+@Preview
+@Composable
+private fun PreviewHIcon() {
+    HIcon {}
 }

@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -181,13 +182,14 @@ private fun ImageList(
             Spacer(modifier = Modifier.weight(1f))
             Box(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(2.dp)
+                    .clip(MaterialTheme.shapes.medium)
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .padding(4.dp)
             ) {
                 Text(
                     text = "${currentPage}/${totalPage}",
                     maxLines = 1,
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.onSecondary,
                 )
             }
         }
@@ -209,7 +211,6 @@ private fun ImageList(
             HIcon(
                 Icons.Outlined.KeyboardArrowUp,
                 size = 32,
-                tint = MaterialTheme.colorScheme.primary,
                 rounded = true
             ) {
                 scope.launch {

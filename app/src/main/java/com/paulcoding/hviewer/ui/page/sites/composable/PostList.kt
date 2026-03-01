@@ -17,7 +17,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
-import com.paulcoding.hviewer.extensions.isScrollingUpwards
 import com.paulcoding.hviewer.helper.BasePaginationHelper
 import com.paulcoding.hviewer.helper.LoadMoreHandler
 import com.paulcoding.hviewer.model.PostItem
@@ -79,7 +78,6 @@ fun PostList(
                 item {
                     if (!hidesEmpty) HEmpty(
                         title = "No posts found",
-                        // message = "Refresh?",
                     ) {
                         onRefresh()
                     }

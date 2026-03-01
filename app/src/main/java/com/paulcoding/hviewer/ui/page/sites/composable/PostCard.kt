@@ -39,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.stringResource
@@ -97,11 +96,10 @@ fun PostCard(
         elevation = CardDefaults.cardElevation(4.dp),
         border = CardDefaults.outlinedCardBorder(),
         shape = CardDefaults.outlinedShape,
-        colors = CardDefaults.cardColors().copy(containerColor = Color.White),
         onClick = { onClick() },
     ) {
         Box(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .animateContentSize(
                     animationSpec = tween(durationMillis = 300)
@@ -209,7 +207,7 @@ fun InfoBottomSheet(
                             text = url,
                             textDecoration = TextDecoration.Underline,
                             fontSize = 12.sp,
-                            color = Color.Blue
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                     if (size != null) {

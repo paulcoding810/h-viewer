@@ -38,7 +38,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -166,7 +165,7 @@ fun SettingsPage(
                 H7Tap() {
                     viewModel.dispatch(SettingsViewModel.Action.SetDevMode(true))
                 }
-                HIcon(Icons.Outlined.Update, tint = MaterialTheme.colorScheme.primary) {
+                HIcon(Icons.Outlined.Update) {
                     viewModel.dispatch(SettingsViewModel.Action.CheckForAppUpdate(showToast = true))
                 }
             }
@@ -200,7 +199,7 @@ fun SettingsPage(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f))
         ) {
             Box(modifier = Modifier.align(Alignment.Center)) {
                 HLoading()

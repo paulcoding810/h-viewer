@@ -38,7 +38,6 @@ fun TabsIcon(
                     .clip(CircleShape),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.primary,
             )
         }
     }
