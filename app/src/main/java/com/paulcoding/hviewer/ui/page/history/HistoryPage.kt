@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
+import com.paulcoding.hviewer.model.toPostItem
 import com.paulcoding.hviewer.ui.component.ConfirmDialog
 import com.paulcoding.hviewer.ui.component.HBackIcon
 import com.paulcoding.hviewer.ui.component.HEmpty
@@ -78,11 +79,12 @@ fun HistoryPage(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 items(historyPosts) {
+                    val postItem = it.toPostItem()
                     PostCard(
-                        postItem = it,
+                        postItem = postItem,
                         onTagClick = navToCustomTag,
                         onClick = {
-                            navToImages(it)
+                            navToImages(postItem)
                         }) {
                         HIcon(
                             Icons.Outlined.Delete,

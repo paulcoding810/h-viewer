@@ -7,6 +7,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.paulcoding.hviewer.APK_NAME
+import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.model.HRelease
 import com.paulcoding.hviewer.model.isUpdatable
 import com.paulcoding.hviewer.preference.Preferences
@@ -31,7 +32,7 @@ class SettingsViewModel(
             remoteUrl = preferences.remoteUrl.ifEmpty { "https://github.com/{OWNER}/{REPO}/" },
             remoteBranch = preferences.branch,
             isLockScreenEnabled = preferences.pin.isNotEmpty(),
-            isDevMode = false,
+            isDevMode = BuildConfig.DEBUG,
             isSecureScreenEnabled = preferences.secureScreen,
         )
     )

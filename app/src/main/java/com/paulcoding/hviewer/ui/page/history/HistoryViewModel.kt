@@ -12,15 +12,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class HistoryViewModel(private val historyRepository: HistoryRepository) : ViewModel() {
-    val viewedPosts = historyRepository.viewedPosts.map { it.map(HistoryEntity::toPostItem) }.stateIn(
+    val viewedPosts = historyRepository.viewedPosts.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = emptyList()
     )
 
-    fun deleteHistory(postItem: PostItem) {
+    fun deleteHistory(item: HistoryEntity) {
         viewModelScope.launch {
-            historyRepository.delete(postItem)
+            historyRepository.delete(item)
         }
     }
 

@@ -1,6 +1,7 @@
 package com.paulcoding.hviewer.repository
 
 import com.paulcoding.hviewer.database.HistoryDao
+import com.paulcoding.hviewer.model.HistoryEntity
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.toHistoryEntity
 
@@ -11,8 +12,8 @@ class HistoryRepository(private val historyDao: HistoryDao) {
         historyDao.insert(postItem.toHistoryEntity())
     }
 
-    suspend fun delete(postItem: PostItem) {
-        historyDao.delete(postItem.toHistoryEntity())
+    suspend fun delete(item: HistoryEntity) {
+        historyDao.delete(item)
     }
 
     suspend fun deleteAll() {
