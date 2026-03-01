@@ -1,19 +1,27 @@
 package com.paulcoding.hviewer.ui.page.favorite
 
+import android.widget.Toast
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.ImportExport
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -37,15 +45,16 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.extensions.copyText
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.component.HBackIcon
@@ -63,20 +72,24 @@ fun FavoritePage(
     navToTabs: () -> Unit,
     navToImages: (PostItem) -> Unit,
     navToCustomTag: (Tag) -> Unit,
-    goBack: () -> Boolean
+    goBack: () -> Unit
 ) {
-    val context = LocalContext.current
+    val context = LocalActivity.current!!
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     val favoritePosts by viewModel.favoritePostsWithQuery.collectAsState()
     val query by viewModel.query.collectAsState()
+    val effect by viewModel.effect.collectAsState()
+    val importState by viewModel.importState.collectAsState()
     val tabsCount by viewModel.tabsManager.tabsSizeFlow.collectAsState(initial = 0)
 
     var tabsIconPosition by remember { mutableStateOf(Offset.Zero) }
     var startPos by remember { mutableStateOf(Offset.Zero) }
     var isAnimating by remember { mutableStateOf(false) }
+    var showImportDialog by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val listState = rememberLazyListState()
 
     fun removeWithUndo(post: PostItem) {
         viewModel.onAction(FavoriteViewModel.Action.Delete(post))
@@ -98,6 +111,34 @@ fun FavoritePage(
         }
     }
 
+    LaunchedEffect(effect) {
+        when (val e = effect) {
+            is FavoriteViewModel.Effect.CopyToClipboard -> {
+                context.copyText(e.data)
+                Toast.makeText(context, context.getString(R.string.copied_to_clipboard), Toast.LENGTH_LONG).show()
+            }
+            null -> {}
+        }
+        viewModel.onAction(FavoriteViewModel.Action.ConsumeEffect)
+    }
+
+    LaunchedEffect(importState) {
+        if (importState.isSuccess) {
+            listState.animateScrollToItem(0)
+            showImportDialog = false
+
+            Toast.makeText(
+                context,
+                context.resources.getQuantityString(
+                    R.plurals.imported_result,
+                    importState.successCount,
+                    importState.successCount
+                ),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -109,43 +150,48 @@ fun FavoritePage(
                 query = query,
                 onAction = viewModel::onAction,
                 onTabIconGloballyPositioned = { tabsIconPosition = it },
+                onImportIconClicked = { showImportDialog = true },
                 navToTabs = navToTabs,
                 tabsCount = tabsCount,
                 goBack = goBack
             )
         },
     ) { paddings ->
-        Column(
-            modifier = Modifier
-                .padding(paddings)
-                .fillMaxSize()
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.padding(paddings),
+            contentPadding = PaddingValues(vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier.padding(horizontal = 12.dp),
-                contentPadding = PaddingValues(vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(items = favoritePosts, key = { it.url }) { item ->
-                    FavoriteCard(
-                        item,
-                        isFavorite = true,
-                        setFavorite = {
-                            removeWithUndo(item)
-                        },
-                        onTagClick = navToCustomTag,
-                        onAddToTabs = {
-                            startPos = it
-                            isAnimating = true
-                            viewModel.tabsManager.addTab(item)
-                        },
-                        onClick = {
-                            navToImages(item)
-                        })
-                }
+            items(items = favoritePosts, key = { it.url }) { item ->
+                FavoriteCard(
+                    item,
+                    isFavorite = true,
+                    setFavorite = {
+                        removeWithUndo(item)
+                    },
+                    onTagClick = navToCustomTag,
+                    onAddToTabs = {
+                        startPos = it
+                        isAnimating = true
+                        viewModel.tabsManager.addTab(item)
+                    },
+                    onClick = {
+                        navToImages(item)
+                    })
             }
-            if (favoritePosts.isEmpty()) {
-                HEmpty()
-            }
+        }
+
+        if (favoritePosts.isEmpty()) {
+            HEmpty()
+        }
+
+        if (showImportDialog) {
+            ImportDialog(
+                importState = importState,
+                onDismiss = { showImportDialog = false },
+                onAction = viewModel::onAction
+            )
         }
     }
 }
@@ -157,11 +203,14 @@ private fun FavoriteTopBar(
     query: String,
     onAction: (FavoriteViewModel.Action) -> Unit,
     onTabIconGloballyPositioned: (Offset) -> Unit,
+    onImportIconClicked: () -> Unit,
     navToTabs: () -> Unit,
     tabsCount: Int,
-    goBack: () -> Boolean
+    goBack: () -> Unit
 ) {
     var showSearchBar by remember { mutableStateOf(false) }
+    var showImportExportDropdown by remember { mutableStateOf(false) }
+
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
 
@@ -209,11 +258,49 @@ private fun FavoriteTopBar(
                     showSearchBar = true
                 })
             }
+
+            HIcon(Icons.Default.ImportExport, onClick = { showImportExportDropdown = true })
+
+            DropdownMenu(
+                expanded = showImportExportDropdown,
+                onDismissRequest = { showImportExportDropdown = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.import_json)) },
+                    leadingIcon = { Icon(Icons.Default.Download, "Import") },
+                    onClick = {
+                        showImportExportDropdown = false
+                        onImportIconClicked()
+                    })
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.export_json)) },
+                    leadingIcon = { Icon(Icons.Default.Upload, "Export") },
+                    onClick = {
+                        showImportExportDropdown = false
+                        onAction(FavoriteViewModel.Action.Export)
+                    })
+            }
             TabsIcon(
                 onClick = navToTabs,
                 size = tabsCount,
                 onGloballyPositioned = onTabIconGloballyPositioned
             )
         }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+private fun PreviewFavoriteTopBar() {
+    FavoriteTopBar(
+        scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+        query = "",
+        onAction = {},
+        onTabIconGloballyPositioned = {},
+        onImportIconClicked = {},
+        navToTabs = {},
+        tabsCount = 0,
+        goBack = {}
     )
 }

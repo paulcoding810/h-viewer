@@ -12,6 +12,10 @@ class FavoriteRepository(private val favoriteDao: FavoriteDao) {
         favoriteDao.insert(postItem.toFavoriteEntity(keepTimestamp))
     }
 
+    suspend fun addFavorites(postItems: List<PostItem>) =
+        favoriteDao.insert(postItems.map { it.toFavoriteEntity(keepTimestamp = false) })
+
+
     suspend fun deleteFavorite(postItem: PostItem) {
         favoriteDao.delete(postItem.url)
     }
@@ -24,5 +28,5 @@ class FavoriteRepository(private val favoriteDao: FavoriteDao) {
         }
     }
 
-   fun isFavorite(postItem: PostItem) = favoriteDao.isFavorite(postItem.url)
+    fun isFavorite(postItem: PostItem) = favoriteDao.isFavorite(postItem.url)
 }

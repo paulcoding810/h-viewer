@@ -18,6 +18,9 @@ interface FavoriteDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(favoriteEntity: FavoriteEntity)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(favoriteEntities: List<FavoriteEntity>): List<Long>
+
     @Query("DELETE FROM favorite WHERE url = :url")
     suspend fun delete(url: String)
 
