@@ -3,11 +3,11 @@ package com.paulcoding.hviewer.ui.page.favorite
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -23,6 +23,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,13 +32,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -52,7 +53,6 @@ import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HIcon
 import com.paulcoding.hviewer.ui.page.sites.composable.FavoriteCard
 import com.paulcoding.hviewer.ui.page.sites.composable.TabsIcon
-import com.paulcoding.hviewer.ui.page.tabs.AddToCartAnimation
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -76,9 +76,7 @@ fun FavoritePage(
     var tabsIconPosition by remember { mutableStateOf(Offset.Zero) }
     var startPos by remember { mutableStateOf(Offset.Zero) }
     var isAnimating by remember { mutableStateOf(false) }
-    var showSearchBar by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val focusRequester = remember { FocusRequester() }
 
     fun removeWithUndo(post: PostItem) {
         viewModel.onAction(FavoriteViewModel.Action.Delete(post))
@@ -106,59 +104,15 @@ fun FavoritePage(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            LargeTopAppBar(
-                title = {
-                    if (!showSearchBar) {
-                        Text(text = stringResource(R.string.favorite))
-                    } else {
-                        LaunchedEffect(Unit) {
-                            focusRequester.requestFocus()
-                        }
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                value = query,
-                                modifier = Modifier.focusRequester(focusRequester),
-                                textStyle = TextStyle(fontSize = 14.sp),
-                                onValueChange = { viewModel.onAction(FavoriteViewModel.Action.QueryChanged(it)) },
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Text,
-                                    imeAction = ImeAction.Go
-                                ),
-                                trailingIcon = {
-                                    if (query.isNotEmpty())
-                                        HIcon(Icons.Outlined.Clear) {
-                                            viewModel.onAction(FavoriteViewModel.Action.QueryChanged(""))
-                                        }
-                                }
-                            )
-                        }
-                    }
-                },
+            FavoriteTopBar(
                 scrollBehavior = scrollBehavior,
-                navigationIcon = {
-                    HBackIcon { goBack() }
-                }, actions = {
-                    if (showSearchBar) {
-                        HIcon(Icons.Default.Close, onClick = {
-                            showSearchBar = false
-                            viewModel.onAction(FavoriteViewModel.Action.QueryChanged(""))
-                            focusRequester.freeFocus()
-                        })
-                    } else {
-                        HIcon(Icons.Default.Search, onClick = {
-                            showSearchBar = true
-                        })
-                    }
-                    TabsIcon(
-                        onClick = navToTabs,
-                        size = tabsCount,
-                        onGloballyPositioned = { tabsIconPosition = it }
-                    )
-                })
+                query = query,
+                onAction = viewModel::onAction,
+                onTabIconGloballyPositioned = { tabsIconPosition = it },
+                navToTabs = navToTabs,
+                tabsCount = tabsCount,
+                goBack = goBack
+            )
         },
     ) { paddings ->
         Column(
@@ -193,12 +147,73 @@ fun FavoritePage(
                 HEmpty()
             }
         }
-
-        AddToCartAnimation(
-            isAnimating = isAnimating,
-            startPosition = startPos,
-            endPosition = tabsIconPosition.copy(y = tabsIconPosition.y - 100),
-            onAnimationEnd = { isAnimating = false },
-        )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FavoriteTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+    query: String,
+    onAction: (FavoriteViewModel.Action) -> Unit,
+    onTabIconGloballyPositioned: (Offset) -> Unit,
+    navToTabs: () -> Unit,
+    tabsCount: Int,
+    goBack: () -> Boolean
+) {
+    var showSearchBar by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
+    LargeTopAppBar(
+        title = {
+            if (!showSearchBar) {
+                Text(text = stringResource(R.string.favorite))
+            } else {
+                LaunchedEffect(Unit) {
+                    focusRequester.requestFocus()
+                }
+                OutlinedTextField(
+                    value = query,
+                    modifier = Modifier.focusRequester(focusRequester),
+                    textStyle = TextStyle(fontSize = 14.sp),
+                    onValueChange = { onAction(FavoriteViewModel.Action.QueryChanged(it)) },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Search
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onSearch = { focusManager.clearFocus() },
+                    ),
+                    trailingIcon = {
+                        if (query.isNotEmpty())
+                            HIcon(Icons.Outlined.Clear) {
+                                onAction(FavoriteViewModel.Action.QueryChanged(""))
+                            }
+                    }
+                )
+            }
+        },
+        scrollBehavior = scrollBehavior,
+        navigationIcon = {
+            HBackIcon { goBack() }
+        }, actions = {
+            if (showSearchBar) {
+                HIcon(Icons.Default.Close, onClick = {
+                    showSearchBar = false
+                    onAction(FavoriteViewModel.Action.QueryChanged(""))
+                })
+            } else {
+                HIcon(Icons.Default.Search, onClick = {
+                    showSearchBar = true
+                })
+            }
+            TabsIcon(
+                onClick = navToTabs,
+                size = tabsCount,
+                onGloballyPositioned = onTabIconGloballyPositioned
+            )
+        }
+    )
 }
