@@ -1,21 +1,19 @@
 package com.paulcoding.hviewer.ui.page.sites
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -28,18 +26,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import com.paulcoding.hviewer.R
-import com.paulcoding.hviewer.model.SiteConfig
 import com.paulcoding.hviewer.ui.component.HEmpty
 import com.paulcoding.hviewer.ui.component.HFavoriteIcon
 import com.paulcoding.hviewer.ui.component.HIcon
@@ -118,45 +113,30 @@ fun SitesPage(
                     val hostsMap = uiState.siteConfigs!!.toHostsMap()
                     hostsMap.keys.map { site ->
                         hostsMap[site]?.let { siteConfig ->
-                            Site(site = siteConfig) {
-                                navToSite(
-                                    siteConfig.baseUrl,
-                                    false
-                                )
-                            }
+                            ListItem(
+                                modifier = Modifier.clickable {
+                                    navToSite(
+                                        siteConfig.baseUrl,
+                                        false
+                                    )
+                                },
+                                headlineContent = { Text(siteConfig.name) },
+                                leadingContent = {
+                                    AsyncImage(
+                                        model = "https://www.google.com/s2/favicons?sz=64&domain=${siteConfig.baseUrl}",
+                                        contentDescription = siteConfig.baseUrl,
+                                        modifier = Modifier
+                                            .size(20.dp)
+                                            .clip(CircleShape),
+                                        contentScale = ContentScale.Crop,
+                                        placeholder = painterResource(R.mipmap.ic_launcher_foreground)
+                                    )
+                                }
+                            )
                         }
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-private fun Site(site: SiteConfig, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-            .fillMaxWidth()
-            .clickable {
-                onClick()
-            },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        site.SiteIcon()
-        Text(site.name)
-    }
-}
-
-@Composable
-private fun SiteConfig.SiteIcon(size: Dp = 20.dp, clip: Dp = 4.dp) {
-    AsyncImage(
-        "https://www.google.com/s2/favicons?sz=64&domain=$baseUrl", baseUrl,
-        modifier = Modifier
-            .size(size)
-            .clip(RoundedCornerShape(clip)),
-        contentScale = ContentScale.Crop,
-        placeholder = painterResource(R.mipmap.ic_launcher_foreground)
-    )
 }
