@@ -119,7 +119,6 @@ fun ImageList(
 private fun ImageList(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    pagerState: PagerState = rememberPagerState { images.size },
     images: List<String> = emptyList(),
     bottomRowActions: @Composable (() -> Unit) = {},
     systemBarVisible: Boolean = true,
@@ -137,7 +136,6 @@ private fun ImageList(
         animationSpec = tween(200)
     )
 
-    // TODO: Nested BackHandler not working
     HideSystemBar(isHidden = !systemBarVisible, onBack = {
         if (selectedImage != null) {
             selectedImage = null
@@ -146,85 +144,86 @@ private fun ImageList(
         }
     })
 
-    Box(modifier = modifier.fillMaxSize()) {
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            itemsIndexed(images, key = { _, image -> image }) { index, image ->
-                PostImage(
-                    url = image,
-                    onDoubleTap = {
-                        selectedImage = index
-                    },
-                    onTap = {},
-                )
-            }
-            if (isLoading) {
-                item {
-                    HLoading(Modifier.systemBarsPadding())
+    if (selectedImage == null) {
+        Box(modifier = modifier.fillMaxSize()) {
+            LazyColumn(
+                state = listState,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                itemsIndexed(images, key = { _, image -> image }) { index, image ->
+                    PostImage(
+                        url = image,
+                        onDoubleTap = {
+                            selectedImage = index
+                        },
+                        onTap = {},
+                    )
+                }
+                if (isLoading) {
+                    item {
+                        HLoading(Modifier.systemBarsPadding())
+                    }
                 }
             }
-        }
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset {
-                    IntOffset(x = 0, y = translationY.roundToPx())
-                }
-                .padding(16.dp)
-                .statusBarsPadding(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            HIcon(Icons.AutoMirrored.Outlined.ArrowBack, rounded = true, onClick = goBack)
-            Spacer(modifier = Modifier.weight(1f))
-            Box(
+            Row(
                 modifier = Modifier
-                    .clip(MaterialTheme.shapes.medium)
-                    .background(MaterialTheme.colorScheme.secondaryContainer)
-                    .padding(4.dp)
+                    .fillMaxWidth()
+                    .offset {
+                        IntOffset(x = 0, y = translationY.roundToPx())
+                    }
+                    .padding(16.dp)
+                    .statusBarsPadding(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    text = "${currentPage}/${totalPage}",
-                    maxLines = 1,
-                    color = MaterialTheme.colorScheme.onSecondary,
-                )
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .offset {
-                    IntOffset(x = 0, y = -translationY.roundToPx())
-                }
-                .align(Alignment.BottomStart)
-                .padding(16.dp)
-                .navigationBarsPadding(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            bottomRowActions()
-            Spacer(modifier = Modifier.weight(1f))
-            HIcon(
-                Icons.Outlined.KeyboardArrowUp,
-                size = 32,
-                rounded = true
-            ) {
-                scope.launch {
-                    listState.animateScrollToItem(0, 0)
+                HIcon(Icons.AutoMirrored.Outlined.ArrowBack, rounded = true, onClick = goBack)
+                Spacer(modifier = Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(MaterialTheme.colorScheme.secondaryContainer)
+                        .padding(4.dp)
+                ) {
+                    Text(
+                        text = "${currentPage}/${totalPage}",
+                        maxLines = 1,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
                 }
             }
-        }
-    }
 
-    selectedImage?.let { selectedIndex ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .offset {
+                        IntOffset(x = 0, y = -translationY.roundToPx())
+                    }
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+                    .navigationBarsPadding(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                bottomRowActions()
+                Spacer(modifier = Modifier.weight(1f))
+                HIcon(
+                    Icons.Outlined.KeyboardArrowUp,
+                    size = 32,
+                    rounded = true
+                ) {
+                    scope.launch {
+                        listState.animateScrollToItem(0, 0)
+                    }
+                }
+            }
+        }
+    } else {
+        val pagerState = rememberPagerState(initialPage = selectedImage!!) { images.size }
+
         HorizontalImageList(
             pagerState = pagerState,
             images = images,
-            initialPage = selectedIndex,
             onDismiss = { offsetY ->
                 selectedImage = null
                 scope.launch {
@@ -237,21 +236,18 @@ private fun ImageList(
 
 @Composable
 private fun HorizontalImageList(
-    pagerState: PagerState = rememberPagerState { images.size },
+    modifier: Modifier = Modifier,
+    pagerState: PagerState,
     images: List<String>,
-    initialPage: Int,
     onDismiss: (currentImageOffsetY: Int) -> Unit
 ) {
-    LaunchedEffect(Unit) {
-        pagerState.scrollToPage(initialPage)
-    }
-
     val offset = remember<MutableMap<Int, Offset?>> { mutableMapOf() }
 
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier,
+            modifier = Modifier.fillMaxSize(),
             beyondViewportPageCount = 2,
         ) { pageIndex ->
             ImageModal(
