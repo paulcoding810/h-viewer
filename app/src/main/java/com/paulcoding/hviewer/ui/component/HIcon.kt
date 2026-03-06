@@ -1,5 +1,6 @@
 package com.paulcoding.hviewer.ui.component
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -52,7 +53,6 @@ fun HFavoriteIcon(
 fun HIcon(
     imageVector: ImageVector = Icons.Outlined.Settings,
     description: String = "",
-    size: Int = 24,
     modifier: Modifier = Modifier,
     colors: IconButtonColors = IconButtonDefaults.filledTonalIconButtonColors(),
     rounded: Boolean = false,
@@ -65,7 +65,10 @@ fun HIcon(
             enabled = enabled,
             colors = colors
         ) {
-            Icon(imageVector, description, modifier = Modifier.size(size.dp))
+            Icon(
+                imageVector, description,
+                modifier = modifier,
+            )
         }
     else
         IconButton(
@@ -73,7 +76,10 @@ fun HIcon(
             enabled = enabled,
             colors = colors.copy(containerColor = Color.Transparent)
         ) {
-            Icon(imageVector, description, modifier = modifier.size(size.dp))
+            Icon(
+                imageVector, description,
+                modifier = modifier,
+            )
         }
 }
 
@@ -93,5 +99,8 @@ private fun PreviewHNotFavoriteIcon() {
 @Preview
 @Composable
 private fun PreviewHIcon() {
-    HIcon {}
+    Column {
+        HIcon(onClick = {})
+        HIcon(modifier = Modifier.size(128.dp), imageVector = Icons.Outlined.Settings, onClick = {})
+    }
 }

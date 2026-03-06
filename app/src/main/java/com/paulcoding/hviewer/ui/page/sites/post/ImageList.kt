@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -208,8 +209,8 @@ private fun ImageList(
                 bottomRowActions()
                 Spacer(modifier = Modifier.weight(1f))
                 HIcon(
-                    Icons.Outlined.KeyboardArrowUp,
-                    size = 32,
+                    imageVector = Icons.Outlined.KeyboardArrowUp,
+                    modifier = Modifier.size(32.dp),
                     rounded = true
                 ) {
                     scope.launch {
