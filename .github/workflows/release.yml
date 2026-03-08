@@ -31,7 +31,6 @@ jobs:
       - name: Build app
         run: |
           ./gradlew assembleRelease
-          ./gradlew bundleRelease
 
       - name: Sign APK
         id: sign_app
