@@ -31,6 +31,13 @@ if (versionPropsFile.exists()) {
 android {
     signingConfigs {
         getByName("debug") {
+            storeFile = file("debug.keystore")
+            keyAlias = "androiddebugkey"
+            storePassword = "android"
+            keyPassword = "android"
+        }
+
+        create("release") {
             storeFile = file(keystoreProperties["storeFile"] as String)
             keyAlias = keystoreProperties["keyAlias"] as String
             storePassword = keystoreProperties["storePassword"] as String
@@ -77,6 +84,7 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
