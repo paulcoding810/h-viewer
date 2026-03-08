@@ -50,21 +50,19 @@ jobs:
           mv app/build/outputs/apk/release/app-x86-release-unsigned-signed.apk hviewer-${{ github.ref_name }}-x86-release.apk
           mv app/build/outputs/apk/release/app-x86_64-release-unsigned-signed.apk hviewer-${{ github.ref_name }}-x86_64-release.apk
 
-#      - name: Create changelog
-#        id: changelog
-#        uses: requarks/changelog-action@v1
-#        with:
-#          token: ${{ github.token }}
-#          tag: ${{ github.ref_name }}
-#          includeInvalidCommits: true
-#          excludeTypes: build,chore
-#          writeToFile: false
+      - name: Create changelog
+        id: changelog
+        uses: requarks/changelog-action@v1
+        with:
+          includeInvalidCommits: true
+          token: ${{ github.token }}
+          tag: ${{ github.ref_name }}
 
       - name: Create release
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          body: ChangeLog
+          body: ${{ steps.changelog.outputs.changes }}Ø
           files: |
             hviewer-${{ github.ref_name }}-arm64-v8a-release.apk
             hviewer-${{ github.ref_name }}-armeabi-v7a-release.apk
