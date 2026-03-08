@@ -62,6 +62,6 @@ jobs:
           serviceAccountJson: play-store-key.json
           packageName: com.paulcoding.hviewer
 #          releaseFiles: app/build/outputs/bundle/release/*signed.aab
-          releaseFiles: app-release-signed.aab
+          releaseFiles: app-release.aab
           track: internal
 #          track: ${{ github.event.inputs.track }}

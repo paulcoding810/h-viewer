@@ -36,6 +36,13 @@ android {
             storePassword = "android"
             keyPassword = "android"
         }
+
+        create("release") {
+            storeFile = file("release.keystore")
+            keyAlias = keystoreProperties["keyAlias"] as String?
+            storePassword = keystoreProperties["storePassword"] as String?
+            keyPassword = keystoreProperties["keyPassword"] as String?
+        }
     }
     namespace = "com.paulcoding.hviewer"
     compileSdk = 36
@@ -75,6 +82,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
