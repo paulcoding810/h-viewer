@@ -39,9 +39,9 @@ android {
 
         create("release") {
             storeFile = file("release.keystore")
-            keyAlias = keystoreProperties["keyAlias"] as String?
-            storePassword = keystoreProperties["storePassword"] as String?
-            keyPassword = keystoreProperties["keyPassword"] as String?
+            keyAlias = keystoreProperties["keyAlias"]?.toString() ?: ""
+            storePassword = keystoreProperties["storePassword"]?.toString() ?: ""
+            keyPassword = keystoreProperties["keyPassword"]?.toString() ?: ""
         }
     }
     namespace = "com.paulcoding.hviewer"

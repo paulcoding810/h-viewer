@@ -64,7 +64,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           draft: true
-          body: ${{ steps.changelog.outputs.changes }}Ø
+          body: ${{ steps.changelog.outputs.changes }}
           files: |
             hviewer-${{ github.ref_name }}-arm64-v8a-release.apk
             hviewer-${{ github.ref_name }}-armeabi-v7a-release.apk
