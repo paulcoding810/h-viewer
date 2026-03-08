@@ -24,6 +24,9 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: generate key.properties
+        run: echo ${{ secrets.KEY_PROPERTIES }} > key.properties
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
