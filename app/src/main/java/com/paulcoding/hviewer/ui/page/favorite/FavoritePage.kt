@@ -122,7 +122,7 @@ fun FavoritePage(
         viewModel.onAction(FavoriteViewModel.Action.ConsumeEffect)
     }
 
-    LaunchedEffect(importState) {
+    LaunchedEffect(importState.isSuccess) {
         if (importState.isSuccess) {
             listState.animateScrollToItem(0)
             showImportDialog = false
