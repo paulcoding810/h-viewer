@@ -1,16 +1,25 @@
-name: Build & Release
+name: Publish to Play Store
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - feat/*
+    inputs:
+      track:
+        description: "Play Store track"
+        required: true
+        default: "internal"
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: Checkout repo
         uses: actions/checkout@v4
 
       - name: Setup JDK
@@ -19,20 +28,18 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Decode Play Store key
+      - name: Decode Play Store service account
         run: echo "$PLAY_STORE_JSON_KEY" > play-store-key.json
         env:
           PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_JSON_KEY }}
 
-#      - name: Build AAB
-#        run: ./gradlew bundleRelease
+      - name: Build Release AAB
+        run: ./gradlew bundleRelease
 
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: play-store-key.json
           packageName: com.paulcoding.hviewer
-#          releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          releaseFiles: app-release.aab
-          track: release
-          status: draft
+          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          track: ${{ github.event.inputs.track }}
