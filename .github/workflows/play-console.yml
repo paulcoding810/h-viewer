@@ -34,4 +34,5 @@ jobs:
           packageName: com.paulcoding.hviewer
 #          releaseFiles: app/build/outputs/bundle/release/app-release.aab
           releaseFiles: app-release.aab
-          track: alpha
+          track: release
+          status: draft
