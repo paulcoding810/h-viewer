@@ -13,9 +13,6 @@ on:
           - alpha
           - beta
           - production
-  push:
-    branches:
-      - feat/*
 jobs:
   publish:
     runs-on: ubuntu-latest
