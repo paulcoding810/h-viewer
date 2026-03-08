@@ -18,7 +18,6 @@ if (keystorePropertiesFile.exists()) {
         keystoreProperties.load(it)
     }
 }
-println("🚀 ~ keystoreProperties: $keystoreProperties")
 
 val versionPropsFile = rootProject.file("version.properties")
 val versionProps = Properties()
