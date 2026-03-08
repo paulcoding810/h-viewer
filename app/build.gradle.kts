@@ -38,7 +38,7 @@ android {
         }
 
         create("release") {
-            storeFile = file(keystoreProperties["storeFile"] as String)
+            storeFile = file("release.keystore")
             keyAlias = keystoreProperties["keyAlias"] as String
             storePassword = keystoreProperties["storePassword"] as String
             keyPassword = keystoreProperties["keyPassword"] as String
