@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.util.prefixIfNot
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -10,6 +11,23 @@ plugins {
     id("kotlin-parcelize")
 }
 
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.inputStream().use {
+        keystoreProperties.load(it)
+    }
+}
+
+val versionPropsFile = rootProject.file("version.properties")
+val versionProps = Properties()
+
+if (versionPropsFile.exists()) {
+    versionPropsFile.inputStream().use {
+        versionProps.load(it)
+    }
+}
+
 android {
     signingConfigs {
         getByName("debug") {
@@ -17,6 +35,13 @@ android {
             keyAlias = "androiddebugkey"
             storePassword = "android"
             keyPassword = "android"
+        }
+
+        create("release") {
+            storeFile = file("release.keystore")
+            keyAlias = keystoreProperties["keyAlias"]?.toString() ?: ""
+            storePassword = keystoreProperties["storePassword"]?.toString() ?: ""
+            keyPassword = keystoreProperties["keyPassword"]?.toString() ?: ""
         }
     }
     namespace = "com.paulcoding.hviewer"
@@ -32,9 +57,9 @@ android {
     defaultConfig {
         applicationId = "com.paulcoding.hviewer"
         minSdk = 26
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.6.1"
+        targetSdk = 35
+        versionCode = versionProps["VERSION_CODE"]?.toString()?.toInt() ?: 1
+        versionName = versionProps["VERSION_NAME"]?.toString() ?: "1.0.0"
 
         buildConfigField("String", "REPO_URL", "\"$repoUrl\"")
 
@@ -57,6 +82,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
