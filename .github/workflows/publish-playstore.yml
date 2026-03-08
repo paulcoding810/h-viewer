@@ -1,19 +1,21 @@
 name: Publish to Play Store
 
 on:
-  workflow_dispatch:
-    inputs:
-      track:
-        description: "Play Store track"
-        required: true
-        default: "internal"
-        type: choice
-        options:
-          - internal
-          - alpha
-          - beta
-          - production
-
+#  workflow_dispatch:
+#    inputs:
+#      track:
+#        description: "Play Store track"
+#        required: true
+#        default: "internal"
+#        type: choice
+#        options:
+#          - internal
+#          - alpha
+#          - beta
+#          - production
+  push:
+    branches:
+      - feat/*
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -42,4 +44,5 @@ jobs:
           serviceAccountJson: play-store-key.json
           packageName: com.paulcoding.hviewer
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
-          track: ${{ github.event.inputs.track }}
+          track: internal
+#          track: ${{ github.event.inputs.track }}
