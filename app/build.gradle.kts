@@ -36,13 +36,6 @@ android {
             storePassword = "android"
             keyPassword = "android"
         }
-
-        create("release") {
-            storeFile = file("release.keystore")
-            keyAlias = keystoreProperties["keyAlias"] as String
-            storePassword = keystoreProperties["storePassword"] as String
-            keyPassword = keystoreProperties["keyPassword"] as String
-        }
     }
     namespace = "com.paulcoding.hviewer"
     compileSdk = 36
@@ -84,7 +77,6 @@ android {
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
