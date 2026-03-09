@@ -141,7 +141,11 @@ fun SettingsPage(
                         stringResource(R.string.open_crash_log),
                         onClick = { navToListScript(ListScriptType.Crash) }
                     ) {
-                        Icon(Icons.Outlined.BugReport, "Open crash log files", Modifier.size(24.dp))
+                        Icon(
+                            imageVector = Icons.Outlined.BugReport,
+                            contentDescription = "Open crash log files",
+                            modifier = Modifier.size(24.dp)
+                        )
                     }
                     HorizontalDivider()
 

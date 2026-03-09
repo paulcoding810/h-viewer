@@ -129,6 +129,7 @@ class SettingsViewModel(
                     preferences.branch = branch
                     preferences.remoteUrl = url
                     configsRepository.saveRemoteScripts(remoteConfigs = siteConfigs)
+                    _uiState.update { it.copy(remoteUrl = url, remoteBranch = branch) }
                     _effect.value = Effect.Toast("Remote config updated")
                 }
                 .onFailure { exception ->
