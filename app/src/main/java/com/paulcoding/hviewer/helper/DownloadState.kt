@@ -20,7 +20,7 @@ import com.paulcoding.hviewer.model.SiteConfig
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun rememberDownloadState(post: PostItem, siteConfig: SiteConfig): DownloadState {
+fun rememberDownloadState(post: PostItem): DownloadState {
     val downloadState by DownloadImageService.downloadStatusFlow.collectAsState()
     val context = LocalContext.current
 
@@ -70,20 +70,6 @@ fun rememberDownloadState(post: PostItem, siteConfig: SiteConfig): DownloadState
         isDownloading = downloadState == DownloadStatus.DOWNLOADING,
         download = ::download
     )
-}
-
-/**
- * Compatibility function for cases where siteConfig is not available.
- * Derives siteConfig from the post URL.
- */
-@Composable
-fun rememberDownloadState(post: PostItem): DownloadState {
-    val postUri = post.url.toUri()
-    val host = postUri.host ?: throw IllegalArgumentException("Invalid post URL: ${post.url}")
-    val siteConfig = GlobalData.siteConfigMap[host]
-        ?: throw IllegalStateException("No site config found for host: $host")
-
-    return rememberDownloadState(post, siteConfig)
 }
 
 /**

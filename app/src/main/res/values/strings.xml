@@ -75,6 +75,7 @@
     <string name="import_json">Import</string>
     <string name="input_json_placeholder">Input your json here...</string>
     <string name="submit">Submit</string>
+    <string name="site_not_supported">Site %1$s not supported</string>
 
     <plurals name="imported_result">
         <item quantity="one">Imported %1$d item</item>

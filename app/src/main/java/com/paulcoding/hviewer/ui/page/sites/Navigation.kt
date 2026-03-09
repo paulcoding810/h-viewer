@@ -1,12 +1,16 @@
 package com.paulcoding.hviewer.ui.page.sites
 
+import android.widget.Toast
 import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.paulcoding.hviewer.R
+import com.paulcoding.hviewer.helper.GlobalData
 import com.paulcoding.hviewer.helper.fadeInWithBlur
 import com.paulcoding.hviewer.helper.fadeOutWithBlur
+import com.paulcoding.hviewer.helper.host
 import com.paulcoding.hviewer.model.PostItem
 import com.paulcoding.hviewer.model.Tag
 import com.paulcoding.hviewer.ui.page.Routes
@@ -108,6 +112,12 @@ fun NavGraphBuilder.sitesNavigation(navController: NavController) {
 fun NavController.navToSearch(url: String) = navigate(Routes.Search(url))
 
 fun NavController.navToPost(postItem: PostItem) {
+    val host = postItem.url.host
+    val siteConfig = GlobalData.siteConfigMap[host]
+    if (siteConfig == null) {
+        Toast.makeText(context, context.getString(R.string.site_not_supported, host), Toast.LENGTH_SHORT).show()
+        return
+    }
     navigate(Routes.Post(postItem))
 }
 
