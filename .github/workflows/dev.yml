@@ -47,4 +47,4 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: app
-          path: app/build/outputs/apk/foss/debug/*.apk
+          path: app/build/outputs/apk/foss/debug/*universal*.apk
