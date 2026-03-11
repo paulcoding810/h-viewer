@@ -41,13 +41,10 @@ jobs:
             gradle-
 
       - name: Build app
-        run: ./gradlew assembleDebug
-
-      - name: Rename apk
-        run: mv app/build/outputs/apk/debug/app-universal-debug.apk hviewer-debug.apk
+        run: ./gradlew assembleFossDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
         with:
           name: app
-          path: hviewer-debug.apk
+          path: app/build/outputs/apk/foss/debug/*.apk
