@@ -80,7 +80,6 @@ android {
     productFlavors {
         create("foss") {
             dimension = "version"
-            signingConfig = signingConfigs["release"]
             // The info block is encrypted and can only be read by google
             dependenciesInfo {
                 includeInApk = false
@@ -89,7 +88,6 @@ android {
         }
         create("gplay") {
             dimension = "version"
-            signingConfig = signingConfigs["release"]
         }
     }
 

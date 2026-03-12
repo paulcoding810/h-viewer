@@ -43,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.paulcoding.hviewer.BuildConfig
 import com.paulcoding.hviewer.R
 import com.paulcoding.hviewer.extensions.setSecureScreen
 import com.paulcoding.hviewer.model.ListScriptType
@@ -58,6 +59,7 @@ import org.koin.androidx.compose.koinViewModel
 fun SettingsPage(
     viewModel: SettingsViewModel = koinViewModel(),
     navToListScript: (ListScriptType) -> Unit,
+    showCheckUpdateIcon: Boolean = BuildConfig.FLAVOR == "foss",
     goBack: () -> Boolean,
 ) {
     val context = LocalContext.current
@@ -166,11 +168,13 @@ fun SettingsPage(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                H7Tap() {
+                H7Tap(onDevModeChange = {
                     viewModel.dispatch(SettingsViewModel.Action.SetDevMode(true))
-                }
-                HIcon(Icons.Outlined.Update) {
-                    viewModel.dispatch(SettingsViewModel.Action.CheckForAppUpdate(showToast = true))
+                })
+                if (showCheckUpdateIcon) {
+                    HIcon(Icons.Outlined.Update) {
+                        viewModel.dispatch(SettingsViewModel.Action.CheckForAppUpdate(showToast = true))
+                    }
                 }
             }
         }

@@ -11,7 +11,6 @@ import com.paulcoding.hviewer.repository.FavoriteRepository
 import com.paulcoding.hviewer.repository.HistoryRepository
 import com.paulcoding.hviewer.repository.SiteConfigsRepository
 import com.paulcoding.hviewer.repository.TabsRepository
-import com.paulcoding.hviewer.repository.UpdateAppRepository
 import com.paulcoding.hviewer.ui.page.editor.EditorViewModel
 import com.paulcoding.hviewer.ui.page.editor.ListScriptViewModel
 import com.paulcoding.hviewer.ui.page.favorite.FavoriteViewModel
@@ -24,7 +23,6 @@ import com.paulcoding.hviewer.ui.page.sites.post.PostViewModel
 import com.paulcoding.hviewer.ui.page.sites.site.PostsViewModel
 import com.paulcoding.hviewer.ui.page.sites.site.SiteViewModel
 import com.paulcoding.hviewer.ui.page.tabs.TabsViewModel
-import com.paulcoding.hviewer.worker.UpdateApkWorker
 import com.paulcoding.hviewer.worker.UpdateScriptsWorker
 import com.tencent.mmkv.MMKV
 import kotlinx.coroutines.CoroutineScope
@@ -68,7 +66,6 @@ val viewModelModule = module {
 
 val repositoryModule = module {
     singleOf(::SiteConfigsRepository)
-    singleOf(::UpdateAppRepository)
     singleOf(::FavoriteRepository)
     singleOf(::HistoryRepository)
     singleOf(::TabsRepository)
@@ -114,6 +111,5 @@ val appModule = module {
         CoroutineScope(SupervisorJob() + Dispatchers.IO)
     }
 
-    workerOf(::UpdateApkWorker)
     workerOf(::UpdateScriptsWorker)
 }

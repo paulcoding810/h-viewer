@@ -41,7 +41,7 @@ jobs:
             gradle-
 
       - name: Build app
-        run: ./gradlew assembleFossDebug
+        run: ./gradlew assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
