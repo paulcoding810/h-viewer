@@ -75,6 +75,22 @@ android {
         }
     }
 
+    flavorDimensions.add("version")
+
+    productFlavors {
+        create("foss") {
+            dimension = "version"
+            // The info block is encrypted and can only be read by google
+            dependenciesInfo {
+                includeInApk = false
+                includeInBundle = false
+            }
+        }
+        create("gplay") {
+            dimension = "version"
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix = ".dev"
@@ -95,6 +111,20 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
         isCoreLibraryDesugaringEnabled = true
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-opt-in=kotlin.ExperimentalStdlibApi",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=kotlinx.coroutines.FlowPreview",
+            "-opt-in=kotlin.time.ExperimentalTime",
+            "-opt-in=kotlin.RequiresOptIn",
+            "-opt-in=kotlin.ExperimentalUnsignedTypes",
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-Xannotation-default-target=param-property"
+        )
     }
 
     buildFeatures {

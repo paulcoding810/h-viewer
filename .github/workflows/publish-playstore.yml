@@ -21,6 +21,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Generate key.properties
+        run: |
+          echo "$KEY_PROPERTIES" > key.properties
+          chmod 600 key.properties
+        env:
+          KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
+
       - name: Setup JDK
         uses: actions/setup-java@v4
         with:
@@ -33,30 +40,20 @@ jobs:
           PLAY_STORE_JSON_KEY: ${{ secrets.PLAY_STORE_JSON_KEY }}
 
       - name: Build Release AAB
-        run: ./gradlew bundleRelease
-
-      - name: Sign APK
-        id: sign_app
-        uses: ilharp/sign-android-release@nightly
-        with:
-          releaseDir: app/build/outputs/bundle/release
-          signingKey: ${{ secrets.SIGNING_KEY }}
-          keyAlias: ${{ secrets.ALIAS }}
-          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
-          buildToolsVersion: ${{ env.ANDROID_BUILD_TOOLS_VERSION }}
+        run: ./gradlew bundleGplayRelease
 
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v7
         with:
-          name: app-release.aab
-          path: app/build/outputs/bundle/release/*signed.aab
+          name: gplay-release.aab
+          path: app/build/outputs/bundle/gplayRelease/*.aab
 
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: play-store-key.json
           packageName: com.paulcoding.hviewer
-          releaseFiles: app/build/outputs/bundle/release/*signed.aab
+          releaseFiles: app/build/outputs/bundle/gplayRelease/*.aab
           track: ${{ github.event.inputs.track }}
+          status: draft

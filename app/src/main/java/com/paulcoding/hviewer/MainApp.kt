@@ -5,15 +5,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import com.paulcoding.hviewer.di.appModule
+import com.paulcoding.hviewer.di.flavorModule
 import com.paulcoding.hviewer.di.repositoryModule
 import com.paulcoding.hviewer.di.viewModelModule
 import com.paulcoding.hviewer.helper.CrashHandler
 import com.paulcoding.hviewer.helper.setupPaths
 import com.paulcoding.hviewer.network.networkModule
-import com.paulcoding.hviewer.worker.scheduleApkUpdate
-import com.paulcoding.hviewer.worker.scheduleScriptsUpdate
+import com.paulcoding.hviewer.worker.ScheduleWorker
 import com.paulcoding.js.JS
 import com.tencent.mmkv.MMKV
+import org.koin.android.ext.android.get
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.workmanager.koin.workManagerFactory
@@ -42,12 +43,12 @@ class MainApp : Application() {
             modules(viewModelModule)
             modules(repositoryModule)
             modules(appModule)
+            modules(flavorModule)
         }
     }
 
     private fun setupWorkers() {
-        scheduleScriptsUpdate(this)
-        scheduleApkUpdate(this)
+        get<ScheduleWorker>().schedule(this)
     }
 
     private fun setupNotificationChannels() {

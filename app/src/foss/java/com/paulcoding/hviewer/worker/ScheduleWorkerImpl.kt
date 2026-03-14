@@ -9,20 +9,23 @@ import androidx.work.WorkManager
 import com.paulcoding.hviewer.helper.calculateDelayUntilMidnight
 import java.util.concurrent.TimeUnit
 
-interface ScheduleWorker {
-    fun schedule(context: Context)
+class ScheduleWorkerImpl() : ScheduleWorker {
+    override fun schedule(context: Context) {
+        scheduleScriptsUpdate(context)
+        scheduleApkUpdate(context)
+    }
 
-    fun scheduleScriptsUpdate(context: Context) {
+    private fun scheduleApkUpdate(context: Context) {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
         val updateScriptsWorkRequest =
-            PeriodicWorkRequestBuilder<UpdateScriptsWorker>(1, TimeUnit.DAYS)
+            PeriodicWorkRequestBuilder<UpdateApkWorker>(1, TimeUnit.DAYS)
                 .setConstraints(constraints)
                 .setInitialDelay(calculateDelayUntilMidnight(), TimeUnit.MILLISECONDS)
                 .build()
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-            "updateScripts",
+            "updateApk",
             ExistingPeriodicWorkPolicy.KEEP,
             updateScriptsWorkRequest
         )
