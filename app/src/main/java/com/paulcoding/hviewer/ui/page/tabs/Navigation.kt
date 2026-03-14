@@ -11,7 +11,7 @@ import com.paulcoding.hviewer.ui.page.Routes
 import com.paulcoding.hviewer.ui.page.sites.navToCustomTag
 
 @SuppressLint("UnrememberedGetBackStackEntry")
-fun NavGraphBuilder.tabsNavigation(navController: NavController, viewModel: TabsViewModel,) {
+fun NavGraphBuilder.tabsNavigation(navController: NavController, viewModel: TabsViewModel) {
     composable<Routes.Tabs>(
         enterTransition = { fadeInWithBlur() },
         exitTransition = { fadeOutWithBlur() },
@@ -31,4 +31,10 @@ fun NavGraphBuilder.tabsNavigation(navController: NavController, viewModel: Tabs
     }
 }
 
-fun NavController.navToTabs() = navigate(Routes.Tabs)
+fun NavController.navToTabs() {
+    val route = Routes.Tabs
+    val popped = popBackStack(route, false)
+    if (!popped) {
+        navigate(route)
+    }
+}
