@@ -1,10 +1,10 @@
 package com.paulcoding.hviewer.helper
 
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 
 class BasePaginationHelper(
@@ -21,7 +21,6 @@ class BasePaginationHelper(
 }
 
 
-@OptIn(FlowPreview::class)
 @Composable
 fun LoadMoreHandler(size: Int, listState: LazyListState, paginationHelper: BasePaginationHelper) {
     LaunchedEffect(listState, size) {
@@ -31,6 +30,17 @@ fun LoadMoreHandler(size: Int, listState: LazyListState, paginationHelper: BaseP
                 if (lastVisibleIndex != null) {
                     paginationHelper.onScroll(lastVisibleIndex, size)
                 }
+            }
+    }
+}
+
+@Composable
+fun LoadMoreHandler(size: Int, pagerState: PagerState, paginationHelper: BasePaginationHelper) {
+    LaunchedEffect(pagerState, size) {
+        snapshotFlow { pagerState.currentPage }
+            .debounce(200L)
+            .collect { lastVisibleIndex ->
+                paginationHelper.onScroll(lastVisibleIndex, size)
             }
     }
 }

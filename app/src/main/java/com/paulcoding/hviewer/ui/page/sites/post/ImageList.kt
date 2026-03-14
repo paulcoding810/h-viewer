@@ -31,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,7 +72,9 @@ fun ImageList(
     val isScrollingUp by listState.isScrollingUpwards()
 
     // Throttle scroll position updates to avoid excessive updates
-    LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
+    LaunchedEffect(
+        remember { derivedStateOf { listState.firstVisibleItemIndex } },
+        remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }) {
         snapshotFlow {
             listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
         }
@@ -111,6 +114,7 @@ fun ImageList(
         isLoading = uiState.isLoading,
         currentPage = uiState.postPage,
         totalPage = uiState.postTotalPage,
+        paginationHelper = paginationHelper,
         bottomRowActions = bottomRowActions,
         goBack = goBack,
     )
@@ -120,6 +124,12 @@ fun ImageList(
 private fun ImageList(
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
+    paginationHelper: BasePaginationHelper = BasePaginationHelper(
+        buffer = 5,
+        isLoading = { false },
+        hasMore = { false },
+        loadMore = { },
+    ),
     images: List<String> = emptyList(),
     bottomRowActions: @Composable (() -> Unit) = {},
     systemBarVisible: Boolean = true,
@@ -221,6 +231,8 @@ private fun ImageList(
         }
     } else {
         val pagerState = rememberPagerState(initialPage = selectedImage!!) { images.size }
+
+        LoadMoreHandler(images.size, pagerState = pagerState, paginationHelper)
 
         HorizontalImageList(
             pagerState = pagerState,
