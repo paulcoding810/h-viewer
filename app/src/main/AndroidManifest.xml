@@ -61,7 +61,7 @@
         <activity
             android:name=".WebActivity"
             android:exported="true"
-            android:theme="@style/Theme.HViewer"></activity>
+            android:theme="@style/Theme.HViewer" />
 
         <service
             android:name=".helper.DownloadImageService"
@@ -89,6 +89,5 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
-        `
     </application>
 </manifest>
